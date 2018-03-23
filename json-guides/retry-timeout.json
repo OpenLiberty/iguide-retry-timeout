@@ -1,0 +1,37 @@
+{
+    "name": "RetryTimeout",
+    "title": "Retry and Timeout",
+    "description": "Learn how to use the MicroProfile Retry and Timeout policies.",
+    "duration": "20 minutes",
+    "audience": "developer",
+    "repo": "https://github.com/OpenLiberty/draft-iguide-retry-timeout",
+    "steps": [
+        {
+            "name": "Intro",
+            "title": "What you'll learn",
+            "guide_duration" : "20 minutes",
+            "description": [
+            ],
+            "sections" : [
+                {
+                    "name": "backgroundConcepts",
+                    "title": "Background concepts",
+                    "description": [
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "ExampleScenario",
+            "title": "Example: bank scenario",
+            "description": [
+            ]
+        },
+        {
+            "name": "WhatNext",
+            "title": "Great work!  You're done!",
+            "description": [
+            ]
+        }
+    ]
+}
