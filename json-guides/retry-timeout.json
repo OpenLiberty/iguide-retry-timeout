@@ -11,12 +11,56 @@
             "title": "What you'll learn",
             "guide_duration" : "20 minutes",
             "description": [
+                "Explore how to use MicroProfile Retry and Timeout policies to make your microservice more fault-tolerant.",
+                "You'll..."
             ],
             "sections" : [
                 {
                     "name": "backgroundConcepts",
                     "title": "Background concepts",
                     "description": [
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "AddLibertyMPFaultTolerance",
+            "title": "Enabling MicroProfile Fault Tolerance",
+            "description": [
+                "Microprofile Fault Tolerance allows microservices to handle unavailable services. It uses different policies to guide the execution and result of some logic. The MicroProfile Fault Tolerance 1.0 feature provides an environment to support resilient microservices through patterns that include bulkheads. Enable the MicroProfile Fault Tolerance 1.0 feature in the <code>server.xml</code> file of the Liberty server where the VirtualFinancialAdvisor microservice runs."
+            ],
+            "instruction": [
+              "Add the following element declaration inside the featureManager element of the <code>server.xml</code> file, or click <action title='Enable MicroProfile Fault Tolerance' onclick=\"retryTimeoutCallback.addMicroProfileFaultToleranceFeatureButton(event)\"><b>&lt;feature>mpFaultTolerance-1.0&lt;/feature&gt;</b></action>. Then, click <action title='Save' onclick=\"retryTimeoutCallback.saveServerXMLButton(event)\"><b>Save</b></action> on the editor menu pane."
+            ],
+            "content": [
+                {
+                    "displayType": "tabbedEditor",
+                    "editorList": [
+                        {
+                            "displayType": "fileEditor",
+                            "fileName": "server.xml",
+                            "preload": [
+                                "<?xml version=\"1.0\"?>",
+                                "<server description=\"Sample Liberty server\">",
+                                "   <featureManager>",
+                                "      <feature>cdi-1.2</feature>",
+                                "   </featureManager>",
+                                "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpsPort=\"${default.https.port}\" httpPort=\"{default.http.port}\"/>",
+                                "</server>"
+                            ],
+                            "save": true,
+                            "readonly": [
+                                {
+                                    "from": "1",
+                                    "to": "3"
+                                },
+                                {
+                                    "from": "5",
+                                    "to": "7"
+                                }
+                            ],
+                            "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForFeatureInServerXML(editor); })"
+                        }
                     ]
                 }
             ]
