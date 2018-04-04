@@ -66,9 +66,28 @@
             ]
         },
         {
-            "name": "ExampleScenario",
+            "name": "BankScenario",
             "title": "Example: bank scenario",
             "description": [
+                "Imagine that you're developing a transaction history microservice for a bank to allow clients to check their online transaction history. The initial naive implementation of the microservice allows customer to click on history transaction. When the transaction history request can not be retrieved via the back-end database that store the transactions, the page is loading for an indefinite amount of time. As you progress through the guide, you will see how the transaction history request being handle using <code>@Timeout</code> and <code>@Retry</code> annotations."
+            ],
+            "sections": [
+                {
+                    "name": "TransactionHistory",
+                    "title": "Request a transaction history",
+                    "description": [
+                        "Begin by requesting an online transaction history."
+                    ],
+                    "instruction": [
+                        "Click <action title='Customer requests a transaction history' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 1)\"><b>Customer requests transaction history</b></action> to retrieve a transaction history. Since the back-end database is down, the page is loading indefinitely trying to retrieve the transaction history."
+                    ],
+                    "content":[
+                        {
+                            "displayType":"pod",
+                            "content": "/guides/draft-iguide-retry-timeout/html/transaction-history-example-scenario.html"
+                        }
+                    ]
+                }
             ]
         },
         {
