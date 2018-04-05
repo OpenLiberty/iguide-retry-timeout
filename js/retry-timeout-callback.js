@@ -10,6 +10,8 @@
 *******************************************************************************/
 var retryTimeoutCallback = (function() {
 
+    var htmlRootDir = "/guides/draft-iguide-retry-timeout/html/";
+
     var listenToEditorForFeatureInServerXML = function(editor) {
         var saveServerXML = function(editor) {
             __saveServerXML(editor);
@@ -173,11 +175,34 @@ var retryTimeoutCallback = (function() {
         }
     };
 
+    var clickTransaction = function(event, stepName, requestNum) {
+        if (event.type === "click" ||
+           (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
+            handleTransactionRequestInBrowser(stepName, requestNum);
+        }
+    };
+
+    var __browserTransactionBaseURL = "https://global-ebank.openliberty.io/transactions";
+    var handleTransactionRequestInBrowser = function(stepName, requestNum) {
+        
+        var browserUrl = __browserTransactionBaseURL;
+        var browser = contentManager.getBrowser(stepName);      
+
+        contentManager.setBrowserURL(stepName, browserUrl, 0);       
+        if (stepName === "TransactionHistory") {
+            // only mark current instruction as complete and delay showing the next instruction until processing is done
+            contentManager.markCurrentInstructionComplete(stepName);
+            var browserContentHTML = htmlRootDir + "transaction-history-loading.html";
+            browser.setBrowserContent(browserContentHTML);
+        }
+    };
+
     return {
         listenToEditorForFeatureInServerXML: listenToEditorForFeatureInServerXML,
         addMicroProfileFaultToleranceFeatureButton: addMicroProfileFaultToleranceFeatureButton,
         addMicroProfileFaultToleranceFeature: __addMicroProfileFaultToleranceFeature,
         saveServerXML: __saveServerXML,
-        saveServerXMLButton: saveServerXMLButton
+        saveServerXMLButton: saveServerXMLButton,
+        clickTransaction: clickTransaction
     }
 })();
