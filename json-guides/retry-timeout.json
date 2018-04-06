@@ -19,8 +19,15 @@
                     "name": "backgroundConcepts",
                     "title": "Background concepts",
                     "description": [
+                        "<b>Transient failures:</b> A brief failure that occurs at irregular an unpredictable times."
                     ]
                 }
+            ]
+        },
+        {
+            "name": "ExampleScenario",
+            "title": "Example: bank scenario",
+            "description": [
             ]
         },
         {
@@ -30,7 +37,7 @@
                 "Microprofile Fault Tolerance allows microservices to handle unavailable services. It uses different policies to guide the execution and result of some logic. The MicroProfile Fault Tolerance 1.0 feature provides an environment to support resilient microservices through patterns that include retry and timeout. Enable the MicroProfile Fault Tolerance 1.0 feature in the <code>server.xml</code> file of the Liberty server."
             ],
             "instruction": [
-              "Add the following element declaration inside the featureManager element of the <code>server.xml</code> file, or click <action title='Enable MicroProfile Fault Tolerance' onclick=\"retryTimeoutCallback.addMicroProfileFaultToleranceFeatureButton(event)\"><b>&lt;feature>mpFaultTolerance-1.0&lt;/feature&gt;</b></action>. Then, click <action title='Save' onclick=\"retryTimeoutCallback.saveServerXMLButton(event)\"><b>Save</b></action> on the editor menu pane."
+                "Add the following element declaration inside the featureManager element of the <code>server.xml</code> file, or click <action title='Enable MicroProfile Fault Tolerance' onclick=\"retryTimeoutCallback.addMicroProfileFaultToleranceFeatureButton(event)\"><b>&lt;feature>mpFaultTolerance-1.0&lt;/feature&gt;</b></action>. Then, click <action title='Save' onclick=\"retryTimeoutCallback.saveServerXMLButton(event)\"><b>Save</b></action> on the editor menu pane."
             ],
             "content": [
                 {
@@ -87,6 +94,325 @@
                             "content": "/guides/draft-iguide-retry-timeout/html/transaction-history-example-scenario.html"
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "name": "AddBasicRetry",
+            "title": "Adding the @Retry annotation",
+            "description": [
+                "A Retry policy helps an application recover from transient failures, like a temporary network glitch. The MicroProfile <code>@Retry</code> annotation defines when to re-attempt an operation that has failed. The policy parameters include options that identify how many retry attempts should be allowed, how long to continue to retry an operation, or how to set a retry or abort condition based on a specific exception. Let's begin by looking at some basic parameters:",
+                "<ul><li><b>maxRetries:</b> The maximum number of retry requests. A value of <code>-1</code> indicates to continue retrying forever. The default is <code>3</code> requests.",
+                "<li><b>maxDuration:</b> The maximum amount of time to perform all retries. Once the duration is reached, no more retry attempts should be initiated.  The default is <code>180000</code> units, as defined by the <code>durationUnit</code> parameter.",
+                "<li><b>durationUnit:</b> The unit of time for the <code>maxDuration</code> parameter as described by <code>java.time.temporal.ChronoUnit</code>. The default is <code>ChronoUnit.MILLIS</code> for milliseconds.<p style='margin-top: 10px;'>The <code>java.time.temporal.ChronoUnit</code> class defines a standard set of date period units, including <code>NANOS, MICROS, MILLIS, SECONDS, MINUTES,</code> and <code>HOURS</code>.",
+                "</ul>",
+                "After you modify your <code>server.xml</code> file to <a href='#enabling-microprofile-fault-tolerance'>include the fault tolerance feature</a>, add a Retry policy to re-invoke the View Transaction microservice up to 10 times if the initial request to the microservice fails.  Once 4 seconds has passed, no more retries should be performed."
+            ],
+            "instruction": [
+                "Add the <code>@Retry</code> annotation on line 14, before the showTransactions method, or click<br> <action title='Add @Retry with maxRetries and maxDuration'>@Retry(maxRetries=10, maxDuration=4,\n       durationUnit=ChronoUnit.SECONDS)</action>.<br> This annotation limits the number of retries to 10. The operation aborts if the total duration of all retries lasts more than 4 seconds.<br> Then, click <action title='Run'><b>Run</b></action> on the editor menu pane."
+            ],
+            "content": [
+                {
+                    "displayType": "tabbedEditor",
+                    "editorList": [
+                        {
+                            "displayType": "tabbedEditor",
+                            "fileName": "ViewTransactionService.java",
+                            "preload": [
+                                "package io.openliberty.guides.retrytimeout.global.eBank.microservices;",
+                                "",
+                                "import javax.enterprise.context.ApplicationScoped;",
+                                "import javax.inject.Inject;",
+                                "import java.time.temporal.ChronoUnit;",
+                                "",
+                                "import org.eclipse.microprofile.faulttolerance.Retry;",
+                                "import org.eclipse.microprofile.faulttolerance.Timeout;",
+                                "import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;",
+                                "",
+                                "@ApplicationScoped",
+                                "public class BankService {",
+                                "    @Inject private BankService bankService;",
+                                "",
+                                "    @Timeout(200)",
+                                "    public Service showTransactions() throws Exception {",
+                                "       Service transactions = new Transactions();",
+                                "       return transactions;",
+                                "   }", 
+                                "}"
+                            ],
+                            "readonly": [
+                                {
+                                    "from": "1",
+                                    "to": "13"
+                                },
+                                {
+                                    "from": "15",
+                                    "to": "20"
+                                }
+                            ],
+                            "save": false 
+                        }    
+                    ]
+                },
+                {
+                    "displayType": "pod"
+                }
+            ]
+        },
+        {
+            "name": "AddDelayRetry",
+            "title": "Configuring a delay",
+            "TOCIndent": 1,
+            "description": [
+                "Sometimes an application should wait before retrying a request to a service to decrease the chance that a previous failure reoccurs.  For example, to allow a sudden spike in requests to lessen or to allow connectivity issues to be resolved.  In this case, you can define a Retry policy with a delay: ",
+                "<ul><li><b>delay:</b> The amount of time to wait between each retry.  The value must be greater than or equal to <code>0</code> and be less than the value for <a href='#adding-the-retry-annotation'><b>maxDuration</b></a>.  The default is <code>0</code>.",
+                "<li><b>delayUnit:</b> The unit of time for the <code>delay</code> parameter as described by <code>java.time.temporal.ChronoUnit</code>.  The default is ChronoUnit.MILLIS. <p style='margin-top: 10px;'>The <code>java.time.temporal.ChronoUnit</code> class defines a standard set of date period units, including <code>NANOS, MICROS, MILLIS, SECONDS, MINUTES,</code> and <code>HOURS</code>.",
+                "<ul>"
+            ],
+            "instruction": [
+                "Update the <code>@Retry</code> annotation on lines 15-16 to include a delay of <code>400ms</code>, or click<br><action title='Add @Retry with delay'>@Retry(maxRetries=10,\n       maxDuration=4,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=400, delayUnit=ChronoUnit.MILLIS)</action>.<br> This indicates there should be a delay of 400ms following each failed request to the View Transaction microservice before retrying another, but no more than 10 retries should occur and retry attempts should stop after 4 seconds.<br> Then, click <action title='Run'><b>Run</b></action> on the editor menu pane."
+            ],
+            "content": [
+                {
+                    "displayType": "tabbedEditor",
+                    "editorList": [
+                        {
+                            "displayType": "tabbedEditor",
+                            "fileName": "ViewTransactionService.java",
+                            "preload": [
+                                "package io.openliberty.guides.retrytimeout.global.eBank.microservices;",
+                                "",
+                                "import javax.enterprise.context.ApplicationScoped;",
+                                "import javax.inject.Inject;",
+                                "import java.time.temporal.ChronoUnit;",
+                                "",
+                                "import org.eclipse.microprofile.faulttolerance.Retry;",
+                                "import org.eclipse.microprofile.faulttolerance.Timeout;",
+                                "import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;",
+                                "",
+                                "@ApplicationScoped",
+                                "public class BankService {",
+                                "    @Inject private BankService bankService;",
+                                "",
+                                "    @Retry(maxRetries=10,",
+                                "           maxDuration=4, durationUnit=ChronoUnit.SECONDS)",
+                                "    @Timeout(200)",
+                                "    public Service showTransactions() throws Exception {",
+                                "       Service transactions = new Transactions();",
+                                "       return transactions;",
+                                "   }", 
+                                "}"
+                            ],
+                            "readonly": [
+                                {
+                                    "from": "1",
+                                    "to": "14"
+                                },
+                                {
+                                    "from": "17",
+                                    "to": "22"
+                                }
+                            ],
+                            "save": false 
+                        }    
+                    ]
+                },
+                {
+                    "displayType": "pod"
+                }
+            ]
+        },
+        {
+            "name": "AddJitterRetry",
+            "title": "Adding jitter to the delay",
+            "TOCIndent": 1,
+            "description": [
+                "The Retry policy also provides a way to add jitter to the delay.  Jitter causes a slight variation in the delay time applied between retries.  For example, a jitter of 200ms will randomly add between -200 and 200 ms to each retry delay interval.",
+                "<ul><li><b>jitter:</b> A random variation applied to the <a href='#configuring-a-delay'>delay</a> interval between retries. The value must be greater than or equal to <code>0</code>. A value of <code>0</code> means that it is not set. The default is <code>200</code> units, as defined by the <code>jitterDelayUnit</code> parameter.",
+                "<li><b>jitterDelayUnit:</b> The unit of time for the <code>jitter</code> parameter as described by <code>java.time.temporal.ChronoUnit</code>.  The default is ChronoUnit.MILLIS. <p style='margin-top: 10px;'>The <code>java.time.temporal.ChronoUnit</code> class defines a standard set of date period units, including <code>NANOS, MICROS, MILLIS, SECONDS, MINUTES,</code> and <code>HOURS</code>.",
+                "</ul>",
+                "Why would you want to add a jitter?  Suppose, for example, that multiple applications are making requests to your microservice causing it to become overloaded.  By adding a jitter to the delay time you allow the retry times of these requests to vary.  Therefore, the cluster of retry requests are spread out over time reducing the chance that the busy service continues to be overloaded."            ],
+            "instruction": [
+                "Add a jitter of 100ms to the delay in the <code>@Retry</code> annotation on lines 15-17, or click<br><action title='Add @Retry with jitter'>@Retry(maxRetries=10,\n       maxDuration=4,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=400, delayUnit=ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit=chronoUnit.MILLIS)</action>.<br> The delay between retries will now be spread out between 300 and 500 milliseconds.<br> Then, click <action title='Run'><b>Run</b></action> on the editor menu pane."
+            ],
+            "content": [
+                {
+                    "displayType": "tabbedEditor",
+                    "editorList": [
+                        {
+                            "displayType": "tabbedEditor",
+                            "fileName": "ViewTransactionService.java",
+                            "preload": [
+                                "package io.openliberty.guides.retrytimeout.global.eBank.microservices;",
+                                "",
+                                "import javax.enterprise.context.ApplicationScoped;",
+                                "import javax.inject.Inject;",
+                                "import java.time.temporal.ChronoUnit;",
+                                "",
+                                "import org.eclipse.microprofile.faulttolerance.Retry;",
+                                "import org.eclipse.microprofile.faulttolerance.Timeout;",
+                                "import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;",
+                                "",
+                                "@ApplicationScoped",
+                                "public class BankService {",
+                                "    @Inject private BankService bankService;",
+                                "",
+                                "    @Retry(maxRetries=10,",
+                                "           maxDuration=4, durationUnit=ChronoUnit.SECONDS,",
+                                "           delay=400, delayUnit=ChronoUnit.MILLIS)",
+                                "    @Timeout(200)",
+                                "    public Service showTransactions() throws Exception {",
+                                "       Service transactions = new Transactions();",
+                                "       return transactions;",
+                                "   }", 
+                                "}"
+                            ],
+                            "readonly": [
+                                {
+                                    "from": "1",
+                                    "to": "14"
+                                },
+                                {
+                                    "from": "18",
+                                    "to": "23"
+                                }
+                            ],
+                            "save": false 
+                        }    
+                    ]
+                },
+                {
+                    "displayType": "pod"
+                }
+            ]
+        },
+        {
+            "name": "AddRetryOnRetry",
+            "title": "Specifying a retry failure condition",
+            "TOCIndent": 1,
+            "description": [
+                "A request to a service may fail for many different reasons. By default, every <code>Throwable</code> initiates a retry.  However, you can base a Retry policy on a specific exception using the <code>retryOn</code> parameter.",
+                "<ul><li><b>retryOn:</b> Specifies an exception class that triggers a retry. You can identify more than one exception as an array of values.  For example,<br><span style='margin-left: 10px;'><code>@Retry(retryOn={RuntimeException.class, TimeoutException.class})</code>.</span><br>The default is <code>java.lang.Exception.class</code>.",
+                "</ul>"
+            ],
+            "instruction": [
+                "Update the <code>@Retry</code> annotation beginning on line 15 to set the retry condition to only take place when a TimeoutException occurs, or click<br> <action title='Add @Retry with the retryOn parameter'>@Retry(maxRetries=10,\n       maxDuration=4,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=400, delayUnit=ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit=ChronoUnit.MILLIS,\n       retryOn=TimeoutException.class)</action>.<br> This Retry policy initiates a retry request to our service for each timeout failure that occurs within 4 seconds from the initial failure, with a maximum of 10 retries spaced between 300 and 500 ms.<br> Then, click <action title='Run'><b>Run</b></action> on the editor menu pane."
+            ],
+            "content": [
+                {
+                    "displayType": "tabbedEditor",
+                    "editorList": [
+                        {
+                            "displayType": "tabbedEditor",
+                            "fileName": "ViewTransactionService.java",
+                            "preload": [
+                                "package io.openliberty.guides.retrytimeout.global.eBank.microservices;",
+                                "",
+                                "import javax.enterprise.context.ApplicationScoped;",
+                                "import javax.inject.Inject;",
+                                "import java.time.temporal.ChronoUnit;",
+                                "",
+                                "import org.eclipse.microprofile.faulttolerance.Retry;",
+                                "import org.eclipse.microprofile.faulttolerance.Timeout;",
+                                "import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;",
+                                "",
+                                "@ApplicationScoped",
+                                "public class BankService {",
+                                "    @Inject private BankService bankService;",
+                                "",
+                                "    @Retry(maxRetries=10,",
+                                "           maxDuration=4, durationUnit=ChronoUnit.SECONDS,",
+                                "           delay=400, delayUnit=ChronoUnit.MILLIS,",
+                                "           jitter=100, jitterDelayUnit=ChronoUnit.MILLIS)",
+                                "    @Timeout(200)",
+                                "    public Service showTransactions() throws Exception {",
+                                "       Service transactions = new Transactions();",
+                                "       return transactions;",
+                                "   }", 
+                                "}"
+                            ],
+                            "readonly": [
+                                {
+                                    "from": "1",
+                                    "to": "14"
+                                },
+                                {
+                                    "from": "19",
+                                    "to": "24"
+                                }
+                            ],
+                            "save": false 
+                        }    
+                    ]
+                },
+                {
+                    "displayType": "pod"
+                }
+            ]
+        },
+        {
+            "name": "AddAbortOnRetry",
+            "title": "Specifying an abort failure condition",
+            "TOCIndent": 1,
+            "description": [
+                "You may decide that other failures should abort all retry attempts and instead fail immediately.  The Retry policy also has a parameter to identify these exceptions:",
+                "<ul><li><b>abortOn:</b>  Specifies an exception class that will stop retries and fail immediately. You can identify more than one exception as an array of values.  For example,<br><span style='margin-left: 10px;'><code>@Retry(retryOn={RuntimeException.class, FileNotFound.class})</code>.</span><br>There is no default value.",
+                "</ul>"
+            ],
+            "instruction": [
+                "Add a condition to the <code>@Retry</code> annotation beginning on line 16 to stop all retry attempts when a FileNotFoundException occurs, or click<br> <action title='Add @Retry with the abortOn parameter'>@Retry(maxRetries=10,\n       maxDuration=4,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=400, delayUnit=ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit=ChronoUnit.MILLIS,\n       retryOn=TimeoutException.class\n       abortOn=FileNotFoundException.class)</action>.<br> This annotation will allow all timeouts to our service to be retried up to 10 times within 4 seconds of the original failure, with a delay of 300 to 500 ms between retry attempts, but will halt all retry attempts and immediately return if a FileNotFoundException occurs.<br> Then, click <action title='Run'><b>Run</b></action> on the editor menu pane."
+            ],
+            "content": [
+                {
+                    "displayType": "tabbedEditor",
+                    "editorList": [
+                        {
+                            "displayType": "tabbedEditor",
+                            "fileName": "ViewTransactionService.java",
+                            "preload": [
+                                "package io.openliberty.guides.retrytimeout.global.eBank.microservices;",
+                                "",
+                                "import javax.enterprise.context.ApplicationScoped;",
+                                "import javax.inject.Inject;",                                
+                                "import java.io.FileNotFoundException;",
+                                "import java.time.temporal.ChronoUnit;",
+                                "",
+                                "import org.eclipse.microprofile.faulttolerance.Retry;",
+                                "import org.eclipse.microprofile.faulttolerance.Timeout;",
+                                "import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;",
+                                "",
+                                "@ApplicationScoped",
+                                "public class BankService {",
+                                "    @Inject private BankService bankService;",
+                                "",
+                                "    @Retry(maxRetries=10,",
+                                "           maxDuration=4, durationUnit=ChronoUnit.SECONDS,",
+                                "           delay=400, delayUnit=ChronoUnit.MILLIS,",
+                                "           jitter=100, jitterDelayUnit=ChronoUnit.MILLIS,",
+                                "           retryOn=TimeoutException.class)",
+                                "    @Timeout(200)",
+                                "    public Service showTransactions() throws Exception {",
+                                "       Service transactions = new Transactions();",
+                                "       return transactions;",
+                                "   }", 
+                                "}"
+                            ],
+                            "readonly": [
+                                {
+                                    "from": "1",
+                                    "to": "15"
+                                },
+                                {
+                                    "from": "21",
+                                    "to": "26"
+                                }
+                            ],
+                            "save": false 
+                        }    
+                    ]
+                },
+                {
+                    "displayType": "pod"
                 }
             ]
         },
