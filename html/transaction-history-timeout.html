@@ -8,72 +8,22 @@
   Contributors:
       IBM Corporation - initial API and implementation
 -->
-<!DOCTYPE html>
-<html>
-<head>
-    <link href="https://fonts.googleapis.com/css?family=Asap" rel="stylesheet">
-    <link rel="stylesheet" href="/guides/iguides-common/css/interactive-guides/bankApp.css">
-    <style>
-        html, body {
-            height: 100%;
-        }
-
-        #fail {
-            display: none;    /** Initially the spinner is showing so hide this div **/
-            height: calc(100% - 85px);
-        }
-
-        .flexWarningContainer {
-            display: flex;
-            flex-wrap: nowrap;
-            flex-direction: column;
-            background:rgba(231,29,50,0.07);
-            justify-content: center;
-            margin: 24px 24px 24px 24px; 
-            flex-grow: 1;
-        }
-
-        .flexWarningContainer > div {
-            text-align: center;
-            line-height: 26px;
-            font-size: 16px;
-            align-self: center;
-            color: #272727;
-            letter-spacing: 0;
-        }
-    </style>
-    <script type="text/javascript">       
-        function timeout() {
-            setTimeout(
-                function displaySystemDown() {
-                    document.getElementById("loader").style.display = "none";
-                    document.getElementById("fail").style.display = "flex";
-                }, 5000);
-        }
-    </script>
-</head>
-<body>    
-    <div class="bankHeadingBlock">
-        <div class="bankHeading">Global eBank</div>
-    </div>
-
-    <div class="stepIntro">
-        <div class="stepIntroText">Transaction History</div>
-    </div>
-    
-    <div id="loader" class="loader"></div>
-    <div id="fail">
-        <div class="flexWarningContainer">
-            <div style="margin-bottom:16px;">
-                <img id="errorImg" style="vertical-align:middle" src="/guides/iguide-circuit-breaker/html/interactive-guides/circuit-breaker/images/warning.svg">
-            </div>
-            <div>Unable to retrieve transaction history.</div>
-            <div>Please try again later.</div>
-        </div>
-    </div>
-   
-    <script type="text/javascript">
-        timeout();
-    </script>
-</body>
-</html>
+<div id="timeoutStep" tabindex="0">
+    <div class="dashboard"></div>
+    <div class='browserHolder'></div>
+</div>
+<script>
+    var stepName = "TimeoutAnnotation";
+    var stepElementId = "timeoutStep";
+    var browser;
+    var content = {
+        url: "https://global-ebank.openliberty.io/",
+        browserContent: "/guides/draft-iguide-retry-timeout/html/global-eBank.html",
+        enableStatusBar: false,
+        enableRefreshButton: false
+    };
+    webBrowser.create($('#' + stepElementId).find('.browserHolder'), stepName, content).done(function (newWebBrowser) {
+        contentManager.setWebBrowser(stepName, newWebBrowser, 0);
+        browser = newWebBrowser;
+    });
+</script>

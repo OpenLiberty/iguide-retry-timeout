@@ -10,6 +10,7 @@
 *******************************************************************************/
 var retryTimeoutCallback = (function() {
 
+    var bankServiceFileName = "BankService.java";
     var htmlRootDir = "/guides/draft-iguide-retry-timeout/html/";
 
     var listenToEditorForFeatureInServerXML = function(editor) {
@@ -46,6 +47,7 @@ var retryTimeoutCallback = (function() {
         });
         contentManager.markTabbedEditorReadOnlyLines(stepName, serverFileName, readOnlyLines);
     };
+
     var __getMicroProfileFaultToleranceFeatureContent = function(content) {
         var editorContents = {};
         try {
@@ -66,6 +68,7 @@ var retryTimeoutCallback = (function() {
         }
         return editorContents;
     };
+
     var __getMicroProfileFaultToleranceFeatureContent = function(content) {
         var editorContents = {};
         try {
@@ -87,6 +90,7 @@ var retryTimeoutCallback = (function() {
         }
         return editorContents;
     };
+
     var __isFaultToleranceInFeatures = function(features) {
         var match = false;
         features = features.replace('\n', '');
@@ -122,6 +126,7 @@ var retryTimeoutCallback = (function() {
         }
         return match;
     };
+
     var __checkMicroProfileFaultToleranceFeatureContent = function(content) {
         var isFTFeatureThere = true;
         var editorContentBreakdown = __getMicroProfileFaultToleranceFeatureContent(content);
@@ -143,14 +148,12 @@ var retryTimeoutCallback = (function() {
         return isFTFeatureThere;
     };
 
-    var __correctEditorError = function(stepName, isSave, fallback) {
+    var __correctEditorError = function(stepName) {
         // correct annotation/method
         if (stepName === "AddLibertyMPFaultTolerance") {
             __addMicroProfileFaultToleranceFeature();
-        }
-        // call save editor
-        if (isSave === true) {
-            __saveButtonEditor(stepName);
+        } else if (stepName === "TimeoutAnnotation") {
+            __addTimeoutInEditor();
         }
     };
 
@@ -167,6 +170,7 @@ var retryTimeoutCallback = (function() {
             editor.createErrorLinkForCallBack(true, __correctEditorError);
         }
     };
+
     var saveServerXMLButton = function(event) {
         if (event.type === "click" ||
            (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
@@ -175,27 +179,110 @@ var retryTimeoutCallback = (function() {
         }
     };
 
-    var clickTransaction = function(event, stepName, requestNum) {
+    var __saveButtonEditor = function(stepName) {
+        contentManager.saveTabbedEditor(stepName, bankServiceFileName);
+    };
+
+    var saveButtonEditor = function(event, stepName) {
         if (event.type === "click" ||
            (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
-            handleTransactionRequestInBrowser(stepName, requestNum);
+            // Click or 'Enter' or 'Space' key event...
+            __saveButtonEditor(stepName);
+        }
+    };
+
+    var listenToEditorForTimeoutAnnotation = function(editor) {
+        editor.addSaveListener(__showPodWithBrowser);
+    };
+
+    var __showPodWithBrowser = function(editor) {
+        var stepName = editor.getStepName();
+        var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
+
+        var htmlFile;
+        if (stepName === "TimeoutAnnotation") {
+            htmlFile = htmlRootDir + "transaction-history-timeout.html";
+        } 
+
+        if (__checkEditorContent(stepName, content)) {
+            editor.closeEditorErrorBox(stepName);
+            var index = contentManager.getCurrentInstructionIndex();
+            if(index === 0){
+                contentManager.markCurrentInstructionComplete(stepName);
+                contentManager.updateWithNewInstructionNoMarkComplete(stepName);
+                // display the pod with chat button and web browser in it
+                contentManager.setPodContent(stepName, htmlFile);
+                // resize the height of the tabbed editor
+                contentManager.resizeTabbedEditor(stepName);               
+            }
+        } else {
+            // display error and provide link to fix it
+            editor.createErrorLinkForCallBack(true, __correctEditorError);
+        }
+    };
+
+    var __checkEditorContent = function(stepName, content) {
+        var contentIsCorrect = true;
+        if (stepName === "TimeoutAnnotation") {
+            contentIsCorrect = __validateEditorTimeoutAnnotationStep(content);
+        } 
+        return contentIsCorrect;
+    };
+
+    var __validateEditorTimeoutAnnotationStep = function(content) {
+        var match = false;
+        try {  
+            var pattern = "@Inject private BankService bankService;\\s*" + // readonly boundary
+            "@\\s*Timeout\\s*\\(\\s*200\\s*\\)\\s*" +
+            "public Service showTransactions()"; // readonly boundary
+            var regExpToMatch = new RegExp(pattern, "g");
+            content.match(regExpToMatch)[0];
+            match = true;
+        } catch (ex) {
+
+        }
+        return match;
+    }
+
+    var __addTimeoutInEditor = function(stepName) {
+        contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
+        var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
+        var newContent = "    @Timeout(200)";
+        contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 9, 9, newContent, 1);
+    };
+
+    var addTimeoutButton = function(event, stepName) {
+        if (event.type === "click" ||
+           (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
+            __addTimeoutInEditor(stepName);
+        }
+    };
+
+    var clickTransaction = function(event, stepName) {
+        if (event.type === "click" ||
+           (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
+            handleTransactionRequestInBrowser(stepName);
         }
     };
 
     var __browserTransactionBaseURL = "https://global-ebank.openliberty.io/transactions";
-    var handleTransactionRequestInBrowser = function(stepName, requestNum) {
-        
+    var handleTransactionRequestInBrowser = function(stepName) {       
         var browserUrl = __browserTransactionBaseURL;
-        var browser = contentManager.getBrowser(stepName);      
-
-        contentManager.setBrowserURL(stepName, browserUrl, 0);       
+        var browser = contentManager.getBrowser(stepName);
+        var browserContentHTML = htmlRootDir + "transaction-history-loading.html";      
+         
+        contentManager.markCurrentInstructionComplete(stepName);
         if (stepName === "TransactionHistory") {
             // only mark current instruction as complete and delay showing the next instruction until processing is done
-            contentManager.markCurrentInstructionComplete(stepName);
-            var browserContentHTML = htmlRootDir + "transaction-history-loading.html";
-            browser.setBrowserContent(browserContentHTML);
+            
+        } else if (stepName == "TimeoutAnnotation") {
+            browserUrl = __browserTransactionBaseURL + "/error";
+            browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";            
         }
+        contentManager.setBrowserURL(stepName, browserUrl, 0);
+        browser.setBrowserContent(browserContentHTML);
     };
+
 
     return {
         listenToEditorForFeatureInServerXML: listenToEditorForFeatureInServerXML,
@@ -203,6 +290,9 @@ var retryTimeoutCallback = (function() {
         addMicroProfileFaultToleranceFeature: __addMicroProfileFaultToleranceFeature,
         saveServerXML: __saveServerXML,
         saveServerXMLButton: saveServerXMLButton,
-        clickTransaction: clickTransaction
+        saveButtonEditor: saveButtonEditor,
+        addTimeoutButton: addTimeoutButton,
+        clickTransaction: clickTransaction,
+        listenToEditorForTimeoutAnnotation: listenToEditorForTimeoutAnnotation
     }
 })();

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!--
+  Copyright (c) 2018 IBM Corporation and others.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+ 
+  Contributors:
+      IBM Corporation - initial API and implementation
+-->
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Asap" rel="stylesheet">
+    <link rel="stylesheet" href="/guides/iguides-common/css/interactive-guides/bankApp.css">
+    <style>
+        html, body {
+            height: 100%;
+        }
+    </style>
+    <script type="text/javascript">       
+        function timeout() {
+            setTimeout(
+                function displaySystemDown() {
+                    document.getElementById("loader").style.display = "none";
+                    document.getElementById("fail").style.display = "flex";
+                }, 200);
+        }
+    </script>
+</head>
+<body>    
+    <div class="bankHeadingBlock">
+        <div class="bankHeading">Global eBank</div>
+        <div class="bankSeparatorLine"></div>
+    </div>
+
+    <!--div class="stepIntro">
+        <div class="stepIntroText">Your Account</div>
+    </div-->
+    
+    <div id="loader" class="loader"></div>
+    <div id="fail">
+        <div class="flexWarningContainer">
+            <div style="margin-bottom:16px;">
+                <img id="errorImg" style="vertical-align:middle" src="/guides/iguide-circuit-breaker/html/interactive-guides/circuit-breaker/images/warning.svg">
+            </div>
+            <div>Your recent transactions were</div>
+            <div>unable to load.</div>
+        </div>
+    </div>
+   
+    <script type="text/javascript">
+        timeout();
+    </script>
+</body>
+</html>
