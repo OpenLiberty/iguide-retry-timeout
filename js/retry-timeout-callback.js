@@ -233,7 +233,7 @@ var retryTimeoutCallback = (function() {
         var match = false;
         try {  
             var pattern = "@Inject private BankService bankService;\\s*" + // readonly boundary
-            "@\\s*Timeout\\s*\\(\\s*200\\s*\\)\\s*" +
+            "@\\s*Timeout\\s*\\(\\s*2000\\s*\\)\\s*" +
             "public Service showTransactions()"; // readonly boundary
             var regExpToMatch = new RegExp(pattern, "g");
             content.match(regExpToMatch)[0];
@@ -247,7 +247,7 @@ var retryTimeoutCallback = (function() {
     var __addTimeoutInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
-        var newContent = "    @Timeout(200)";
+        var newContent = "    @Timeout(2000)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 9, 9, newContent, 1);
     };
 

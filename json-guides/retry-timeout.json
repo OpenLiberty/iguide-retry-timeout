@@ -28,7 +28,7 @@
             "name": "BankScenario",
             "title": "Example: bank scenario",
             "description": [
-                "Imagine that you're developing an online transaction history microservice for a bank to allow clients to check their transaction history. After a customer selects to view their transaction history, the initial naive implementation of the microservice loads indefinitely because the transaction history can not be retrieved from the back-end database that stores the transactions. As you progress through the guide, you will see how the transaction history request being handle using <code>@Timeout</code> and <code>@Retry</code> annotations."
+                "Imagine that you're developing an online transaction history microservice for a bank to allow clients to check their transaction history. After a customer selects to view their transaction history, the initial naive implementation of the microservice loads indefinitely because the transaction history can not be retrieved from the database that stores the transactions."
             ],
             "sections": [
                 {
@@ -38,7 +38,7 @@
                         "Begin by requesting an online transaction history."
                     ],
                     "instruction": [
-                        "Click <action title='Customer requests a transaction history' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 1)\"><b>Customer requests transaction history</b></action> to retrieve a transaction history. Since the back-end database is down, the page loads indefinitely trying to retrieve the transaction history."
+                        "Click <action title='Customer requests a transaction history' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 1)\"><b>Customer requests transaction history</b></action> to retrieve a transaction history. Since the database is down, the page loads indefinitely trying to retrieve the transaction history."
                     ],
                     "content":[
                         {
@@ -88,6 +88,62 @@
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForFeatureInServerXML(editor); })"
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "name": "TimeoutAnnotation",
+            "title": "Adding the @Timeout annotation",
+            "description": [
+                "Now that you've seen the application easily fail when it loads for an indefinite amount of time, let's apply a Timeout policy to limit the time it took to make a transaction history request to the service. Limiting the the amount of time the request is made to a transaction history prevents the the page from loading forever.",
+                "With a Timeout policy, the microservice fail with <code>TimeoutException</code> after the maximum amount of time has passed when the request to a transaction history is made.",
+                "The <code>@Timeout</code> annotation has one parameter that specifies the maximum amount of time it took to make a transaction history request to the service. If the parameter is not specified, the default is <code>1000</code> milliseconds.",
+                "After you modify your <code>server.xml</code> file to <a href='#enabling-microprofile-fault-tolerance'> include the Fault Tolerance feature</a>, add a Timeout policy to the transaction history microservice."
+            ],
+            "instruction": [
+                "Add the <code>@Timeout</code> annotation with a value of <code>2000</code> on line 9, before the <code>showTransactions</code> method, or click <action title='Add @Timeout' onclick=\"retryTimeoutCallback.addTimeoutButton(event, 'TimeoutAnnotation')\">@Timeout(2000)</action>. This annotation limits the time it tooks to retrieve a transaction history to 2000 milliseconds before a <code>TimeoutException</code> occurs. Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'TimeoutAnnotation')\"><b>Run</b></action> on the editor menu pane.",
+                "Click <action title='Customer request a transaction history' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TimeoutAnnotation', 1)\"><b>Customer request a transaction history</b></action> to retrieve a transaction history."
+            ],
+            "content": [
+                {
+                    "displayType": "tabbedEditor",
+                    "editorList": [
+                        {
+                            "displayType": "fileEditor",
+                            "fileName": "BankService.java",
+                            "preload": [
+                                "package io.openliberty.guides.retrytimeout.global.eBank.microservices;",
+                                "import javax.enterprise.context.ApplicationScoped;",
+                                "import javax.inject.Inject;",
+                                "import org.eclipse.microprofile.faulttolerance.Timeout;",
+                                "",
+                                "@ApplicationScoped",
+                                "public class BankService {",
+                                "    @Inject private BankService bankService;",
+                                "",
+                                "    public Service showTransactions() throws Exception {",
+                                "        Service transactions = new Transactions();",
+                                "        return transactions;",
+                                "    }",
+                                "}"
+                            ],
+                            "readonly": [
+                                {
+                                    "from": "1",
+                                    "to": "8"
+                                },
+                                {
+                                    "from": "10",
+                                    "to": "14"
+                                }
+                            ],
+                            "save": false,
+                            "callback": "(function test(tabbedEditor) {retryTimeoutCallback.listenToEditorForTimeoutAnnotation(tabbedEditor); })"
+                        }
+                    ]
+                },
+                {
+                    "displayType": "pod"
                 }
             ]
         },
@@ -403,62 +459,6 @@
                             ],
                             "save": false 
                         }    
-                    ]
-                },
-                {
-                    "displayType": "pod"
-                }
-            ]
-        },
-        {
-            "name": "TimeoutAnnotation",
-            "title": "Adding the @Timeout annotation",
-            "description": [
-                "Now that you've seen the application easily fail when it loads for an indefinite amount of time, let's apply a Timeout policy to limit the time it took to make a transaction history request to the service. Limiting the the amount of time the request is made to a transaction history prevents the the page from loading forever.",
-                "With a Timeout policy, the microservice fail with <code>TimeoutException</code> after the maximum amount of time has passed when the request to a transaction history is made.",
-                "The <code>@Timeout</code> annotation has one parameter that specifies the maximum amount of time it took to make a transaction history request to the service. If the parameter is not specified, the default is <code>1000</code> milliseconds.",
-                "After you modify your <code>server.xml</code> file to <a href='#enabling-microprofile-fault-tolerance'> include the Fault Tolerance feature</a>, add a Timeout policy to the transaction history microservice."
-            ],
-            "instruction": [
-                "Add the <code>@Timeout</code> annotation with a value of <code>200</code> on line 9, before the <code>showTransactions</code> method, or click <action title='Add @Timeout' onclick=\"retryTimeoutCallback.addTimeoutButton(event, 'TimeoutAnnotation')\">@Timeout(200)</action>. This annotation limits the time it tooks to retrieve a transaction history to 200 miliseconds before a <code>TimeoutException</code> occurs. Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'TimeoutAnnotation')\"><b>Run</b></action> on the editor menu pane.",
-                "Click <action title='Customer request a transaction history' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TimeoutAnnotation', 1)\"><b>Customer request a transaction history</b></action> to retrieve a transaction history."
-            ],
-            "content": [
-                {
-                    "displayType": "tabbedEditor",
-                    "editorList": [
-                        {
-                            "displayType": "fileEditor",
-                            "fileName": "BankService.java",
-                            "preload": [
-                                "package io.openliberty.guides.retrytimeout.global.eBank.microservices;",
-                                "import javax.enterprise.context.ApplicationScoped;",
-                                "import javax.inject.Inject;",
-                                "import org.eclipse.microprofile.faulttolerance.Timeout;",
-                                "",
-                                "@ApplicationScoped",
-                                "public class BankService {",
-                                "    @Inject private BankService bankService;",
-                                "",
-                                "    public Service showTransactions() throws Exception {",
-                                "        Service transactions = new Transactions();",
-                                "        return transactions;",
-                                "    }",
-                                "}"
-                            ],
-                            "readonly": [
-                                {
-                                    "from": "1",
-                                    "to": "8"
-                                },
-                                {
-                                    "from": "10",
-                                    "to": "14"
-                                }
-                            ],
-                            "save": false,
-                            "callback": "(function test(tabbedEditor) {retryTimeoutCallback.listenToEditorForTimeoutAnnotation(tabbedEditor); })"
-                        }
                     ]
                 },
                 {

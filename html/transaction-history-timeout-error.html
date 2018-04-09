@@ -17,6 +17,10 @@
         html, body {
             height: 100%;
         }
+
+        #fail {
+            display: none;
+        }
     </style>
     <script type="text/javascript">       
         function timeout() {
@@ -24,7 +28,7 @@
                 function displaySystemDown() {
                     document.getElementById("loader").style.display = "none";
                     document.getElementById("fail").style.display = "flex";
-                }, 200);
+                }, 2000);
         }
     </script>
 </head>
