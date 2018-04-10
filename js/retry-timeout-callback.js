@@ -192,17 +192,19 @@ var retryTimeoutCallback = (function() {
     };
 
     var listenToEditorForTimeoutAnnotation = function(editor) {
-        editor.addSaveListener(__showPodWithBrowser);
+        editor.addSaveListener(__showBrowser);
     };
 
-    var __showPodWithBrowser = function(editor) {
+    var __showBrowser = function(editor) {
         var stepName = editor.getStepName();
         var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
+        var browserURL = __browserTransactionBaseURL;
 
-        //var htmlFile;
-        //if (stepName === "TimeoutAnnotation") {
-        //    htmlFile = htmlRootDir + "transaction-history-timeout.html";
-        //} 
+        var htmlFile;
+        if (stepName === "TimeoutAnnotation") {
+            htmlFile = htmlRootDir + "transaction-history-timeout-error.html";
+            browserURL = __browserTransactionBaseURL + "error";
+        } 
 
         if (__checkEditorContent(stepName, content)) {
             editor.closeEditorErrorBox(stepName);
@@ -210,9 +212,12 @@ var retryTimeoutCallback = (function() {
             if (index === 0) {
                 contentManager.markCurrentInstructionComplete(stepName);
                 contentManager.updateWithNewInstructionNoMarkComplete(stepName);
+                // display web browser   
+                contentManager.setBrowserURL(stepName,  browserURL);              
+                contentManager.showBrowser(stepName);              
+                contentManager.setBrowserContent(stepName, htmlFile);
                 // display the pod with web browser in it
                 //contentManager.setPodContent(stepName, htmlFile);
-                contentManager.showBrowser(stepName);
                 // resize the height of the tabbed editor
                 contentManager.resizeTabbedEditor(stepName);               
             }
@@ -296,7 +301,7 @@ var retryTimeoutCallback = (function() {
         var setBrowserContent = function(currentURL) {
             if (contentManager.getCurrentInstructionIndex(webBrowser.getStepName()) === 1) {
                 // Check if the url is correct before loading content
-                if(webBrowser.getURL() === __browserTransactionBaseURL){
+                if (webBrowser.getURL() === __browserTransactionBaseURL) {
                     webBrowser.setBrowserContent(htmlRootDir + "transaction-history-timeout-error.html");
                     contentManager.markCurrentInstructionComplete(webBrowser.getStepName());
                 }                

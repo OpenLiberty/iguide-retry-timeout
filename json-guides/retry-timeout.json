@@ -38,7 +38,7 @@
                         "Begin by requesting an online transaction history."
                     ],
                     "instruction": [
-                        "Click <action title='Customer requests a transaction history' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 1)\"><b>Customer requests transaction history</b></action> to retrieve a transaction history. Since the database is down, the page loads indefinitely trying to retrieve the transaction history."
+                        "Enter the following URL into the browser that follows, or click <action title='URL' onclick=\"retryTimeoutCallback.populateURL(event, 'TransactionHistory')\"><b>https://global-ebank.openliberty.io/transactions</b></action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory')\"><b>Enter</b></action>. Since the database is down, the page loads indefinitely trying to retrieve the transaction history."
                     ],
                     "content":[
                         {
@@ -101,8 +101,7 @@
                 "After you modify your <code>server.xml</code> file to <a href='#enabling-microprofile-fault-tolerance'> include the Fault Tolerance feature</a>, add a Timeout policy to the transaction history microservice."
             ],
             "instruction": [
-                "Add the <code>@Timeout</code> annotation with a value of <code>2000</code> on line 9, before the <code>showTransactions</code> method, or click <action title='Add @Timeout' onclick=\"retryTimeoutCallback.addTimeoutButton(event, 'TimeoutAnnotation')\">@Timeout(2000)</action>. This annotation limits the time it tooks to retrieve a transaction history to 2000 milliseconds before a <code>TimeoutException</code> occurs. Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'TimeoutAnnotation')\"><b>Run</b></action> on the editor menu pane.",
-                "Type the following URL into the browser that follows, or click <action title='URL' onclick=\"retryTimeoutCallback.populateURL(event, 'TimeoutAnnotation')\"><b>https://global-ebank.openliberty.io/transactions</b></action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TimeoutAnnotation')\"><b>Enter</b></action> to retrieve a transaction history."
+                "Add the <code>@Timeout</code> annotation with a value of <code>2000</code> on line 9, before the <code>showTransactions</code> method, or click <action title='Add @Timeout' onclick=\"retryTimeoutCallback.addTimeoutButton(event, 'TimeoutAnnotation')\">@Timeout(2000)</action>. This annotation limits the time it tooks to retrieve a transaction history to 2000 milliseconds before a <code>TimeoutException</code> occurs. Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'TimeoutAnnotation')\"><b>Run</b></action> on the editor menu pane."
             ],
             "content": [
                 {
