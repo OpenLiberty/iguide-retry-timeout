@@ -199,19 +199,20 @@ var retryTimeoutCallback = (function() {
         var stepName = editor.getStepName();
         var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
 
-        var htmlFile;
-        if (stepName === "TimeoutAnnotation") {
-            htmlFile = htmlRootDir + "transaction-history-timeout.html";
-        } 
+        //var htmlFile;
+        //if (stepName === "TimeoutAnnotation") {
+        //    htmlFile = htmlRootDir + "transaction-history-timeout.html";
+        //} 
 
         if (__checkEditorContent(stepName, content)) {
             editor.closeEditorErrorBox(stepName);
             var index = contentManager.getCurrentInstructionIndex();
-            if(index === 0){
+            if (index === 0) {
                 contentManager.markCurrentInstructionComplete(stepName);
                 contentManager.updateWithNewInstructionNoMarkComplete(stepName);
-                // display the pod with chat button and web browser in it
-                contentManager.setPodContent(stepName, htmlFile);
+                // display the pod with web browser in it
+                //contentManager.setPodContent(stepName, htmlFile);
+                contentManager.showBrowser(stepName);
                 // resize the height of the tabbed editor
                 contentManager.resizeTabbedEditor(stepName);               
             }
@@ -283,6 +284,29 @@ var retryTimeoutCallback = (function() {
         browser.setBrowserContent(browserContentHTML);
     };
 
+    var __populateURL = function(event, stepName) {
+        if (event.type === "click" ||
+           (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
+               // Click or 'Enter' or 'Space' key event...
+            contentManager.setBrowserURL(stepName, __browserTransactionBaseURL);
+        }
+    };
+
+    var __listenToBrowserForTimeoutAnnotation = function(webBrowser) {
+        var setBrowserContent = function(currentURL) {
+            if (contentManager.getCurrentInstructionIndex(webBrowser.getStepName()) === 1) {
+                // Check if the url is correct before loading content
+                if(webBrowser.getURL() === __browserTransactionBaseURL){
+                    webBrowser.setBrowserContent(htmlRootDir + "transaction-history-timeout-error.html");
+                    contentManager.markCurrentInstructionComplete(webBrowser.getStepName());
+                }                
+            }
+        }
+        // Cannot use contentManager.hideBrowser as the browser is still going thru initialization
+        webBrowser.contentRootElement.addClass("hidden");
+        webBrowser.addUpdatedURLListener(setBrowserContent);
+    };
+
 
     return {
         listenToEditorForFeatureInServerXML: listenToEditorForFeatureInServerXML,
@@ -293,6 +317,8 @@ var retryTimeoutCallback = (function() {
         saveButtonEditor: saveButtonEditor,
         addTimeoutButton: addTimeoutButton,
         clickTransaction: clickTransaction,
-        listenToEditorForTimeoutAnnotation: listenToEditorForTimeoutAnnotation
+        listenToEditorForTimeoutAnnotation: listenToEditorForTimeoutAnnotation,
+        listenToBrowserForTimeoutAnnotation: __listenToBrowserForTimeoutAnnotation,
+        populateURL: __populateURL
     }
 })();
