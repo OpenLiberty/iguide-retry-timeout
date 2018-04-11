@@ -252,7 +252,6 @@ var retryTimeoutCallback = (function() {
 
     var __addTimeoutInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
-        //var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Timeout(2000)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 9, 9, newContent, 1);
     };
@@ -316,6 +315,19 @@ var retryTimeoutCallback = (function() {
         webBrowser.addUpdatedURLListener(setBrowserContent);
     };
 
+    var __listenToBrowserForTransactionHistory = function(webBrowser) {
+        var setBrowserContent = function(currentURL) {
+            if (contentManager.getCurrentInstructionIndex(webBrowser.getStepName()) === 1) {
+                // Check if the url is correct before loading content
+                if (webBrowser.getURL() === __browserTransactionBaseURL) {
+                    webBrowser.setBrowserContent(htmlRootDir + "transaction-history-loading.html");
+                    contentManager.markCurrentInstructionComplete(webBrowser.getStepName());
+                }                
+            }
+        }
+        webBrowser.addUpdatedURLListener(setBrowserContent);
+    };
+
     return {
         listenToEditorForFeatureInServerXML: listenToEditorForFeatureInServerXML,
         addMicroProfileFaultToleranceFeatureButton: addMicroProfileFaultToleranceFeatureButton,
@@ -327,6 +339,7 @@ var retryTimeoutCallback = (function() {
         clickTransaction: clickTransaction,
         listenToEditorForTimeoutAnnotation: listenToEditorForTimeoutAnnotation,
         listenToBrowserForTimeoutAnnotation: __listenToBrowserForTimeoutAnnotation,
-        populateURL: __populateURL
+        listenToBrowserForTransactionHistory: __listenToBrowserForTransactionHistory,
+        populateURL: __populateURL      
     }
 })();

@@ -28,7 +28,7 @@
             "name": "BankScenario",
             "title": "Example: bank scenario",
             "description": [
-                "Imagine that you're developing an online transaction history microservice for a bank to allow clients to check their transaction history. When a customer tries to view their transaction history, occasionally unforeseen problem may prevent the data from loading and result in a needless long or indefinite page load."
+                "Imagine that you're developing an online transaction history microservice for a bank to allow clients to check their transaction history. When a customer tries to view their transaction history, occasionally an unforeseen problem may prevent the data from loading and result in a needlessly long or indefinite page load."
             ],
             "sections": [
                 {
@@ -43,8 +43,10 @@
                     ],
                     "content":[
                         {
-                            "displayType":"pod",
-                            "content": "/guides/draft-iguide-retry-timeout/html/transaction-history-example-scenario.html"
+                            "displayType":"webBrowser",
+                            "url": "",
+                            "browserContent": "",                          
+                            "callback": "(function test(webBrowser) {retryTimeoutCallback.listenToBrowserForTransactionHistory(webBrowser); })"
                         }
                     ]
                 }
@@ -146,6 +148,7 @@
                     "displayType":"webBrowser",
                     "url": "",
                     "browserContent": "",
+                    "enableRefreshButton": "false",
                     "callback": "(function test(webBrowser) {retryTimeoutCallback.listenToBrowserForTimeoutAnnotation(webBrowser); })"
                 }
             ]
