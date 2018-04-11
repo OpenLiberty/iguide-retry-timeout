@@ -28,7 +28,7 @@
             "name": "BankScenario",
             "title": "Example: bank scenario",
             "description": [
-                "Imagine that you're developing an online transaction history microservice for a bank to allow clients to check their transaction history. After a customer selects to view their transaction history, the initial naive implementation of the microservice loads indefinitely because the transaction history can not be retrieved from the database that stores the transactions."
+                "Imagine that you're developing an online transaction history microservice for a bank to allow clients to check their transaction history. When a customer tries to view their transaction history, occasionally unforeseen problem may prevent the data from loading and result in a needless long or indefinite page load."
             ],
             "sections": [
                 {
@@ -38,7 +38,8 @@
                         "Begin by requesting an online transaction history."
                     ],
                     "instruction": [
-                        "Enter the following URL into the browser that follows, or click <action title='URL' onclick=\"retryTimeoutCallback.populateURL(event, 'TransactionHistory')\"><b>https://global-ebank.openliberty.io/transactions</b></action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory')\"><b>Enter</b></action>. Since the database is down, the page loads indefinitely trying to retrieve the transaction history."
+                        "Enter the following URL into the browser that follows, or click <action title='URL' onclick=\"retryTimeoutCallback.populateURL(event, 'TransactionHistory')\"><b>https://global-ebank.openliberty.io/transactions</b></action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 1)\"><b>Enter</b></action> to retrieve a transaction history.",
+                        "Click <action title='Refresh' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 2)\"><b>Refresh</b></action> in the browser to see the page loads indefinitely unable to retrieve the transaction history."
                     ],
                     "content":[
                         {
@@ -95,13 +96,13 @@
             "name": "TimeoutAnnotation",
             "title": "Adding the @Timeout annotation",
             "description": [
-                "Now that you've seen the application easily fail when it loads for an indefinite amount of time, let's apply a Timeout policy to to limit the time the request is made to a transaction history and to prevent the page from loading forever.",
-                "With a Timeout policy, the microservice fail with <code>TimeoutException</code> after the set amount of time has passed when the request to a transaction history is made.",
-                "The <code>@Timeout</code> annotation has one parameter that specifies the amount of time it took to make a transaction history request to the service. If the parameter is not specified, the default is <code>1000</code> milliseconds.",
+                "Now that you’ve seen the page loads indefinitely when there is some problem on the server end, let's apply a Timeout policy to limit the time the request is made to a transaction history and to prevent the page from loading for a long time.",
+                "The <code>@Timeout</code> annotation takes an integer value that specifies the time allowed for the request to finish. The value must be greater than or equal to <code>0</code>. <code>0</code> means no timeout configured. If the value is not specified, the default is <code>1000</code> milliseconds.",
+                "With a Timeout policy, the microservice fails with a <code>TimeoutException</code> when the set amount of time passes after the request is made.",
                 "After you modify your <code>server.xml</code> file to <a href='#enabling-microprofile-fault-tolerance'> include the Fault Tolerance feature</a>, add a Timeout policy to the transaction history microservice."
             ],
             "instruction": [
-                "Add the <code>@Timeout</code> annotation with a value of <code>2000</code> on line 9, before the <code>showTransactions</code> method, or click <action title='Add @Timeout' onclick=\"retryTimeoutCallback.addTimeoutButton(event, 'TimeoutAnnotation')\">@Timeout(2000)</action>. This annotation limits the time it tooks to retrieve a transaction history to 2000 milliseconds before a <code>TimeoutException</code> occurs. Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'TimeoutAnnotation')\"><b>Run</b></action> on the editor menu pane."
+                "Add the <code>@Timeout</code> annotation with a value of <code>2000</code> on line 9, before the <code>showTransactions</code> method, or click <action title='Add @Timeout' onclick=\"retryTimeoutCallback.addTimeoutButton(event, 'TimeoutAnnotation')\">@Timeout(2000)</action>. This annotation limits the allowed time for the transaction history request to 2000 milliseconds before a <code>TimeoutException</code> occurs. Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'TimeoutAnnotation')\"><b>Run</b></action> on the editor menu pane."
             ],
             "content": [
                 {

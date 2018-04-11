@@ -153,7 +153,7 @@ var retryTimeoutCallback = (function() {
         if (stepName === "AddLibertyMPFaultTolerance") {
             __addMicroProfileFaultToleranceFeature();
         } else if (stepName === "TimeoutAnnotation") {
-            __addTimeoutInEditor();
+            __addTimeoutInEditor(stepName);
         }
     };
 
@@ -252,7 +252,7 @@ var retryTimeoutCallback = (function() {
 
     var __addTimeoutInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
-        var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
+        //var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Timeout(2000)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 9, 9, newContent, 1);
     };
@@ -264,23 +264,27 @@ var retryTimeoutCallback = (function() {
         }
     };
 
-    var clickTransaction = function(event, stepName) {
+    var clickTransaction = function(event, stepName, numOfRequest) {
         if (event.type === "click" ||
            (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
-            handleTransactionRequestInBrowser(stepName);
+            handleTransactionRequestInBrowser(stepName, numOfRequest);
         }
     };
 
     var __browserTransactionBaseURL = "https://global-ebank.openliberty.io/transactions";
-    var handleTransactionRequestInBrowser = function(stepName) {       
+    var handleTransactionRequestInBrowser = function(stepName, numOfRequest) {       
         var browserUrl = __browserTransactionBaseURL;
         var browser = contentManager.getBrowser(stepName);
-        var browserContentHTML = htmlRootDir + "transaction-history-loading.html";      
+        var browserContentHTML = htmlRootDir + "global-eBank.html";      
          
         contentManager.markCurrentInstructionComplete(stepName);
         if (stepName === "TransactionHistory") {
-            // only mark current instruction as complete and delay showing the next instruction until processing is done
-            
+            if (numOfRequest === 1) {
+                browserContentHTML = htmlRootDir + "transaction-history.html";
+                contentManager.updateWithNewInstructionNoMarkComplete(stepName);
+            } else if (numOfRequest === 2) {
+                browserContentHTML = htmlRootDir + "transaction-history-loading.html";
+            }          
         } else if (stepName == "TimeoutAnnotation") {
             browserUrl = __browserTransactionBaseURL + "/error";
             browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";            
@@ -311,7 +315,6 @@ var retryTimeoutCallback = (function() {
         webBrowser.contentRootElement.addClass("hidden");
         webBrowser.addUpdatedURLListener(setBrowserContent);
     };
-
 
     return {
         listenToEditorForFeatureInServerXML: listenToEditorForFeatureInServerXML,
