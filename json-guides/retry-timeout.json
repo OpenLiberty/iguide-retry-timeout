@@ -28,7 +28,7 @@
             "name": "BankScenario",
             "title": "Example: bank scenario",
             "description": [
-                "Imagine that you're developing an online transaction history microservice for a bank to allow clients to check their transaction history. After a customer selects to view their transaction history, the initial naive implementation of the microservice loads indefinitely because the transaction history can not be retrieved from the back-end database that stores the transactions. As you progress through the guide, you will see how the transaction history request being handle using <code>@Timeout</code> and <code>@Retry</code> annotations."
+                "Imagine that you're developing an online transaction history microservice for a bank to allow clients to check their transaction history. When a customer tries to view their transaction history, occasionally an unforeseen problem may prevent the data from loading and result in a needlessly long or indefinite page load."
             ],
             "sections": [
                 {
@@ -38,12 +38,15 @@
                         "Begin by requesting an online transaction history."
                     ],
                     "instruction": [
-                        "Click <action title='Customer requests a transaction history' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 1)\"><b>Customer requests transaction history</b></action> to retrieve a transaction history. Since the back-end database is down, the page loads indefinitely trying to retrieve the transaction history."
+                        "Enter the following URL into the browser that follows, or click <action title='URL' onclick=\"retryTimeoutCallback.populateURL(event, 'TransactionHistory')\"><b>https://global-ebank.openliberty.io/transactions</b></action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 1)\"><b>Enter</b></action> to retrieve a transaction history.",
+                        "Click <action title='Refresh' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 2)\"><b>Refresh</b></action> in the browser to see the page loads indefinitely unable to retrieve the transaction history."
                     ],
                     "content":[
                         {
-                            "displayType":"pod",
-                            "content": "/guides/draft-iguide-retry-timeout/html/transaction-history-example-scenario.html"
+                            "displayType":"webBrowser",
+                            "url": "",
+                            "browserContent": "",                          
+                            "callback": "(function test(webBrowser) {retryTimeoutCallback.listenToBrowserForTransactionHistory(webBrowser); })"
                         }
                     ]
                 }
@@ -88,6 +91,65 @@
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForFeatureInServerXML(editor); })"
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "name": "TimeoutAnnotation",
+            "title": "Adding the @Timeout annotation",
+            "description": [
+                "Now that you’ve seen the page loads indefinitely when there is some problem on the server end, let's apply a Timeout policy to limit the time the request is made to a transaction history and to prevent the page from loading for a long time.",
+                "The <code>@Timeout</code> annotation takes an integer value that specifies the time allowed for the request to finish. The value must be greater than or equal to <code>0</code>. <code>0</code> means no timeout configured. If the value is not specified, the default is <code>1000</code> milliseconds.",
+                "With a Timeout policy, the microservice fails with a <code>TimeoutException</code> when the set amount of time passes after the request is made.",
+                "After you modify your <code>server.xml</code> file to <a href='#enabling-microprofile-fault-tolerance'> include the Fault Tolerance feature</a>, add a Timeout policy to the transaction history microservice."
+            ],
+            "instruction": [
+                "Add the <code>@Timeout</code> annotation with a value of <code>2000</code> on line 9, before the <code>showTransactions</code> method, or click <action title='Add @Timeout' onclick=\"retryTimeoutCallback.addTimeoutButton(event, 'TimeoutAnnotation')\">@Timeout(2000)</action>. This annotation limits the allowed time for the transaction history request to 2000 milliseconds before a <code>TimeoutException</code> occurs. Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'TimeoutAnnotation')\"><b>Run</b></action> on the editor menu pane."
+            ],
+            "content": [
+                {
+                    "displayType": "tabbedEditor",
+                    "editorList": [
+                        {
+                            "displayType": "fileEditor",
+                            "fileName": "BankService.java",
+                            "preload": [
+                                "package io.openliberty.guides.retrytimeout.global.eBank.microservices;",
+                                "import javax.enterprise.context.ApplicationScoped;",
+                                "import javax.inject.Inject;",
+                                "import org.eclipse.microprofile.faulttolerance.Timeout;",
+                                "",
+                                "@ApplicationScoped",
+                                "public class BankService {",
+                                "    @Inject private BankService bankService;",
+                                "",
+                                "    public Service showTransactions() throws Exception {",
+                                "        Service transactions = new Transactions();",
+                                "        return transactions;",
+                                "    }",
+                                "}"
+                            ],
+                            "readonly": [
+                                {
+                                    "from": "1",
+                                    "to": "8"
+                                },
+                                {
+                                    "from": "10",
+                                    "to": "14"
+                                }
+                            ],
+                            "save": false,
+                            "callback": "(function test(tabbedEditor) {retryTimeoutCallback.listenToEditorForTimeoutAnnotation(tabbedEditor); })"
+                        }
+                    ]
+                },
+                {
+                    "displayType":"webBrowser",
+                    "url": "",
+                    "browserContent": "",
+                    "enableRefreshButton": "false",
+                    "callback": "(function test(webBrowser) {retryTimeoutCallback.listenToBrowserForTimeoutAnnotation(webBrowser); })"
                 }
             ]
         },
