@@ -1,0 +1,146 @@
+<!--
+  Copyright (c) 2018 IBM Corporation and others.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+ 
+  Contributors:
+      IBM Corporation - initial API and implementation
+-->
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Asap" rel="stylesheet">
+     
+    <style>
+        .dashboardHolder {
+            position: relative;
+            width: 100%;
+            height: 75px;
+            left: 0;
+            top: 0;
+        }
+
+        .browserHolder {
+            position: relative;
+            width: 100%;           
+        }
+
+        .timeline {
+            display: flex;
+        /*    justify-content: space-between; */
+            align-items: center;
+            flex-direction: column;
+            position: relative;
+            height: 75px;
+            padding-bottom: 10px;
+        }
+
+        .progressBar {
+            width: 85%;
+            height: 5px;
+            border-radius: 10px;
+            background-image: linear-gradient(-180deg, rgb(58, 64, 80) 0%, rgb(58, 64, 80) 47%, rgb(46, 50, 62) 48%, rgb(46, 50, 62) 100%);
+            padding: 3px;
+            position: relative;
+        }
+
+        .progressBar div {
+            height: 1.5px;
+            background-color: #0099ff;
+            border-radius: 10px;
+            overflow: hidden;
+            width: 0%;
+        }
+
+        .legendText {
+            width: 100%;
+            line-height: 14px;
+        }
+
+        .timelineContainer {
+            width: 100%;
+            position: relative;
+            height: 14px;
+        }
+
+        .tickContainer {
+            position: absolute;
+            width: 85%;
+            height: 10px;
+           /* bottom: 0; or top:0; -- Only needed if ticks are < 14px */
+            margin-left: 7.5%
+        }
+
+        .timelineTick {
+            height: 14px;
+            width: 3px;
+            position: absolute;
+        }
+
+        .timeoutTick {
+            border-radius: 10px 10px 0 0;
+            background-image: linear-gradient(180deg, rgb(204, 0, 0) 0%, rgb(204, 0, 0) 47%, rgb(180, 1, 1) 48%, rgb(180, 1, 1) 100%);
+            left: 3px;  /* 3px to line up with start of progress line; otherwise use a percentage; */
+        }
+
+        .retryTick {
+            border-radius: 0 0 10px 10px;
+            background-image: linear-gradient(180deg, rgb(102, 153, 0) 0%, rgb(102, 153, 0) 47%, rgb(118, 177, 1) 48%, rgb(118, 177, 1) 100%);
+            left: 10%;
+        }
+        .timelineLegend {
+            line-height: 14px;
+            position: absolute;
+            font-size: 12px;
+        }
+
+        .timelineLegendStart{
+            left: 6%;
+        }
+
+        .timelineLegendEnd {
+            right: 5%;
+        }
+    </style>
+</head>
+<body>    
+    <div id="retryBasicStep" class="pod-animation-slide-from-right" tabindex="0" aria-label="Virtual financial advisor chat summary and sample browser window">
+
+        <div class='dashboardHolder'>
+            <div class="timeline">
+                <div class="legendText">Timeout</div>
+                <div class="timelineContainer">
+                    <div class="tickContainer">
+                    </div>
+                </div>
+                <div class="progressBar">
+                    <div></div>
+                </div>
+                <div class="timelineContainer">
+                    <div class="tickContainer">
+                    </div>                    
+                    <div class="timelineLegend timelineLegendStart">0</div>
+                    <div class="timelineLegend timelineLegendEnd">10s</div>
+                </div>    
+                <div class="legendText">Retry</div>
+            </div>
+        </div>
+
+        <div class='browserHolder'></div>
+    </div>
+</body>
+
+<script>
+    var stepName = stepContent.getCurrentStepName();
+    var stepElementId = "retryBasicStep";
+    var browser;
+
+    content = {
+        enableStatusBar: false,
+        callback: function test(webBrowser) {retryTimeoutCallback.listenToBrowserForTransactionHistoryAfterRetry(webBrowser); }
+    };
+    webBrowser.create($('#' + stepElementId).find('.browserHolder'), stepName, content).done(function(newWebBrowser){
+        contentManager.setWebBrowser(stepName, newWebBrowser, 0);
+        browser = newWebBrowser;
+    });
+</script>

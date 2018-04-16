@@ -18,3 +18,95 @@
     overflow: auto;
     border-bottom: 1px solid black;
 }
+
+/* CSS for pods with dashboard and browser */
+.dashboardHolder {
+    position: relative;
+    width: 100%;
+    height: 75px;
+    left: 0;
+    top: 0;
+}
+
+.browserHolder {
+    position: relative;
+    width: 100%;           
+}
+
+.timeline {
+    display: flex;
+/*    justify-content: space-between; */
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    height: 75px;
+    padding-bottom: 10px;
+}
+
+.progressBar {
+    width: 85%;
+    height: 5px;
+    border-radius: 10px;
+    background-image: linear-gradient(-180deg, rgb(58, 64, 80) 0%, rgb(58, 64, 80) 47%, rgb(46, 50, 62) 48%, rgb(46, 50, 62) 100%);
+    padding: 3px;
+    position: relative;
+}
+
+.progressBar div {
+    height: 1.5px;
+    background-color: #0099ff;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 10%;
+}
+
+.legendText {
+    width: 100%;
+    line-height: 14px;
+}
+
+.timelineContainer {
+    width: 100%;
+    position: relative;
+    height: 14px;
+}
+
+.tickContainer {
+    position: absolute;
+    width: 85%;
+    height: 10px;
+   /* bottom: 0; or top:0; -- Only needed if ticks are < 14px */
+    margin-left: 7.5%
+}
+
+.timelineTick {
+    height: 14px;
+    width: 3px;
+    position: absolute;
+}
+
+.timeoutTick {
+    border-radius: 10px 10px 0 0;
+    background-image: linear-gradient(180deg, rgb(204, 0, 0) 0%, rgb(204, 0, 0) 47%, rgb(180, 1, 1) 48%, rgb(180, 1, 1) 100%);
+    left: 3px;  /* 3px to line up with start of progress line; otherwise use a percentage; */
+}
+
+.retryTick {
+    border-radius: 0 0 10px 10px;
+    background-image: linear-gradient(180deg, rgb(102, 153, 0) 0%, rgb(102, 153, 0) 47%, rgb(118, 177, 1) 48%, rgb(118, 177, 1) 100%);
+    left: 10%;
+}
+
+.timelineLegend {
+    line-height: 14px;
+    position: absolute;
+    font-size: 12px;
+}
+
+.timelineLegendStart{
+    left: 7%;
+}
+
+.timelineLegendEnd {
+    right: 5%;
+}
