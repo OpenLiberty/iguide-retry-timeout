@@ -68,6 +68,7 @@
                         {
                             "displayType": "fileEditor",
                             "fileName": "server.xml",
+                            "editorHeight": "300px",
                             "preload": [
                                 "<?xml version=\"1.0\"?>",
                                 "<server description=\"Sample Liberty server\">",
@@ -113,6 +114,7 @@
                         {
                             "displayType": "fileEditor",
                             "fileName": "BankService.java",
+                            "editorHeight": "400px",
                             "preload": [
                                 "package io.openliberty.guides.retrytimeout.global.eBank.microservices;",
                                 "import javax.enterprise.context.ApplicationScoped;",
@@ -125,6 +127,7 @@
                                 "",
                                 "    public Service showTransactions() throws Exception {",
                                 "        Service transactions = new Transactions();",
+                                "        transactions.getTransactions();",
                                 "        return transactions;",
                                 "    }",
                                 "}"
@@ -136,7 +139,7 @@
                                 },
                                 {
                                     "from": "10",
-                                    "to": "14"
+                                    "to": "15"
                                 }
                             ],
                             "save": false,
