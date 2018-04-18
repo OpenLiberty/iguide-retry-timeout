@@ -15,11 +15,10 @@ function requestTransactions (e) {
     request.onreadystatechange = function() {
         if (this.readyState == 4) {
             if (this.status == 200) {
-                document.getElementById('content').innerHTML = request.responseText;
+                document.getElementById('body').innerHTML = request.responseText;
             } else {
-                document.getElementById("content").innerHTML = "<h3 style='text-align:center;'>Transactions could not be retrieved.</h3>";
+                document.getElementById("body").innerHTML = "<h3 style='text-align:center;'>Transactions could not be retrieved.</h3>";
             }
-            document.getElementById('connecting').style.display='none';
         }
     };
     request.open("GET", "/retryTimeoutSample/Bank/transactions", true);

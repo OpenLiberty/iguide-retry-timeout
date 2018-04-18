@@ -15,9 +15,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class Utils {
 
@@ -25,18 +22,25 @@ public class Utils {
         String contents = new String();
         try {
             contents = getHTMLContent("transaction-history.html");
-        } catch (IOException e){
-
+        } catch (Exception e){
         }
         return contents;
     }
 
-	public static String getHTMLForFNFException() {
-		String contents = new String();
+    public static String getHTMLForTimeoutException() {
+        String contents = new String();
         try {
-            contents = getHTMLContent("transaction-history.html");
-        } catch (IOException e){
+            contents = getHTMLContent("transaction-history-timeout-error.html");
+        } catch (Exception e){
+        }
+        return contents;
+    }
 
+    public static String getHTMLForException() {
+        String contents = new String();
+        try {
+            contents = getHTMLContent("transaction-history-error.html");
+        } catch (Exception e){
         }
         return contents;
     }
@@ -55,21 +59,4 @@ public class Utils {
         in.close();
         return response.toString();
     }
-
-    public static String getHTMLBankHeader() {
-        String result = 
-                    "<head><link href='https://fonts.googleapis.com/css?family=Asap' rel='stylesheet'>" +
-                    "      <link rel='stylesheet' href='/bulkheadSample/css/chat.css'></head>" +
-                    "<body>" +
-                    "   <div class='bankHeadingBlock'>" + 
-                    "       <div class='bankHeading'>Global eBank</div>" +
-                    "   </div>" +
-                    "   <div class='chatIntro'>" +
-                    "       <img class='chatIcon' src='/bulkheadSample/images/chat-icon.svg' alt='chat icon'/>" +
-                    "       <span class='chatIntroText'>Chat with a financial advisor</span>" +
-                    "   </div>" +
-                    "   <div id='fallback'>";
-        return result;
-    }
-
 }

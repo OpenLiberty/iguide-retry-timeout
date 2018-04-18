@@ -20,7 +20,7 @@ The <extract-directory>/src directory contains the BankService.java file as show
 The @Timeout and @Retry annotations that are injected into the code are located in BankService.java.
 
 The Transactions.java file contains some configurable variables to control the outcome of the transaction history request.
-If `sleep` is longer than the timeout period specified in @Timeout, the requests will time out. Otherwise, the request will return with the transactions or an exception, depending on the boolean `throwException` in Transactions.java.
+If `sleepTime` is longer than the timeout period specified in @Timeout, the requests will time out. Otherwise, the request will return with the transactions or an exception, depending on the boolean `fetchSuccessful` in Transactions.java.
 
 You can edit the Java files to change the parameter values of the @Timeout and @Retry annotations.
 Changes to the Java files will automatically restart the server to take effect immediately.

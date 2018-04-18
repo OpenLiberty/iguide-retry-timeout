@@ -16,6 +16,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
+
 import io.openliberty.guides.retrytimeout.global.eBank.microservices.Service;
 import io.openliberty.guides.retrytimeout.global.eBank.microservices.Transactions;
 import io.openliberty.guides.retrytimeout.global.eBank.microservices.Utils;
@@ -35,9 +37,11 @@ public class Producer {
             Transactions.resetCount();
             Service trans = bankService.showTransactions();
             returnMsg = trans.toString();
+        } catch (TimeoutException e) {
+            returnMsg = Utils.getHTMLForTimeoutException();
         } catch (Exception e) {
-            returnMsg = e.getMessage();
-        } 
+            returnMsg = Utils.getHTMLForException();
+        }
         return returnMsg;
     }
     

@@ -15,12 +15,19 @@ import java.io.IOException;
 import java.lang.Thread;
 
 public class Transactions extends Service {
+    /*
+    Use these variables to control the execution of the sample app
+        * sleepTime (long) - sleep time in ms. if shorter than @Timeout in BankService.java,
+            the request will successfully finish.
+        * fetchSuccessful (boolean) - true will result in transaction history page.
+            false wil result in error page.
+    */
+    private long sleepTime = 2100;
+    private boolean fetchSuccessful = true;
+
 
     public static int count = 0;
     public static long timeStart = System.currentTimeMillis();
-    
-    private long sleep = 2100;
-    private boolean throwException = false;
 
     public Transactions() throws Exception {
         
@@ -29,15 +36,15 @@ public class Transactions extends Service {
     public void getTransactions() throws Exception {
         System.out.println(((count == 0) ? "Trying..." : "Retrying...") + count + " at " + (System.currentTimeMillis() - timeStart) + "ms");
         count++;
-        Thread.sleep(this.sleep);
-        if (throwException) {
+        Thread.sleep(this.sleepTime);
+        if (!fetchSuccessful) {
             throwException();
         }
         this.service = Utils.getHTMLForTransactions();
     }
 
     private void throwException() throws IOException {
-        this.service = Utils.getHTMLForFNFException();
+        this.service = Utils.getHTMLForException();
         System.out.println("Throwing FileNotFoundException");
         throw new FileNotFoundException();
     }
