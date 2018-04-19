@@ -89,7 +89,6 @@
                                     "to": "7"
                                 }
                             ],
-                            "editorHeight": 300,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForFeatureInServerXML(editor); })"
                         }
                     ]
@@ -165,10 +164,10 @@
                 "A request to a service may fail for many different reasons. The default Retry policy initiates a retry for every <code>Throwable</code>.  However, you can base a Retry policy on a specific exception using the <code>retryOn</code> parameter.",
                 "<ul><li><b>retryOn:</b> Specifies an exception class that triggers a retry. You can identify more than one exception as an array of values.  For example,<br><span style='margin-left: 10px;'><code>@Retry(retryOn={RuntimeException.class, TimeoutException.class})</code>.</span><br>The default is <code>java.lang.Exception.class</code>.",
                 "</ul>",
-                "After modifying the <code>server.xml</code> file to <a href='#enabling-microprofile-fault-tolerance'> include the Fault Tolerance feature</a>, we added a Timeout policy to our sample application which will cause the transaction history microservice to fail with a TimeoutException if the request does not complete within 2000 milliseconds.  Now, let's add a Retry policy to the code to retry the request to the transaction history microservice when a Timeout condition occurs."
+                "After modifying the <code>server.xml</code> file to <a href='#enabling-microprofile-fault-tolerance'> include the Fault Tolerance feature</a>, we added a Timeout policy to our sample application which will cause the transaction history microservice to fail with a <code>TimeoutException</code> if the request does not complete within 2000 milliseconds.  Now, let's add a Retry policy to the code to retry the request to the transaction history microservice when a Timeout condition occurs."
             ],
             "instruction": [
-                "Add the <code>@Retry</code> annotation on line 12, before the showTransactions method, to retry the service request only when a TimeoutException occurs, or click<br> <action title='Add @Retry with the retryOn parameter'>@Retry(retryOn=TimeoutException.class)</action>.<br> Then, click <action title='Run'><b>Run</b></action> on the editor menu pane."
+                "Add the <code>@Retry</code> annotation on line 12, before the showTransactions method, to retry the service request only when a <code>TimeoutException</code> occurs, or click<br> <action title='Add @Retry with the retryOn parameter'>@Retry(retryOn=TimeoutException.class)</action>.<br> Then, click <action title='Run'><b>Run</b></action> on the editor menu pane."
             ],
             "content": [
                 {
@@ -190,7 +189,7 @@
                                 "@ApplicationScoped",
                                 "public class BankService {",
                                 "",
-                                "    @Timeout(200)",
+                                "    @Timeout(2000)",
                                 "    public Service showTransactions() throws Exception {",
                                 "       Service transactions = new Transactions();",
                                 "       transactions.getTransactions();",
@@ -208,7 +207,7 @@
                                     "to": "19"
                                 }
                             ],
-                            "editorHeight": 450,
+                            "editorHeight": "450px",
                             "save": false 
                         }    
                     ]
@@ -219,18 +218,18 @@
             ]
         },
         {
-            "name": "AddBasicRetry",
+            "name": "AddLimitsRetry",
             "title": "Adding retry limits",
             "TOCIndent": 1,
             "description": [
-                "Of course, you will want to set limits on the number of retry attempts. Otherwise, a busy service may become overloaded with retry requests tying up resources and taking even longer to recover from its failing condition.  The <code>@Retry</code> annotation has parameters that limit the number of rety attempts and that limit the amount of time a service can spend retrying.",
+                "Of course, you will want to set limits on the number of retry attempts. Otherwise, a busy service may become overloaded with retry requests tying up resources and taking even longer to recover from its failing condition.  The <code>@Retry</code> annotation has parameters that limit the number of retry attempts and that limit the amount of time a service can spend retrying.",
                 "<ul><li><b>maxRetries:</b> The maximum number of retry requests. A value of <code>-1</code> indicates to continue retrying forever. The default is <code>3</code> requests.",
                 "<li><b>maxDuration:</b> The maximum amount of time to perform all retries. Once the duration is reached, no more retry attempts should be initiated.  The default is <code>180000</code> units, as defined by the <code>durationUnit</code> parameter.",
                 "<li><b>durationUnit:</b> The unit of time for the <code>maxDuration</code> parameter as described by <code>java.time.temporal.ChronoUnit</code>. The default is <code>ChronoUnit.MILLIS</code> for milliseconds.<p style='margin-top: inherit;'>The <code>java.time.temporal.ChronoUnit</code> class defines a standard set of date period units, including <code>NANOS, MICROS, MILLIS, SECONDS, MINUTES,</code> and <code>HOURS</code>.",
                 "</ul>"
             ],
             "instruction": [
-                "Update the <code>@Retry</code> annotation on line 13 to limit the number of retry attempts to 10 and the retry duration to 4 seconds, or click<br> <action title='Add @Retry with maxRetries and maxDuration'>@Retry(retryOn=TimeoutException.class,\n       maxRetries=10,\n       maxDuration=4,\n       durationUnit=ChronoUnit.SECONDS)</action>.<br>This Retry policy initiates a retry request for each TimeoutException that occurs, but limits retry attempts to no more than 10 retries. The operation aborts if the total duration of all retries lasts more than 4 seconds.<br> Then, click <action title='Run'><b>Run</b></action> on the editor menu pane."
+                "Update the <code>@Retry</code> annotation on line 13 to limit the number of retry attempts to 10 and the retry duration to 4 seconds, or click<br> <action title='Add @Retry with maxRetries and maxDuration'>@Retry(retryOn=TimeoutException.class,\n       maxRetries=10,\n       maxDuration=4,\n       durationUnit=ChronoUnit.SECONDS)</action>.<br>This Retry policy initiates a retry request for each <code>TimeoutException</code> that occurs, but limits retry attempts to no more than 10 retries. The operation aborts if the total duration of all retries lasts more than 4 seconds.<br> Then, click <action title='Run'><b>Run</b></action> on the editor menu pane."
             ],
             "content": [
                 {
@@ -253,7 +252,7 @@
                                 "public class BankService {",
                                 "",
                                 "    @Retry(retryOn=TimeoutException.class)",
-                                "    @Timeout(200)",
+                                "    @Timeout(2000)",
                                 "    public Service showTransactions() throws Exception {",
                                 "       Service transactions = new Transactions();",
                                 "       transactions.getTransactions();",
@@ -271,7 +270,7 @@
                                     "to": "20"
                                 }
                             ],
-                            "editorHeight": 468,
+                            "editorHeight": "468px",
                             "save": false 
                         }    
                     ]
@@ -318,7 +317,7 @@
                                 "           maxRetries=10,",
                                 "           maxDuration=4,",
                                 "           durationUnit=ChronoUnit.SECONDS)",
-                                "    @Timeout(200)",
+                                "    @Timeout(2000)",
                                 "    public Service showTransactions() throws Exception {",
                                 "       Service transactions = new Transactions();",
                                 "       transactions.getTransactions();",
@@ -336,7 +335,7 @@
                                     "to": "23"
                                 }
                             ],
-                            "editorHeight": 468,
+                            "editorHeight": "468px",
                             "save": false 
                         }    
                     ]
@@ -357,7 +356,7 @@
                 "</ul>",
                 "Why would you want to add a jitter?  Suppose, for example, that multiple applications are making requests to your microservice causing it to become overloaded.  By adding a jitter to the delay time you allow the retry times of these requests to vary.  Therefore, the cluster of retry requests are spread out over time reducing the chance that the busy service continues to be overloaded."            ],
             "instruction": [
-                "Add a jitter of 100ms to the delay in the <code>@Retry</code> annotation on lines 15-17, or click<br><action title='Add @Retry with jitter'>@Retry(maxRetries=10,\n       maxDuration=4,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=400, delayUnit=ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit=chronoUnit.MILLIS)</action>.<br> The delay between retries will now be spread out between 300 and 500 milliseconds.<br> Click <action title='Run'><b>Run</b></action> on the editor menu pane."
+                "Add a jitter of 100ms to the delay in the <code>@Retry</code> annotation on lines 13-17, or click<br><action title='Add @Retry with jitter'>@Retry(retryOn=TimeoutException.class,\n       maxRetries=10,\n       maxDuration=4,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=400, delayUnit=ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit=chronoUnit.MILLIS)</action>.<br> The delay between retries will now be spread out between 300 and 500 milliseconds.<br> Click <action title='Run'><b>Run</b></action> on the editor menu pane."
             ],
             "content": [
                 {
@@ -384,7 +383,7 @@
                                 "           maxDuration=4,",
                                 "           durationUnit=ChronoUnit.SECONDS,",
                                 "           delay=400, dealyUnit=ChronoUnit.MILLIS)",
-                                "    @Timeout(200)",
+                                "    @Timeout(2000)",
                                 "    public Service showTransactions() throws Exception {",
                                 "       Service transactions = new Transactions();",
                                 "       transactions.getTransactions();",
@@ -402,7 +401,7 @@
                                     "to": "24"
                                 }
                             ],
-                            "editorHeight": 468,
+                            "editorHeight": "468px",
                             "save": false 
                         }    
                     ]
@@ -417,12 +416,12 @@
             "title": "Specifying an abort failure condition",
             "TOCIndent": 1,
             "description": [
-                "You may decide that in some failure conditions all retry attempts should be aborted and instead the service should fail immediately. This prevents the service from retrying for conditions that you know the service cannot recover from, like a FileNotFoundException. The Retry policy also has a parameter to identify these exceptions.",
-                "<ul><li><b>abortOn:</b>  Specifies an exception class that will stop retries and fail immediately. You can identify more than one exception as an array of values.  For example,<br><span style='margin-left: 10px;'><code>@Retry(abortOn={RuntimeException.class, FileNotFound.class})</code>.</span><br>There is no default value.",
+                "You may decide that in some failure conditions all retry attempts should be aborted and instead the service should fail immediately. This prevents the service from retrying for conditions that you know the service cannot recover from, like a <code>FileNotFoundException</code>. The Retry policy also has a parameter to identify these exceptions.",
+                "<ul><li><b>abortOn:</b>  Specifies an exception class that will stop retries and fail immediately. You can identify more than one exception as an array of values.  For example,<br><span style='margin-left: 10px;'><code>@Retry(abortOn={RuntimeException.class, FileNotFoundException.class})</code>.</span><br>There is no default value.",
                 "</ul>"
             ],
             "instruction": [
-                "Add a condition to the <code>@Retry</code> annotation beginning on line 14 to stop all retry attempts when a FileNotFoundException occurs, or click<br> <action title='Add @Retry with the abortOn parameter'>@Retry(maxRetries=10,\n       maxDuration=4,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=400, delayUnit=ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit=ChronoUnit.MILLIS,\n       retryOn=TimeoutException.class,\n       abortOn=FileNotFoundException.class)</action>.<br> This Retry policy will allow all timeouts from our service to be retried up to 10 times within 4 seconds of the original timeout failure, with a delay of 300 to 500 ms between retry attempts, but will halt all retry attempts and immediately return if a FileNotFoundException occurs.<br>Click <action title='Run'><b>Run</b></action> on the editor menu pane."
+                "Add a condition to the <code>@Retry</code> annotation beginning on line 14 to stop all retry attempts when a <code>FileNotFoundException</code> occurs, or click<br> <action title='Add @Retry with the abortOn parameter'>@Retry(retryOn=TimeoutException.class,\n       maxRetries=10,\n       maxDuration=4,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=400, delayUnit=ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit=ChronoUnit.MILLIS,\n       abortOn=FileNotFoundException.class)</action>.<br> This Retry policy will allow all timeouts from our service to be retried up to 10 times within 4 seconds of the original timeout failure, with a delay of 300 to 500 ms between retry attempts, but will halt all retry attempts and immediately return if a <code>FileNotFoundException</code> occurs.<br>Click <action title='Run'><b>Run</b></action> on the editor menu pane."
             ],
             "content": [
                 {
@@ -452,7 +451,7 @@
                                 "           delay=400, dealyUnit=ChronoUnit.MILLIS,",
                                 "           jitter=100,",
                                 "           jitterDelayUnit=ChronoUnite.MILLIS)",
-                                "    @Timeout(200)",
+                                "    @Timeout(2000)",
                                 "    public Service showTransactions() throws Exception {",
                                 "       Service transactions = new Transactions();",
                                 "       transactions.getTransactions();",
@@ -470,7 +469,7 @@
                                     "to": "27"
                                 }
                             ],
-                            "editorHeight": 468,
+                            "editorHeight": "468px",
                             "save": false 
                         }    
                     ]
