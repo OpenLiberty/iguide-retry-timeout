@@ -14,7 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.Thread;
 
-public class Transactions extends Service {
+public class Transactions {
     /*
     Use these variables to control the execution of the sample app
         * sleepTime (long) - sleep time in ms. if shorter than @Timeout in BankService.java,
@@ -28,6 +28,7 @@ public class Transactions extends Service {
 
     public static int count = 0;
     public static long timeStart = System.currentTimeMillis();
+    protected String service = "";
 
     public Transactions() throws Exception {
         
@@ -52,6 +53,10 @@ public class Transactions extends Service {
     public static void resetCount() {
         count = 0;
         timeStart = System.currentTimeMillis();
+    }
+
+    public String toString() {
+        return this.service;
     }
 
 }
