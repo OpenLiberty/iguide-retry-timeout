@@ -17,13 +17,13 @@ import java.lang.Thread;
 public class Transactions {
     /*
     Use these variables to control the execution of the sample app
-        * sleepTime (long) - sleep time in ms. if shorter than @Timeout in BankService.java,
-            the request will successfully finish.
         * fetchSuccessful (boolean) - true will result in transaction history page.
             false wil result in error page.
+        * sleepTime (long) - sleep time in ms. if shorter than @Timeout in BankService.java,
+            the request will successfully finish.
     */
-    private long sleepTime = 2100;
     private boolean fetchSuccessful = true;
+    private long sleepTime = 2100;
 
 
     public static int count = 0;
@@ -37,10 +37,10 @@ public class Transactions {
     public void getTransactions() throws Exception {
         System.out.println(((count == 0) ? "Trying..." : "Retrying...") + count + " at " + (System.currentTimeMillis() - timeStart) + "ms");
         count++;
-        Thread.sleep(this.sleepTime);
         if (!fetchSuccessful) {
             throwException();
         }
+        Thread.sleep(this.sleepTime);
         this.service = Utils.getHTMLForTransactions();
     }
 
