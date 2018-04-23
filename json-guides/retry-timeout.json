@@ -105,7 +105,7 @@
                 "After you modify your <code>server.xml</code> file to <a href='#enabling-microprofile-fault-tolerance'> include the Fault Tolerance feature</a>, add a Timeout policy to the transaction history microservice."
             ],
             "instruction": [
-                "Add the <code>@Timeout</code> annotation with a value of <code>2000</code> on line 9, before the <code>showTransactions</code> method, or click <action title='Add @Timeout' onclick=\"retryTimeoutCallback.addTimeoutButton(event, 'TimeoutAnnotation')\">@Timeout(2000)</action>. This annotation limits the allowed time for the transaction history request to 2000 milliseconds before a <code>TimeoutException</code> occurs. Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'TimeoutAnnotation')\"><b>Run</b></action> on the editor menu pane."
+                "Add the <code>@Timeout</code> annotation with a value of <code>2000</code> on line 8, before the <code>showTransactions</code> method, or click <action title='Add @Timeout' onclick=\"retryTimeoutCallback.addTimeoutButton(event, 'TimeoutAnnotation')\">@Timeout(2000)</action>. This annotation limits the allowed time for the transaction history request to 2000 milliseconds before a <code>TimeoutException</code> occurs. Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'TimeoutAnnotation')\"><b>Run</b></action> on the editor menu pane."
             ],
             "content": [
                 {
@@ -123,7 +123,6 @@
                                 "",
                                 "@ApplicationScoped",
                                 "public class BankService {",
-                                "    @Inject private BankService bankService;",
                                 "",
                                 "    public Service showTransactions() throws Exception {",
                                 "        Service transactions = new Transactions();",
@@ -135,11 +134,11 @@
                             "readonly": [
                                 {
                                     "from": "1",
-                                    "to": "8"
+                                    "to": "7"
                                 },
                                 {
-                                    "from": "10",
-                                    "to": "15"
+                                    "from": "9",
+                                    "to": "14"
                                 }
                             ],
                             "save": false,
