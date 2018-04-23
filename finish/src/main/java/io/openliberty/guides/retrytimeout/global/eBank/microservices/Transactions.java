@@ -46,7 +46,6 @@ public class Transactions {
 
     private void throwException() throws IOException {
         this.service = Utils.getHTMLForException();
-        System.out.println("Throwing FileNotFoundException");
         throw new FileNotFoundException();
     }
 
