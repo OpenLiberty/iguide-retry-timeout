@@ -21,14 +21,13 @@ import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
 
 @ApplicationScoped
 public class BankService {
-    @Timeout(2000) // default is 1000ms
-    @Retry(
-            maxRetries=4,  // default is 3
-            maxDuration=10, durationUnit=ChronoUnit.SECONDS, // default 180000
-            delay=200, delayUnit=ChronoUnit.MILLIS, // default 0
-            jitter=200, jitterDelayUnit=ChronoUnit.MILLIS, // default 200
-            retryOn={TimeoutException.class}, // CONFIRMED: 1 class works w/o brackets
-            abortOn={FileNotFoundException.class})
+    @Timeout(2000) // default 1000ms
+    @Retry( retryOn={TimeoutException.class}, // default Exception.class
+            maxRetries=4, // default 3
+            maxDuration=10, durationUnit=ChronoUnit.SECONDS, // default 180000, MILLIS
+            delay=200, delayUnit=ChronoUnit.MILLIS, // default 0, MILLIS
+            jitter=200, jitterDelayUnit=ChronoUnit.MILLIS, // default 200, MILLIS
+            abortOn={FileNotFoundException.class}) // no default
     public Transactions showTransactions() throws Exception {
         Transactions transactions = new Transactions();
         transactions.getTransactions();
