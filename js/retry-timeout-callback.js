@@ -203,7 +203,7 @@ var retryTimeoutCallback = (function() {
         var htmlFile;
         if (stepName === "TimeoutAnnotation") {
             htmlFile = htmlRootDir + "transaction-history-timeout-error.html";
-            browserURL = __browserTransactionBaseURL + "error";
+            browserURL = __browserTransactionBaseURL + "/error";
         } 
 
         if (__checkEditorContent(stepName, content)) {
@@ -238,7 +238,7 @@ var retryTimeoutCallback = (function() {
     var __validateEditorTimeoutAnnotationStep = function(content) {
         var match = false;
         try {  
-            var pattern = "@Inject private BankService bankService;\\s*" + // readonly boundary
+            var pattern = "public class BankService {\\s*" + // readonly boundary
             "@\\s*Timeout\\s*\\(\\s*2000\\s*\\)\\s*" +
             "public Service showTransactions()"; // readonly boundary
             var regExpToMatch = new RegExp(pattern, "g");
@@ -253,7 +253,7 @@ var retryTimeoutCallback = (function() {
     var __addTimeoutInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Timeout(2000)";
-        contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 9, 9, newContent, 1);
+        contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 7, 7, newContent, 1);
     };
 
     var addTimeoutButton = function(event, stepName) {
