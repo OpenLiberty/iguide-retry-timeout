@@ -253,7 +253,7 @@ var retryTimeoutCallback = (function() {
     var __addTimeoutInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Timeout(2000)";
-        contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 8, 8, newContent, 1);
+        contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 7, 7, newContent, 1);
     };
 
     var addTimeoutButton = function(event, stepName) {
