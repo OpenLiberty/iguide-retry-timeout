@@ -13,16 +13,15 @@
 <head>
     <link href="https://fonts.googleapis.com/css?family=Asap" rel="stylesheet">
     <link rel="stylesheet" href="/guides/iguides-common/css/interactive-guides/bankApp.css">
-    <style>
-        html, body {
-            height: 100%;
-        }
+    <script type="text/javascript"> 
+        var script = document.createElement('script');
+        script.onload = function() {
+            var guideRootDir = "/guides/draft-iguide-retry-timeout/nls/"
+            retrieveExternalizedStrings(guideRootDir);
+        };
+        script.src = '/guides/iguides-common/js/interactive-guides/externalized-string.js';
+        document.getElementsByTagName('head')[0].appendChild(script);
 
-        #fail {
-            display: none;
-        }
-    </style>
-    <script type="text/javascript">       
         function timeout() {
             setTimeout(
                 function displaySystemDown() {
@@ -31,23 +30,45 @@
                 }, 2000);
         }
     </script>
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        #fail {
+            display: none;
+        }
+
+        #errorImg {        
+            vertical-align: middle;
+        }
+
+        #imgHolder {
+            margin-bottom: 16px;
+        }
+
+        #unableToLoad {
+            width: 200px;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+    </style>   
 </head>
 <body>    
     <div class="bankHeadingBlock">
         <div class="bankHeading">Global eBank</div>
     </div>
     <div class="stepIntro">
-        <div class="stepIntroText">Transaction History</div>
+        <div class="stepIntroText" data-externalizedString="YOUR_ACCOUNT"></div>
     </div>
     
     <div id="loader" class="loader"></div>
     <div id="fail">
         <div class="flexWarningContainer">
-            <div style="margin-bottom:16px;">
-                <img id="errorImg" style="vertical-align:middle" src="/guides/iguide-circuit-breaker/html/interactive-guides/circuit-breaker/images/warning.svg">
+            <div id="imgHolder">
+                <img id="errorImg" src="/guides/iguide-circuit-breaker/html/interactive-guides/circuit-breaker/images/warning.svg">
             </div>
-            <div>Your recent transactions were</div>
-            <div>unable to load.</div>
+            <div id="unableToLoad" data-externalizedString="TRANSACTION_UNABLE_TO_LOAD"></div>
         </div>
     </div>
    
