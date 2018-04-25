@@ -291,7 +291,7 @@
                 "<ul>"
             ],
             "instruction": [
-                "Update the <code>@Retry</code> annotation on lines 13-16 to include a delay of 400ms, or click<br><action title='Add @Retry with delay'>@Retry(retryOn = TimeoutException.class,\n       maxRetries=4,\n       maxDuration=10,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=400, delayUnit=ChronoUnit.MILLIS)</action>.<br> This indicates there should be a delay of 400ms following each timeout failure from the View Transaction microservice before retrying another request, but no more than 4 retries should occur and retry attempts should stop after 10 seconds.<br> Then, click <action title='Run'><b>Run</b></action> on the editor menu pane."
+                "Update the <code>@Retry</code> annotation on lines 13-16 to include a delay of 200ms, or click<br><action title='Add @Retry with delay'>@Retry(retryOn = TimeoutException.class,\n       maxRetries=4,\n       maxDuration=10,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=200, delayUnit=ChronoUnit.MILLIS)</action>.<br> This indicates there should be a delay of 200ms following each timeout failure from the View Transaction microservice before retrying another request, but no more than 4 retries should occur and retry attempts should stop after 10 seconds.<br> Then, click <action title='Run'><b>Run</b></action> on the editor menu pane."
             ],
             "content": [
                 {
@@ -356,7 +356,7 @@
                 "</ul>",
                 "Why would you want to add a jitter?  Suppose, for example, that multiple applications are making requests to your microservice causing it to become overloaded.  By adding a jitter to the delay time you allow the retry times of these requests to vary.  Therefore, the cluster of retry requests are spread out over time reducing the chance that the busy service continues to be overloaded."            ],
             "instruction": [
-                "Add a jitter of 100ms to the delay in the <code>@Retry</code> annotation on lines 13-17, or click<br><action title='Add @Retry with jitter'>@Retry(retryOn = TimeoutException.class,\n       maxRetries=4,\n       maxDuration=10,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=400, delayUnit=ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit=chronoUnit.MILLIS)</action>.<br> The delay between retries will now be spread out between 300 and 500 milliseconds.<br> Click <action title='Run'><b>Run</b></action> on the editor menu pane."
+                "Add a jitter of 100ms to the delay in the <code>@Retry</code> annotation on lines 13-17, or click<br><action title='Add @Retry with jitter'>@Retry(retryOn = TimeoutException.class,\n       maxRetries=4,\n       maxDuration=10,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=200, delayUnit=ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit=ChronoUnit.MILLIS)</action>.<br> The delay between retries will now be spread out between 100 and 300 milliseconds.<br> Click <action title='Run'><b>Run</b></action> on the editor menu pane."
             ],
             "content": [
                 {
@@ -382,7 +382,7 @@
                                 "           maxRetries=4,",
                                 "           maxDuration=10,",
                                 "           durationUnit=ChronoUnit.SECONDS,",
-                                "           delay=400, dealyUnit=ChronoUnit.MILLIS)",
+                                "           delay=200, delayUnit=ChronoUnit.MILLIS)",
                                 "    @Timeout(2000)",
                                 "    public Service showTransactions() throws Exception {",
                                 "       Service transactions = new Transactions();",
@@ -421,7 +421,7 @@
                 "</ul>"
             ],
             "instruction": [
-                "Add a condition to the <code>@Retry</code> annotation beginning on line 14 to stop all retry attempts when a <code>FileNotFoundException</code> occurs, or click<br> <action title='Add @Retry with the abortOn parameter'>@Retry(retryOn = TimeoutException.class,\n       maxRetries=4,\n       maxDuration=10,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=400, delayUnit=ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit=ChronoUnit.MILLIS,\n       abortOn=FileNotFoundException.class)</action>.<br> This Retry policy will allow all timeouts from our service to be retried up to 4 times within 10 seconds of the original timeout failure, with a delay of 300 to 500 ms between retry attempts, but will halt all retry attempts and immediately return if a <code>FileNotFoundException</code> occurs.<br>Click <action title='Run'><b>Run</b></action> on the editor menu pane."
+                "Add a condition to the <code>@Retry</code> annotation beginning on line 14 to stop all retry attempts when a <code>FileNotFoundException</code> occurs, or click<br> <action title='Add @Retry with the abortOn parameter'>@Retry(retryOn = TimeoutException.class,\n       maxRetries=4,\n       maxDuration=10,\n       durationUnit=ChronoUnit.SECONDS,\n       delay=200, delayUnit=ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit=ChronoUnit.MILLIS,\n       abortOn=FileNotFoundException.class)</action>.<br> This Retry policy will allow all timeouts from our service to be retried up to 4 times within 10 seconds of the original timeout failure, with a delay of 100 to 300 ms between retry attempts, but will halt all retry attempts and immediately return if a <code>FileNotFoundException</code> occurs.<br>Click <action title='Run'><b>Run</b></action> on the editor menu pane."
             ],
             "content": [
                 {
@@ -448,9 +448,9 @@
                                 "           maxRetries=4,",
                                 "           maxDuration=10,",
                                 "           durationUnit=ChronoUnit.SECONDS,",
-                                "           delay=400, dealyUnit=ChronoUnit.MILLIS,",
+                                "           delay=200, delayUnit=ChronoUnit.MILLIS,",
                                 "           jitter=100,",
-                                "           jitterDelayUnit=ChronoUnite.MILLIS)",
+                                "           jitterDelayUnit=ChronoUnit.MILLIS)",
                                 "    @Timeout(2000)",
                                 "    public Service showTransactions() throws Exception {",
                                 "       Service transactions = new Transactions();",

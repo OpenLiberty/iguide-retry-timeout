@@ -292,7 +292,7 @@ var retryTimeoutCallback = (function() {
         var match = false;
         try {
             var pattern = "public class BankService {\\s*" + // readonly boundary
-            "@\\s*Retry\\s*\\(\\s*retryOn\\s*=\\s*TimeoutException\\.class\\s*\\)\\s*" +
+            "@Retry\\s*\\(\\s*retryOn\\s*=\\s*TimeoutException\\.class\\s*\\)\\s*" +
             "@Timeout\\(2000\\)"; // readonly boundary
             var regExpToMatch = new RegExp(pattern, "g");
             content.match(regExpToMatch)[0];
