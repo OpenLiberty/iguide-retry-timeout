@@ -25,7 +25,15 @@
             overflow: auto;
         }
     </style>
-    <script type="text/javascript">       
+    <script type="text/javascript">
+        var script = document.createElement('script');
+        script.onload = function() {
+            var guideRootDir = "/guides/draft-iguide-retry-timeout/nls/"
+            retrieveExternalizedStrings(guideRootDir);
+        };
+        script.src = '/guides/iguides-common/js/interactive-guides/externalized-string.js';
+        document.getElementsByTagName('head')[0].appendChild(script);
+
         function timeout() {
             setTimeout(
                 function displaySystemDown() {
@@ -40,64 +48,64 @@
         <div class="bankHeading">Global eBank</div>
     </div>
     <div class="stepIntro">
-        <div class="stepIntroText">Your Account</div>
+        <div class="stepIntroText" data-externalizedString="YOUR_ACCOUNT"></div>
     </div>
     
     <div id="loader" class="loader"></div>
     <div id="transHistory">
-        <div class="stepIntroText">Recent Transactions</div>
+        <div class="stepIntroText" data-externalizedString="RECENT_TRANSACTIONS"></div>
         <table class="transaction">
             <tr>
-                <th class="tableText" style="width:130px">DESCRIPTION</th>
-                <th class="bl tableText" style="width:70px">TYPE</th>
-                <th class="bl tableText" style="width:70px">AMOUNT</th>
-                <th class="bl tableText" style="width:70px">BALANCE</th>
+                <th class="tableText" style="width:130px" data-externalizedString="DESCRIPTION"></th>
+                <th class="bl tableText" style="width:70px" data-externalizedString="TYPE"></th>
+                <th class="bl tableText" style="width:70px" data-externalizedString="AMOUNT"></th>
+                <th class="bl tableText" style="width:70px" data-externalizedString="BALANCE"></th>
             </tr>
             <tr>
-                <td class="tableText">APRIL 4, 2018</td>
+                <td class="tableText" data-externalizedString="MONTH"> 4, 2018</td>
                 <td></td>
                 <td></td>
                 <td></td>
             </tr>
             <tr>
-                <td class="bl tableText">Credit card autopay</td>
-                <td class="bl tableText">Debit</td>
+                <td class="bl tableText" data-externalizedString="DESC_CREDIT_CARD"></td>
+                <td class="bl tableText" data-externalizedString="TYPE_DEBIT"></td>
                 <td class="bl tableText">-$200</td>
                 <td class="bl tableText">$1785</td>
             </tr>
             <tr>
-                <td class="tableText">APRIL 3, 2018</td>
+                <td class="tableText" data-externalizedString="MONTH"> 3, 2018</td>
                 <td></td>
                 <td></td>
                 <td></td>
             </tr>
             <tr>
-                <td class="bl tableText">Food</td>
-                <td class="bl tableText">Debit</td>
+                <td class="bl tableText" data-externalizedString="DESC_FOOD"></td>
+                <td class="bl tableText" data-externalizedString="TYPE_DEBIT"></td>
                 <td class="bl tableText">-$15</td>
                 <td class="bl tableText">$1985</td>
             </tr>
             <tr>
-                <td class="tableText">APRIL 2, 2018</td>
+                <td class="tableText"data-externalizedString="MONTH"> 2, 2018</td>
                 <td></td>
                 <td></td>
                 <td></td>
             </tr>
             <tr>
-                <td class="bl tableText">Paycheck</td>
-                <td class="bl tableText">Credit</td>
+                <td class="bl tableText" data-externalizedString="DESC_PAYCHECK"></td>
+                <td class="bl tableText" data-externalizedString="TYPE_CREDIT"></td>
                 <td class="bl tableText greenColor">$1000</td>
                 <td class="bl tableText">$2000</td>
             </tr>
             <tr>
-                <td class="tableText">APRIL 1, 2018</td>
+                <td class="tableText" data-externalizedString="MONTH"> 1, 2018</td>
                 <td></td>
                 <td></td>
                 <td></td>
             </tr>
             <tr>
-                <td class="bl tableText">Check deposit</td>
-                <td class="bl tableText">Deposit</td>
+                <td class="bl tableText" data-externalizedString="DESC_CHECKDEPOSIT"></td>
+                <td class="bl tableText" data-externalizedString="TYPE_DEPOSIT"></td>
                 <td class="bl tableText greenColor">$200</td>
                 <td class="bl tableText">$1000</td>
             </tr>
