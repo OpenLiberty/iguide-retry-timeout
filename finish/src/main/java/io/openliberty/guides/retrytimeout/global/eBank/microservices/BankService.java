@@ -26,7 +26,7 @@ public class BankService {
             maxRetries=4, // default 3
             maxDuration=10, durationUnit=ChronoUnit.SECONDS, // default 180000, MILLIS
             delay=200, delayUnit=ChronoUnit.MILLIS, // default 0, MILLIS
-            jitter=200, jitterDelayUnit=ChronoUnit.MILLIS, // default 200, MILLIS
+            jitter=100, jitterDelayUnit=ChronoUnit.MILLIS, // default 200, MILLIS
             abortOn={FileNotFoundException.class}) // no default
     public Transactions showTransactions() throws Exception {
         Transactions transactions = new Transactions();
