@@ -11,19 +11,19 @@
             "title": "What you'll learn",
             "guide_duration" : "20 minutes",
             "description": [
-                "Explore how to use MicroProfile Retry and Timeout policies to make your microservice more fault-tolerant.",
-                "You'll start with a sample bank scenario and experience a not-so-uncommon network blip. You'll then enable MicroProfile Fault Tolerance to make use of their easy to use policies. Next, you'll use the Timeout policy to prevent requests from hanging for too long. Finally, you'll explore the Retry policy and how it can help overcome brief unpredictable failures your application may experience."
+                "Explore how to use <a href='https://microprofile.io/' target='_blank'>MicroProfile</a> Retry and Timeout policies from the <a href='https://github.com/eclipse/microprofile-fault-tolerance' target='_blank'>Fault Tolerance feature</a> to make your microservice more resilient to common failures.",
+                "You'll start with a sample bank scenario and experience a not-so-uncommon network blip. You'll then enable MicroProfile Fault Tolerance and use the Timeout policy to quickly fail requests that are hanging for too long. Finally, you'll explore the Retry policy and how it can help overcome brief unpredictable failures your application may experience."
             ],
             "sections" : [
                 {
                     "name": "backgroundConcepts",
                     "title": "Background concepts",
                     "description": [
-                        "In this guide, we use the MicroProfile Timeout and Retry policies to fail quickly and recover from brief intermittent issues.",
+                        "In this guide, we use the MicroProfile <b>Timeout</b> and <b>Retry</b> policies to fail quickly and recover from brief intermittent issues. An application may experience these <b>transient failures</b>, especially when it needs to fetch data remotely. Perhaps the database was overloaded by queries, the network connection became unstable, or the site host had a brief downtime. Using Timeout and Retry together can help overcome or alleviate these kinds of transient failures.",
                         "<h4>Timeout</h4>",
-                        "You may have noticed that sometimes a webpage takes a long time to load, only to never finish. Timeout can help by ending requests that have taken too long and are unlikely to return successfully. This is useful to fail quickly without drawing out the waiting time.",
+                        "In some cases, the user may experience a page loading for a long time, only to never finish. Timeout can help by ending requests that have taken too long and are unlikely to return successfully. This is useful to fail quickly without drawing out the waiting time.",
                         "<h4>Retry</h4>",
-                        "An application may experience brief unpredictable failures, especially when it may need to contact some remote database far far away. Retry can help overcome these transient failures by giving the request another chance."
+                        "Sometimes, the underlying issues may be short-lived. In these cases, rather than failing quickly on these transient failures, give the request another chance with the Retry policy. Simply retrying the request after a few seconds may be all you need to avoid showing a dreaded error page."
                     ]
                 }
             ]
