@@ -7,15 +7,14 @@ to build the project and install it in your local repository. The command create
 `target/liberty` directory that contains your Liberty server, retryTimeoutSampleServer, and starts 
 the server.
 
-To start and stop the server, issue the following commands from the
+To start the server, issue the following command from the
 `<extract-directory>` directory:
 
-    mvn liberty:start-server
-    mvn liberty:stop-server
+    mvn liberty:run-server
 
-To view the console logs in realtime as the application is retrying requests, run:
+This will start the server and output the server console.log file in the terminal window.
 
-    tail -f <extract-directory>/target/liberty/wlp/usr/servers/retryTimeoutSampleServer/logs/console.log
+To stop the server, hit <kbd>Ctrl</kbd> + <kbd>C</kbd> or close the terminal window.
 
 To access the sample application, visit the following URL from your browser:
     http://localhost:9080/retryTimeoutSample/transactions
@@ -46,5 +45,5 @@ The `@Retry` annotation has many parameters to configure its usage.
 
 ## Transactions.java
 The Transactions.java file contains some configurable variables to control the outcome of the transaction history request.
-* `sleepTime` controls how long the request takes. If this value is greater than the value specified in `@Timeout`, the requests will time out. If this value is less than the `@Timeout` value, the request will go through successfully.
-* `fetchSuccessful` controls whether the request will be successful or not. If `true`, the request will be made. If `false`, an Exception will be thrown.
+* **sleepTime** controls how long the request takes. If this value is greater than the value specified in `@Timeout`, the requests will time out. If this value is less than the `@Timeout` value, the request will go through successfully.
+* **fetchSuccessful** controls whether the request will be successful or not. If `true`, the request will be made. If `false`, an Exception will be thrown.
