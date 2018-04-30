@@ -101,7 +101,7 @@
             "description": [
                 "Now that you’ve seen the page loads indefinitely when there is some problem on the server end, let's apply a Timeout policy to limit the time the request is made to a transaction history and to prevent the page from loading for a long time.",
                 "The <code>@Timeout</code> annotation takes an integer value that specifies the time allowed for the request to finish. The value must be greater than or equal to <code>0</code>. <code>0</code> means no timeout configured. If the value is not specified, the default is <code>1000</code> milliseconds.",
-                "The <code>@Timeout</code> annotation can also be configure to change the default unit with the following parameters:",
+                "The <code>@Timeout</code> annotation can also be configured to change the default unit with the following parameters:",
                 "<ul><li><b>value</b>: The value that specifies the time allowed for the request to finish.</li><li><b>unit</b>: The unit of time for the value parameter as described by <code>java.time.temporal.ChronoUnit</code>. The default is <code>ChronoUnit.MILLIS</code> for milliseconds.</li><code>The java.time.temporal.ChronoUnit</code> class defines a standard set of date period units, including <code>NANOS, MICROS, MILLIS, SECONDS, MINUTES</code>, and <code>HOURS</code></ul>",
                 "With a Timeout policy, the microservice fails with a <code>TimeoutException</code> when the set amount of time passes after the request is made.",
                 "After you modify your <code>server.xml</code> file to <a href='#enabling-microprofile-fault-tolerance'> include the Fault Tolerance feature</a>, add a Timeout policy to the transaction history microservice."
