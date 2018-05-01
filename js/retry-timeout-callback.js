@@ -195,22 +195,22 @@ var retryTimeoutCallback = (function() {
     };
 
     var listenToEditorForTimeoutAnnotation = function(editor) {
-        editor.addSaveListener(__showBrowser);
+        editor.addSaveListener(__showStartingBrowser)
     };
 
     var listenToEditorForRetryAnnotation = function(editor) {
         editor.addSaveListener(__showStartingBrowser);
     };
 
-    var __showBrowser = function(editor) {
+    var __showStartingBrowser = function(editor) {
         var stepName = editor.getStepName();
         var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
-//        var browserURL = __browserTransactionBaseURL;
 
         var htmlFile;
         if (stepName === "TimeoutAnnotation") {
-            htmlFile = htmlRootDir + "transaction-history-timeout-error.html";
-            browserURL = __browserTransactionBaseURL + "/error";
+            htmlFile = htmlRootDir + "transaction-history-timeout.html";
+        } else if (stepName === "AddRetryOnRetry") {
+            htmlFile = htmlRootDir + "transaction-history-retry-start.html";
         } 
 
         if (__checkEditorContent(stepName, content)) {
@@ -219,40 +219,9 @@ var retryTimeoutCallback = (function() {
             if (index === 0) {
                 contentManager.markCurrentInstructionComplete(stepName);
                 contentManager.updateWithNewInstructionNoMarkComplete(stepName);
-                // display web browser   
-                contentManager.setBrowserURL(stepName,  browserURL);              
-                contentManager.showBrowser(stepName);              
-                contentManager.setBrowserContent(stepName, htmlFile);
-                // display the pod with web browser in it
-                //contentManager.setPodContent(stepName, htmlFile);
-                // resize the height of the tabbed editor
-                contentManager.resizeTabbedEditor(stepName);               
-            }
-        } else {
-            // display error and provide link to fix it
-            editor.createErrorLinkForCallBack(true, __correctEditorError);
-        }
-    };
-
-    var __showStartingBrowser = function(editor) {
-        var stepName = editor.getStepName();
-        var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
-        var browserURL = __browserTransactionBaseURL;
-
-        var htmlFile;
-        if (stepName === "AddRetryOnRetry") {
-            htmlFile = htmlRootDir + "transaction-history-retry-start.html";
-        }
-
-        if (__checkEditorContent(stepName, content)) {
-            editor.closeEditorErrorBox(stepName);
-            var index = contentManager.getCurrentInstructionIndex();
-            if (index === 0) {
-                contentManager.markCurrentInstructionComplete(stepName);
-                contentManager.updateWithNewInstructionNoMarkComplete(stepName);
                 // display empty web browser
-                contentManager.setPodContent(stepName, htmlFile); 
-
+                contentManager.setPodContent(stepName, htmlFile);
+                
                 // resize the height of the tabbed editor
                 contentManager.resizeTabbedEditor(stepName);               
             }
@@ -335,13 +304,9 @@ var retryTimeoutCallback = (function() {
                 contentManager.updateWithNewInstructionNoMarkComplete(stepName);
             } else if (numOfRequest === 2) {
                 browserContentHTML = htmlRootDir + "transaction-history-loading.html";
-            }          
-        } else if (stepName === "TimeoutAnnotation") {
-            browserUrl = __browserTransactionBaseURL + "/error";
-            browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";            
+            }            
         } else if (stepName === "AddRetryOnRetry") {
             browserContentHTML = htmlRootDir + "transaction-history-retry-onRetry.html";
-//            browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";
         }
 
         contentManager.setBrowserURL(stepName, browserUrl, 0);
@@ -354,21 +319,6 @@ var retryTimeoutCallback = (function() {
                // Click or 'Enter' or 'Space' key event...
             contentManager.setBrowserURL(stepName, __browserTransactionBaseURL);
         }
-    };
-
-    var __listenToBrowserForTimeoutAnnotation = function(webBrowser) {
-        var setBrowserContent = function(currentURL) {
-            if (contentManager.getCurrentInstructionIndex(webBrowser.getStepName()) === 1) {
-                // Check if the url is correct before loading content
-                if (webBrowser.getURL() === __browserTransactionBaseURL) {
-                    webBrowser.setBrowserContent(htmlRootDir + "transaction-history-timeout-error.html");
-                    contentManager.markCurrentInstructionComplete(webBrowser.getStepName());
-                }                
-            }
-        }
-        // Cannot use contentManager.hideBrowser as the browser is still going thru initialization
-        webBrowser.contentRootElement.addClass("hidden");
-        webBrowser.addUpdatedURLListener(setBrowserContent);
     };
 
     var __listenToBrowserForTransactionHistory = function(webBrowser) {
@@ -421,7 +371,6 @@ var retryTimeoutCallback = (function() {
         addTimeoutButton: addTimeoutButton,
         clickTransaction: clickTransaction,
         listenToEditorForTimeoutAnnotation: listenToEditorForTimeoutAnnotation,
-        listenToBrowserForTimeoutAnnotation: __listenToBrowserForTimeoutAnnotation,
         listenToBrowserForTransactionHistory: __listenToBrowserForTransactionHistory,
         listenToEditorForRetryAnnotation: listenToEditorForRetryAnnotation,
         listenToBrowserForTransactionHistoryAfterRetry: __listenToBrowserForTransactionHistoryAfterRetry,
