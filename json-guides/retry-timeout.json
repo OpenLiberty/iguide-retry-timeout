@@ -481,7 +481,9 @@
             "name": "WhatNext",
             "title": "Great work!  You're done!",
             "description": [
-            ]
+                "You learned about the benefits of Retry and Timeout policies and how to make your microservice more resilient to failures. You learned that the Timeout policy can be used to quickly fail requests that are hanging for too long. You learned to use the Retry policy to re-attempt an operation that has failed and therefore recovered from unpredictable failures your application may experience.",
+                "<p> <a href='https://github.com/OpenLiberty/iguide-retry-timeout/tree/master/finish/sampleapp_retryTimeout.zip' >Download the sample retry timeout application on github</a>.</p>"
+             ]
         }
     ]
 }
