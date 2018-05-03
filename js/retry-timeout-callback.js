@@ -323,11 +323,19 @@ var retryTimeoutCallback = (function() {
 
     var __listenToBrowserForTransactionHistory = function(webBrowser) {
         var setBrowserContent = function(currentURL) {
-            if (contentManager.getCurrentInstructionIndex(webBrowser.getStepName()) === 1) {
+            var stepName = webBrowser.getStepName();
+            var currentInstructionIndex = contentManager.getCurrentInstructionIndex(stepName);
+            if (currentInstructionIndex === 0) {
+                if (webBrowser.getURL() === __browserTransactionBaseURL) {
+                    webBrowser.setBrowserContent(htmlRootDir + "transaction-history.html");
+                    contentManager.markCurrentInstructionComplete(stepName);
+                    contentManager.updateWithNewInstructionNoMarkComplete(stepName);
+                }               
+            } else if (currentInstructionIndex === 1) {
                 // Check if the url is correct before loading content
                 if (webBrowser.getURL() === __browserTransactionBaseURL) {
                     webBrowser.setBrowserContent(htmlRootDir + "transaction-history-loading.html");
-                    contentManager.markCurrentInstructionComplete(webBrowser.getStepName());
+                    contentManager.markCurrentInstructionComplete(stepName);
                 }                
             }
         }
