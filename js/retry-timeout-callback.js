@@ -213,7 +213,7 @@ var retryTimeoutCallback = (function() {
             htmlFile = htmlRootDir + "transaction-history-timeout.html";
         } else if (stepName === "AddRetryOnRetry") {
             htmlFile = htmlRootDir + "transaction-history-retry-start.html";
-        } 
+        }
 
         if (__checkEditorContent(stepName, content)) {
             editor.closeEditorErrorBox(stepName);
@@ -225,7 +225,7 @@ var retryTimeoutCallback = (function() {
                 contentManager.setPodContent(stepName, htmlFile);
                 
                 // resize the height of the tabbed editor
-                contentManager.resizeTabbedEditor(stepName);               
+                contentManager.resizeTabbedEditor(stepName);
             }
         } else {
             // display error and provide link to fix it
@@ -246,7 +246,7 @@ var retryTimeoutCallback = (function() {
 
     var __validateEditorTimeoutAnnotationStep = function(content) {
         var match = false;
-        try {  
+        try {
             var pattern = "public class BankService {\\s*" + // readonly boundary
             "@\\s*Timeout\\s*\\(\\s*2000\\s*\\)\\s*" +
             "public Service showTransactions()"; // readonly boundary
@@ -291,30 +291,26 @@ var retryTimeoutCallback = (function() {
         if (event.type === "click" ||
            (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
                var browser = contentManager.getBrowser(stepName);
-               browser.setURL(__browserTransactionBaseURL);
                handleTransactionRequestInBrowser(stepName, numOfRequest);
         }
     };
 
-    var handleTransactionRequestInBrowser = function(stepName, numOfRequest) {       
-        var browserUrl = __browserTransactionBaseURL;
+    var handleTransactionRequestInBrowser = function(stepName, numOfRequest) {
         var browser = contentManager.getBrowser(stepName);
-        var browserContentHTML = htmlRootDir + "global-eBank.html";      
-        
-        if (numOfRequest !== -1) {        
+        var browserContentHTML = htmlRootDir + "global-eBank.html";
+
+        browser.setURL(__browserTransactionBaseURL); 
+
+        if (numOfRequest !== -1) {
             contentManager.markCurrentInstructionComplete(stepName);
-        }            
+        }
         if (stepName === "TransactionHistory") {
             if (numOfRequest === 1) {
                 browserContentHTML = htmlRootDir + "transaction-history.html";
                 contentManager.updateWithNewInstructionNoMarkComplete(stepName);
             } else if (numOfRequest === 2) {
                 browserContentHTML = htmlRootDir + "transaction-history-loading.html";
-            }          
-        } else if (stepName === "TimeoutAnnotation") {
-            browserUrl = __browserTransactionBaseURL + "/error";
-            contentManager.setBrowserURL(stepName, browserUrl, 0);
-            browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";            
+            }
         } else if (stepName === "AddRetryOnRetry" || stepName === "AddLimitsRetry") {
             browserContentHTML = htmlRootDir + "transaction-history-loading.html";
         }
@@ -361,15 +357,15 @@ var retryTimeoutCallback = (function() {
      * @param delayInMS        - Delay in milliseconds
      * @param jitterInMS       - Jitter in milliseconds
      * @param timeout          - Timeout value in milliseconds
-     * @param timeoutCount     - Running count on how many timeouts have been 
+     * @param timeoutCount     - Running count on how many timeouts have been
      *                               processed.  Initialized to 0.
      * @param timeoutsToSimulate   - Number of timeouts to simulate.
      * @param elapsedRetryProgress - Running total of the number of milliseconds
      *                                   that have passed on the dashboard.
-     * @param currentPctProgress   - Percent completed on dashboard
+     * @param currentPctProgress   - Percent completed on timeline
      * @param timeoutTickContainer - Where to place the timeout ticks
      * @param retryTickContainer   - Where to place the retry ticks
-     * @param $progressBar         - JQuery object of the progress bar  
+     * @param $progressBar         - JQuery object of the progress bar
      */
     var setTicks = function(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar) {
         timeoutCount++;
@@ -401,23 +397,29 @@ var retryTimeoutCallback = (function() {
      * @param delayInMS        - Delay in milliseconds
      * @param jitterInMS       - Jitter in milliseconds
      * @param timeout          - Timeout value in milliseconds
-     * @param timeoutCount     - Running count on how many timeouts have been 
+     * @param timeoutCount     - Running count on how many timeouts have been
      *                               processed.  Initialized to 0.
      * @param timeoutsToSimulate   - Number of timeouts to simulate.
      * @param elapsedRetryProgress - Running total of the number of milliseconds
      *                                   that have passed on the dashboard.
-     * @param currentPctProgress   - Percent completed on dashboard
+     * @param currentPctProgress   - Percent completed on timeline
      * @param timeoutTickContainer - Where to place the timeout ticks
      * @param retryTickContainer   - Where to place the retry ticks
-     * @param $progressBar         - JQuery object of the progress bar  
+     * @param $progressBar         - JQuery object of the progress bar
      */
     var setProgressBar = function(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar){
         var progress1pct = maxDurationInMS * .01;  // Number Milliseconds in 1% of timeline.
         var moveProgressBar = setInterval( function() {
-            // Moves the timeline forward 1% at a time.  If no more timeouts should 
+            // Moves the timeline forward 1% at a time.  If no more timeouts should
             // be processed it stops and shows the transaction history.
             if (timeoutCount === timeoutsToSimulate) {
                 clearInterval(moveProgressBar);
+                currentPctProgress += 3; // Advance the progress bar to simulate processing
+                if (currentPctProgress < 100) {
+                    $progressBar.attr("style", "width:" + currentPctProgress + "%");
+                } else {
+                    $progressBar.attr("style", "width:99%;");
+                }
                 browser.setURL(__browserTransactionBaseURL);
                 browser.setBrowserContent(htmlRootDir + "transaction-history.html");
             } else {
@@ -429,7 +431,7 @@ var retryTimeoutCallback = (function() {
                     if (currentPctProgress <= 100) {
                         $progressBar.attr("style", "width:" + currentPctProgress + "%");
                     } else {
-                        // Exceeded maxDuration!  
+                        // Exceeded maxDuration!
                         //console.log("maxDuration exceeded....put up error");
                         clearInterval(moveProgressBar);
                         browser.setURL(__browserTransactionBaseURL);
@@ -441,10 +443,10 @@ var retryTimeoutCallback = (function() {
                     elapsedRetryProgress += timeout;
                     //console.log("set elapsedRetryProgress up " + timeout + ":" + elapsedRetryProgress);
                     setTicks(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar);
-                }   
+                }
             }
         }, progress1pct);  // Repeat -- moving the timeline 1% at a time
-    };        
+    };
 
     var __populateURL = function(event, stepName) {
         if (event.type === "click" ||
@@ -461,7 +463,7 @@ var retryTimeoutCallback = (function() {
                 if (webBrowser.getURL() === __browserTransactionBaseURL) {
                     webBrowser.setBrowserContent(htmlRootDir + "transaction-history-loading.html");
                     contentManager.markCurrentInstructionComplete(webBrowser.getStepName());
-                }                
+                }
             }
         }
         webBrowser.addUpdatedURLListener(setBrowserContent);
@@ -471,10 +473,7 @@ var retryTimeoutCallback = (function() {
         var setBrowserContent = function(currentURL) {
             var stepName = webBrowser.getStepName();
             var numOfRequest = contentManager.getCurrentInstructionIndex(stepName);
-            // Check if the url is correct before loading content
-            if (webBrowser.getURL() === __browserTransactionBaseURL) {
-                handleTransactionRequestInBrowser(stepName, numOfRequest);
-            }                
+            handleTransactionRequestInBrowser(stepName, numOfRequest);
         }
         webBrowser.addUpdatedURLListener(setBrowserContent);
     };
@@ -599,7 +598,7 @@ var retryTimeoutCallback = (function() {
                             return false;   // break out of loop
                     }
                 });
-            } 
+            }
 
             if (elementMatch === false) {
                 allMatch = 0;
@@ -620,9 +619,9 @@ var retryTimeoutCallback = (function() {
      *
      * @param  content - content of the editor
      * 
-     * @returns editorContents - object containing 
+     * @returns editorContents - object containing
      *              retryParms - array of strings.  Each string is of form
-     *                                 retryparms=value 
+     *                                 retryparms=value
      *                           as specified in the content
      *              afterAnnotationContent - copy of content appearing after the
      *                           @Retry annotation
