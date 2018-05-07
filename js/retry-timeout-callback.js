@@ -151,14 +151,22 @@ var retryTimeoutCallback = (function() {
 
     var __correctEditorError = function(stepName) {
         // correct annotation/method
-        if (stepName === "AddLibertyMPFaultTolerance") {
-            __addMicroProfileFaultToleranceFeature();
-        } else if (stepName === "TimeoutAnnotation") {
-            __addTimeoutInEditor(stepName);
-        } else if (stepName === "AddRetryOnRetry") {
-            __addRetryOnRetryInEditor(stepName);
-        } else if (stepName === "AddLimitsRetry") {
-            __addLimitsRetryInEditor(stepName);
+        switch(stepName) {
+            case "AddLibertyMPFaultTolerance":
+                __addMicroProfileFaultToleranceFeature();
+                break;
+            case "TimeoutAnnotation":
+                __addTimeoutInEditor(stepName);
+                break;
+            case "AddRetryOnRetry":
+                __addRetryOnRetryInEditor(stepName);
+                break;
+            case "AddLimitsRetry":
+                __addLimitsRetryInEditor(stepName);
+                break;
+            case "AddDelayRetry":
+                __addDelayRetryInEditor(stepName);
+                break;
         }
     };
 
@@ -200,7 +208,7 @@ var retryTimeoutCallback = (function() {
         editor.addSaveListener(__showStartingBrowser)
     };
 
-    var listenToEditorForRetryAnnotation = function(editor) {
+    var listenToEditorForInitialRetryAnnotation = function(editor) {
         editor.addSaveListener(__showStartingBrowser);
     };
 
@@ -311,16 +319,22 @@ var retryTimeoutCallback = (function() {
             } else if (numOfRequest === 2) {
                 browserContentHTML = htmlRootDir + "transaction-history-loading.html";
             }
-        } else if (stepName === "AddRetryOnRetry" || stepName === "AddLimitsRetry") {
+        } else /** if (stepName === "AddRetryOnRetry" || stepName === "AddLimitsRetry", etc....)**/ {
             browserContentHTML = htmlRootDir + "transaction-history-loading.html";
         }
 
         browser.setBrowserContent(browserContentHTML);
 
-        if (stepName === "AddRetryOnRetry") {
-            showTransactionHistory(stepName, browser);
-        } else if (stepName === "AddLimitsRetry") {
-            showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 0 /* Not set */, 0 /* Not set */);
+        switch(stepName) {
+            case "AddRetryOnRetry":
+                showTransactionHistory(stepName, browser);
+                break;
+            case "AddLimitsRetry":
+                showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 0 /* Not set */, 0 /* Not set */);
+                break;
+            case "AddDelayRetry":
+                showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 200, 0 /* Not set */ );
+                break;
         }
     };
 
@@ -382,7 +396,8 @@ var retryTimeoutCallback = (function() {
         // Do the math...
         var retryTickPlacement = Math.round((elapsedRetryProgress/maxDurationInMS) * 1000) / 10;  // Round to 1 decimal place
         //console.log("Timeout: " + timeoutCount + " retryTickPlacement: " + retryTickPlacement);
-        $progressBar.attr("style", "width:" + retryTickPlacement + "%");
+        currentPctProgress = retryTickPlacement;
+        $progressBar.attr("style", "width:" + currentPctProgress + "%");
         $('<div/>').attr('class','timelineTick retryTick').attr('style','left:' + retryTickPlacement + '%;').appendTo(retryTickContainer);
 
         // Advance the progress bar until the next timeout
@@ -496,6 +511,9 @@ var retryTimeoutCallback = (function() {
                     case 'AddLimitsRetry':
                         __addLimitsRetryInEditor(stepName);
                         break;
+                    case 'AddDelayRetry':
+                        __addDelayRetryInEditor(stepName);
+                        break;
                }
         }
     };
@@ -508,11 +526,17 @@ var retryTimeoutCallback = (function() {
 
     var __addLimitsRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
-        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit=ChronoUnit.SECONDS)";
+        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 13, newContent, 1);
     };
 
-    var listenToEditorForLimitsRetry = function(editor) {
+    var __addDelayRetryInEditor = function(stepName) {
+        contentManager.resetEditorContents(stepName, bankServiceFileName);
+        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay=200, delayUnit = ChronoUnit.MILLIS)";
+        contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 16, newContent, 1);
+    }
+
+    var listenToEditorForRetryAnnotation = function(editor) {
         editor.addSaveListener(__showPodWithDashboardAndBrowser);
     };
 
@@ -527,6 +551,14 @@ var retryTimeoutCallback = (function() {
                              "maxDuration=10",
                              "durationUnit=ChronoUnit.SECONDS"
                             ];
+        } else if (stepName === "AddDelayRetry") {
+            paramsToCheck = ["retryOn=TimeoutException.class",
+                             "maxRetries=4",
+                             "maxDuration=10",
+                             "durationUnit=ChronoUnit.SECONDS",
+                             "delay=200",
+                             "delayUnit=ChronoUnit.MILLIS"
+                            ];
         }
 
         if (__checkRetryAnnotationInContent(content, paramsToCheck)) {
@@ -534,12 +566,8 @@ var retryTimeoutCallback = (function() {
             contentManager.markCurrentInstructionComplete(stepName);
             contentManager.updateWithNewInstructionNoMarkComplete(stepName);
 
-            var htmlFile;
-            if (stepName === "AddLimitsRetry") {
-                htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
-            }
-
             // Display the pod with dashboard and web browser in it
+            var htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
             contentManager.setPodContent(stepName, htmlFile);
             contentManager.resizeTabbedEditor(stepName);
         } else {
@@ -664,7 +692,7 @@ var retryTimeoutCallback = (function() {
             //   groups[4] - content after the @Retry annotation
             var codeToMatch = "([\\s\\S]*public class BankService {\\s*)" +     // Before the @Retry
                               "(@Retry" + "\\s*" + "\\(" + "\\s*" +
-                              "((?:\\s*(?:retryOn|maxRetries|maxDuration|durationUnit|delay|delayUit|jitter|jitterDelayUnit|abortOn)\\s*=\\s*[\\d\.,a-zA-Z]*)*)" +
+                              "((?:\\s*(?:retryOn|maxRetries|maxDuration|durationUnit|delay|delayUnit|jitter|jitterDelayUnit|abortOn)\\s*=\\s*[\\d\.,a-zA-Z]*)*)" +
                               "\\s*" + "\\))" +
                               "(\\s*@Timeout\\(2000\\)[\\s\\S]*)";              // After the @Retry
             var regExpToMatch = new RegExp(codeToMatch, "g");
@@ -699,8 +727,8 @@ var retryTimeoutCallback = (function() {
         clickTransaction: clickTransaction,
         listenToEditorForTimeoutAnnotation: listenToEditorForTimeoutAnnotation,
         listenToBrowserForTransactionHistory: __listenToBrowserForTransactionHistory,
+        listenToEditorForInitialRetryAnnotation: listenToEditorForInitialRetryAnnotation,
         listenToEditorForRetryAnnotation: listenToEditorForRetryAnnotation,
-        listenToEditorForLimitsRetry: listenToEditorForLimitsRetry,
         listenToBrowserForTransactionHistoryAfterRetry: __listenToBrowserForTransactionHistoryAfterRetry,
         populateURL: __populateURL,
         addRetryAnnotationButton: addRetryAnnotationButton
