@@ -167,6 +167,9 @@ var retryTimeoutCallback = (function() {
             case "AddDelayRetry":
                 __addDelayRetryInEditor(stepName);
                 break;
+            case "AddJitterRetry":
+                __addJitterRetryInEditor(stepName);
+                break;
         }
     };
 
@@ -333,7 +336,10 @@ var retryTimeoutCallback = (function() {
                 showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 0 /* Not set */, 0 /* Not set */);
                 break;
             case "AddDelayRetry":
-                showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 200, 0 /* Not set */ );
+                showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 200, 0 /* Not set */);
+                break;
+            case "AddJitterRetry":
+                showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 200, 100);
                 break;
         }
     };
@@ -393,6 +399,14 @@ var retryTimeoutCallback = (function() {
 
         // Show the retry tick
         elapsedRetryProgress += delayInMS;
+        //console.log("elapsedRetryProgress: " + elapsedRetryProgress);
+        if (jitterInMS > 0 && delayInMS > 0) {
+            // Have a jitter that determines the next delay time.
+            var positiveOrNegative = Math.floor(Math.random() * 10) < 5 ? -1: 1;
+            var jitterDelay = Math.floor((Math.random() * delayInMS) + 1) * positiveOrNegative;
+            //console.log("jitterDelay: " + jitterDelay);
+            elapsedRetryProgress += jitterDelay;
+        }
         // Do the math...
         var retryTickPlacement = Math.round((elapsedRetryProgress/maxDurationInMS) * 1000) / 10;  // Round to 1 decimal place
         //console.log("Timeout: " + timeoutCount + " retryTickPlacement: " + retryTickPlacement);
@@ -514,6 +528,9 @@ var retryTimeoutCallback = (function() {
                     case 'AddDelayRetry':
                         __addDelayRetryInEditor(stepName);
                         break;
+                    case 'AddJitterRetry':
+                        __addJitterRetryInEditor(stepName);
+                        break;
                }
         }
     };
@@ -527,13 +544,19 @@ var retryTimeoutCallback = (function() {
     var __addLimitsRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS)";
-        contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 13, newContent, 1);
+        contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 13, newContent, 4);
     };
 
     var __addDelayRetryInEditor = function(stepName) {
-        contentManager.resetEditorContents(stepName, bankServiceFileName);
+        contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay=200, delayUnit = ChronoUnit.MILLIS)";
-        contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 16, newContent, 1);
+        contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 16, newContent, 5);
+    }
+
+    var __addJitterRetryInEditor = function(stepName) {
+        contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
+        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay=200, delayUnit = ChronoUnit.MILLIS,\n           jitter=100,\n           jitterDelayUnit = ChronoUnit.MILLIS)";
+        contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 17, newContent, 7);
     }
 
     var listenToEditorForRetryAnnotation = function(editor) {
@@ -559,6 +582,16 @@ var retryTimeoutCallback = (function() {
                              "delay=200",
                              "delayUnit=ChronoUnit.MILLIS"
                             ];
+        } else if (stepName === "AddJitterRetry") {
+            paramsToCheck = ["retryOn=TimeoutException.class",
+                             "maxRetries=4",
+                             "maxDuration=10",
+                             "durationUnit=ChronoUnit.SECONDS",
+                             "delay=200",
+                             "delayUnit=ChronoUnit.MILLIS",
+                             "jitter=100",
+                             "jitterDelayUnit=ChronoUnit.MILLIS"
+                            ]
         }
 
         if (__checkRetryAnnotationInContent(content, paramsToCheck)) {
