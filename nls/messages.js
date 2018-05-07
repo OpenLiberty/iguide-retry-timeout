@@ -24,5 +24,7 @@ var messages = {
     TYPE_CREDIT: "Credit",
     TYPE_DEPOSIT: "Deposit",
     MONTH: "APRIL",
-    PLEASE_TRY_AGAIN: "Please try again at a later time."
+    PLEASE_TRY_AGAIN: "Please try again at a later time.",
+    TIMEOUT: "Timeout",
+    RETRY: "Retry"
 };
