@@ -22,7 +22,7 @@
         callback: function test(webBrowser) {retryTimeoutCallback.listenToBrowserForTransactionHistoryAfterRetry(webBrowser); }
     };
 
-    webBrowser.create($('#' + stepElementId).find('.browserHolder'), stepName, content).done(function (newWebBrowser) {
+    webBrowser.create($("[data-step='" + stepName + "']").find('.browserHolder'), stepName, content).done(function(newWebBrowser){
         contentManager.setWebBrowser(stepName, newWebBrowser, 0);
     });
 </script>
