@@ -170,6 +170,9 @@ var retryTimeoutCallback = (function() {
             case "AddJitterRetry":
                 __addJitterRetryInEditor(stepName);
                 break;
+            case "AddAbortOnRetry":
+                __addAbortOnRetryInEditor(stepName);
+                break;
         }
     };
 
@@ -222,7 +225,7 @@ var retryTimeoutCallback = (function() {
         var htmlFile;
         if (stepName === "TimeoutAnnotation") {
             htmlFile = htmlRootDir + "transaction-history-timeout.html";
-        } else if (stepName === "AddRetryOnRetry") {
+        } else if (stepName === "AddRetryOnRetry"  || stepName === "AddAbortOnRetry") {
             htmlFile = htmlRootDir + "transaction-history-retry-start.html";
         }
 
@@ -234,6 +237,14 @@ var retryTimeoutCallback = (function() {
                 contentManager.updateWithNewInstructionNoMarkComplete(stepName);
                 // display empty web browser
                 contentManager.setPodContent(stepName, htmlFile);
+
+                if (stepName === "AddAbortOnRetry") {
+                    // Because of the excessive length of the parameters added
+                    // in this step, the editor had to be made very tall.  To
+                    // match the height with the browser created in the pod next
+                    // to the editor, increase the size of the browser.
+                    $("[data-step='AddAbortOnRetry']").find('.wbContent').attr("style", "height: 518px");
+                }
                 
                 // resize the height of the tabbed editor
                 contentManager.resizeTabbedEditor(stepName);
@@ -250,6 +261,18 @@ var retryTimeoutCallback = (function() {
             contentIsCorrect = __validateEditorTimeoutAnnotationStep(content);
         } else if (stepName === "AddRetryOnRetry") {
             contentIsCorrect = __validateEditorRetryOnRetryStep(content);
+        } else if (stepName === "AddAbortOnRetry") {
+            var paramsToCheck = ["retryOn=TimeoutException.class",
+                                 "maxRetries=4",
+                                 "maxDuration=10",
+                                 "durationUnit=ChronoUnit.SECONDS",
+                                 "delay=200",
+                                 "delayUnit=ChronoUnit.MILLIS",
+                                 "jitter=100",
+                                 "jitterDelayUnit=ChronoUnit.MILLIS",
+                                 "abortOn=FileNotFoundException.class"
+                                ]
+            contentIsCorrect = __checkRetryAnnotationInContent(content, paramsToCheck);
         }
 
         return contentIsCorrect;
@@ -321,6 +344,8 @@ var retryTimeoutCallback = (function() {
             } else if (numOfRequest === 2) {
                 browserContentHTML = htmlRootDir + "transaction-history-loading.html";
             }
+        } else if (stepName === "AddAbortOnRetry") {
+            browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";   
         } else /** if (stepName === "AddRetryOnRetry" || stepName === "AddLimitsRetry", etc....)**/ {
             browserContentHTML = htmlRootDir + "transaction-history-loading.html";
         }
@@ -403,7 +428,7 @@ var retryTimeoutCallback = (function() {
             // Have a jitter that determines the next delay time.
             var positiveOrNegative = Math.floor(Math.random() * 10) < 5 ? -1: 1;
             var jitterDelay = Math.floor((Math.random() * jitterInMS) + 1) * positiveOrNegative;
-            console.log("jitterDelay: " + jitterDelay);
+            //console.log("jitterDelay: " + jitterDelay);
             elapsedRetryProgress += jitterDelay;
         }
         // Do the math...
@@ -530,6 +555,9 @@ var retryTimeoutCallback = (function() {
                     case 'AddJitterRetry':
                         __addJitterRetryInEditor(stepName);
                         break;
+                    case 'AddAbortOnRetry':
+                        __addAbortOnRetryInEditor(stepName);
+                        break;
                }
         }
     };
@@ -556,6 +584,12 @@ var retryTimeoutCallback = (function() {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay=200, delayUnit = ChronoUnit.MILLIS,\n           jitter=100,\n           jitterDelayUnit = ChronoUnit.MILLIS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 17, newContent, 7);
+    }
+
+    var __addAbortOnRetryInEditor = function(stepName) {
+        contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
+        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay=200, delayUnit = ChronoUnit.MILLIS,\n           jitter=100,\n           jitterDelayUnit = ChronoUnit.MILLIS,\n           abortOn=FileNotFoundException.class)";
+        contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 14, 20, newContent, 8);
     }
 
     var listenToEditorForRetryAnnotation = function(editor) {
