@@ -301,7 +301,6 @@ var retryTimeoutCallback = (function() {
     var clickTransaction = function(event, stepName, numOfRequest) {
         if (event.type === "click" ||
            (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
-               var browser = contentManager.getBrowser(stepName);
                handleTransactionRequestInBrowser(stepName, numOfRequest);
         }
     };
@@ -403,8 +402,8 @@ var retryTimeoutCallback = (function() {
         if (jitterInMS > 0 && delayInMS > 0) {
             // Have a jitter that determines the next delay time.
             var positiveOrNegative = Math.floor(Math.random() * 10) < 5 ? -1: 1;
-            var jitterDelay = Math.floor((Math.random() * delayInMS) + 1) * positiveOrNegative;
-            //console.log("jitterDelay: " + jitterDelay);
+            var jitterDelay = Math.floor((Math.random() * jitterInMS) + 1) * positiveOrNegative;
+            console.log("jitterDelay: " + jitterDelay);
             elapsedRetryProgress += jitterDelay;
         }
         // Do the math...
