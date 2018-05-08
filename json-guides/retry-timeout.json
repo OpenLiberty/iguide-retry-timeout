@@ -296,7 +296,7 @@
             ],
             "instruction": [
                 "Update the <code>@Retry</code> annotation on lines 13-16 to include a delay of 200ms, or click<br><action title='Add @Retry with delay' onclick=\"retryTimeoutCallback.addRetryAnnotationButton(event, 'AddDelayRetry')\">@Retry(retryOn = TimeoutException.class,\n       maxRetries=4,\n       maxDuration=10,\n       durationUnit = ChronoUnit.SECONDS,\n       delay=200, delayUnit = ChronoUnit.MILLIS)</action>.<br> This indicates there should be a delay of 200ms following each timeout failure from the View Transaction microservice before retrying another request, but no more than 4 retries should occur and retry attempts should stop after 10 seconds.<br> Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'AddDelayRetry')\"><b>Run</b></action> on the editor menu pane.",
-                "Enter the following URL into the browser that follows, or click <action title='URL to retrieve transaction history' onclick=\"retryTimeoutCallback.populateURL(event, 'AddDelayRetry')\"><b>https://global-ebank.openliberty.io/transactions</b></action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'AddDelayRetry', 0)\"><b>Enter</b></action> to retrieve the account transaction history. Watch the timeline simulate timeouts every 2 seconds until the transaction history is displayed.  The timeline also shows how the Retry policy automatically initiates another request to the View Transaction microservice 200ms after each timeout."
+                "Enter the following URL into the browser that follows, or click <action title='URL to retrieve transaction history' onclick=\"retryTimeoutCallback.populateURL(event, 'AddDelayRetry')\"><b>https://global-ebank.openliberty.io/transactions</b></action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'AddDelayRetry', 0)\"><b>Enter</b></action> to retrieve the account transaction history. The timeline shows how the Retry policy automatically initiates another request to the View Transaction microservice 200ms after each timeout (2000ms) that occurs until the transaction history is displayed."
             ],
             "content": [
                 {
@@ -341,8 +341,8 @@
                                 }
                             ],
                             "editorHeight": "468px",
-                            "save": false, 
-                            "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForRetryAnnotation(editor); })" 
+                            "save": false,
+                            "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForRetryAnnotation(editor); })"
                         }    
                     ]
                 },
@@ -362,7 +362,8 @@
                 "</ul>",
                 "Why would you want to add a jitter?  Suppose, for example, that multiple applications are making requests to your microservice causing it to become overloaded.  By adding a jitter to the delay time you allow the retry times of these requests to vary.  Therefore, the cluster of retry requests are spread out over time reducing the chance that the busy service continues to be overloaded."            ],
             "instruction": [
-                "Add a jitter of 100ms to the delay in the <code>@Retry</code> annotation on lines 13-17, or click<br><action title='Add @Retry with jitter'>@Retry(retryOn = TimeoutException.class,\n       maxRetries=4,\n       maxDuration=10,\n       durationUnit = ChronoUnit.SECONDS,\n       delay=200, delayUnit = ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit = ChronoUnit.MILLIS)</action>.<br> The delay between retries will now be spread out between 100 and 300 milliseconds.<br> Click <action title='Run'><b>Run</b></action> on the editor menu pane."
+                "Add a jitter of 100ms to the delay in the <code>@Retry</code> annotation on lines 13-17, or click<br><action title='Add @Retry with jitter' onclick=\"retryTimeoutCallback.addRetryAnnotationButton(event, 'AddJitterRetry')\">@Retry(retryOn = TimeoutException.class,\n       maxRetries=4,\n       maxDuration=10,\n       durationUnit = ChronoUnit.SECONDS,\n       delay=200, delayUnit = ChronoUnit.MILLIS,\n       jitter=100,\n       jitterDelayUnit = ChronoUnit.MILLIS)</action>.<br> The delay between retries will now be spread out between 100 and 300 milliseconds.<br> Click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'AddJitterRetry')\"><b>Run</b></action> on the editor menu pane.",
+                "Enter the following URL into the browser that follows, or click <action title='URL to retrieve transaction history' onclick=\"retryTimeoutCallback.populateURL(event, 'AddJitterRetry')\"><b>https://global-ebank.openliberty.io/transactions</b></action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'AddJitterRetry', 0)\"><b>Enter</b></action> to retrieve the account transaction history. The Retry policy now includes a jitter of 100ms, so the timeline shows an attempt to display the transaction history occurring somewhere between 100 and 300 milliseconds (200ms delay +- 100ms jitter) after any timeout (2000ms) that occurs within 10 seconds."            
             ],
             "content": [
                 {
@@ -408,7 +409,8 @@
                                 }
                             ],
                             "editorHeight": "468px",
-                            "save": false 
+                            "save": false,
+                            "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForRetryAnnotation(editor); })" 
                         }    
                     ]
                 },
