@@ -422,24 +422,43 @@ var retryTimeoutCallback = (function() {
         $('<div/>').attr('class','timelineTick timeoutTick').attr('style','left:' + timeoutTickPlacement + '%;').appendTo(timeoutTickContainer);
 
         // Show the retry tick
-        elapsedRetryProgress += delayInMS;
-        //console.log("elapsedRetryProgress: " + elapsedRetryProgress);
+        var retryTickSpot = elapsedRetryProgress + delayInMS;
+        //console.log("retryTickSpot: " + retryTickSpot);
         if (jitterInMS > 0 && delayInMS > 0) {
             // Have a jitter that determines the next delay time.
             var positiveOrNegative = Math.floor(Math.random() * 10) < 5 ? -1: 1;
             var jitterDelay = Math.floor((Math.random() * jitterInMS) + 1) * positiveOrNegative;
             //console.log("jitterDelay: " + jitterDelay);
-            elapsedRetryProgress += jitterDelay;
+            retryTickSpot += jitterDelay;
+            //console.log("retryTickSpot adjusted for jitter: " + retryTickSpot);
         }
-        // Do the math...
-        var retryTickPlacement = Math.round((elapsedRetryProgress/maxDurationInMS) * 1000) / 10;  // Round to 1 decimal place
-        //console.log("Timeout: " + timeoutCount + " retryTickPlacement: " + retryTickPlacement);
-        currentPctProgress = retryTickPlacement;
-        $progressBar.attr("style", "width:" + currentPctProgress + "%");
-        $('<div/>').attr('class','timelineTick retryTick').attr('style','left:' + retryTickPlacement + '%;').appendTo(retryTickContainer);
+        var retryTickPctPlacement = Math.round((retryTickSpot/maxDurationInMS) * 1000) / 10;  // Round to 1 decimal place
+        var progress1pct = maxDurationInMS * .01;  // Number Milliseconds in 1% of timeline.
+        var moveProgressBar = setInterval( function() {
+            // Advance the blue progress bar 1% at a time until we reach the spot
+            // for the retry tick.
+            currentPctProgress++;
+            //console.log("currentPctProgress: " + currentPctProgress + "  :retryTickPctPlacement: " + retryTickPctPlacement);
+            if (currentPctProgress < retryTickPctPlacement) {
+                // Advance blue progress bar until we reach the place where
+                // the retry tick should go.
+                $progressBar.attr("style", "width:" + currentPctProgress + "%");
+            } else {
+                clearInterval(moveProgressBar);
+                currentPctProgress = retryTickPctPlacement;
+                //console.log("retry tick placed.  CurrentPctProgress: " + currentPctProgress);
 
-        // Advance the progress bar until the next timeout
-        setProgressBar(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar);
+                // Move the blue progress bar exactly to the retry tick spot
+                $progressBar.attr("style", "width:" + retryTickPctPlacement + "%");
+
+                // Put up the retry tick at its spot...
+                $('<div/>').attr('class','timelineTick retryTick').attr('style','left:' + retryTickPctPlacement + '%;').appendTo(retryTickContainer);
+                elapsedRetryProgress = retryTickSpot;
+
+                // Advance the progress bar until the next timeout
+                setProgressBar(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar);
+            }
+        }, progress1pct);
     };
 
     /**
