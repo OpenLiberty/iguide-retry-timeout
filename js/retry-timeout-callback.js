@@ -219,7 +219,7 @@ var retryTimeoutCallback = (function() {
     };
 
     var listenToPlayground = function(editor) {
-        editor.addSaveListener(parseParameters);
+        editor.addSaveListener(updatePlayground);
     };
 
     var __showBrowser = function(editor) {
@@ -550,12 +550,12 @@ var retryTimeoutCallback = (function() {
                 var forwardPctProgress = Math.round(((elapsedRetryProgress + timeout)/maxDurationInMS) * 1000) / 10;  // Round to 1 decimal place
                 if (currentPctProgress < forwardPctProgress) {
                     currentPctProgress++;
-                    //console.log("extend progress to " + currentPctProgress + "%");
+                    console.log("extend progress to " + currentPctProgress + "%");
                     if (currentPctProgress <= 100) {
                         $progressBar.attr("style", "width:" + currentPctProgress + "%;");
                     } else {
                         // Exceeded maxDuration!
-                        //console.log("maxDuration exceeded....put up error");
+                        console.log("maxDuration exceeded....put up error");
                         clearInterval(moveProgressBar);
                         browser.setURL(__browserTransactionBaseURL);
                         // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
@@ -852,42 +852,31 @@ var retryTimeoutCallback = (function() {
         return editorContents;
     };
 
+    var createPlayground = function(root, stepName) {
+        if(!root.selector){
+            root = root.contentRootElement;
+        }
+
+        var playground = retryTimeoutPlayground.create(root, editor.stepName);
+        contentManager.setPlayground(stepName, playground, 0);
+    };
+
+    var updatePlayground = function(editor) {
+        var stepName = editor.getStepName();
+        var playground = contentManager.getPlayground(stepName);
+
+        var params = __getParamsFromEditor(editor.getEditorContent());
+        playground.startTimeline(stepName, params);
+    };
+
     var parseParameters = function(editor) {
         var content = contentManager.getTabbedEditorContents(editor.stepName, bankServiceFileName);
         // params.retryParms and params.timeoutParms
         var params = __getParamsFromEditor(content);
         console.log(params);
+        return params;
 
         // sort out params and send to playground timeline/browser
-        updatePlayground(editor.stepName, params);
-    };
-
-    var updatePlayground = function(stepName, params) {
-        var browser = contentManager.getBrowser(stepName);
-        browser.setURL(__browserTransactionBaseURL); 
-
-        var retryParams = params.retryParms;
-
-        // Set params, or use default param values
-        // TODO: probably handle setting defaults in __getParamsFromEditor
-        var maxRetries = parseInt(retryParams.maxRetries) || 3;
-        var maxDuration = parseInt(retryParams.maxDuration) || 180000;
-        var delay = parseInt(retryParams.delay) || 0;
-        var jitter = parseInt(retryParams.jitter) || 200;
-        var timeout = parseInt(params.timeoutParms[0]) || 1000;
-
-        var timeoutCount = 0;
-        var elapsedRetryProgress = 0;
-        var $tickContainers = $("[data-step='" + stepName + "']").find('.tickContainer');
-        var timeoutTickContainer = $tickContainers[0];
-        var retryTickContainer = $tickContainers[1];
-        var $progressBar = $("[data-step='" + stepName + "']").find('.progressBar').find('div');
-    
-        // Reset the tick containers for browser refreshes
-        $(timeoutTickContainer).empty();
-        $(retryTickContainer).empty();
-
-        setProgressBar(maxDuration, delay, jitter, timeout, timeoutCount, maxRetries, elapsedRetryProgress, 0, timeoutTickContainer, retryTickContainer, $progressBar);
     };
 
     var __getParamsFromEditor = function(content) {
@@ -979,6 +968,7 @@ var retryTimeoutCallback = (function() {
         listenToPlayground: listenToPlayground,
         populateURL: __populateURL,
         addRetryAnnotationButton: addRetryAnnotationButton,
-        parseParameters: parseParameters
+        parseParameters: parseParameters,
+        createPlayground: createPlayground
     }
 })();
