@@ -374,7 +374,7 @@ var retryTimeoutCallback = (function() {
 //        contentManager.setBrowserURL(stepName, browserURL);
             browser.setURL(__browserTransactionBaseURL);
             browser.setBrowserContent(htmlRootDir + "transaction-history.html");
-        }, 2000);  // Timeout is set to 2000 milliseconds
+        }, 3000);  // Timeout is set to 3000 milliseconds = 2000ms timeout + some processing time
     };
 
     var showTransactionHistoryWithDashboard = function(stepName, browser, timeoutsToSimulate, maxDurationInMS, delayInMS, jitterInMS) {
@@ -419,7 +419,7 @@ var retryTimeoutCallback = (function() {
         var timeoutTickPlacement = Math.round((elapsedRetryProgress/maxDurationInMS) * 1000) / 10;  // Round to 1 decimal place
         //console.log("Timeout: " + timeoutCount + " timeoutTickPlacement: " + timeoutTickPlacement);
         $progressBar.attr("style", "width:" + timeoutTickPlacement + "%");
-        $('<div/>').attr('class','timelineTick timeoutTick').attr('style','left:' + timeoutTickPlacement + '%;').appendTo(timeoutTickContainer);
+        $('<div/>').attr('class','timelineTick timeoutTick').attr('style','left:calc(' + timeoutTickPlacement + '% - 5px);').appendTo(timeoutTickContainer);
 
         // Show the retry tick
         var retryTickSpot = elapsedRetryProgress + delayInMS;
@@ -452,7 +452,7 @@ var retryTimeoutCallback = (function() {
                 $progressBar.attr("style", "width:" + retryTickPctPlacement + "%");
 
                 // Put up the retry tick at its spot...
-                $('<div/>').attr('class','timelineTick retryTick').attr('style','left:' + retryTickPctPlacement + '%;').appendTo(retryTickContainer);
+                $('<div/>').attr('class','timelineTick retryTick').attr('style','left:calc(' + retryTickPctPlacement + '% - 5px);').appendTo(retryTickContainer);
                 elapsedRetryProgress = retryTickSpot;
 
                 // Advance the progress bar until the next timeout
@@ -486,11 +486,11 @@ var retryTimeoutCallback = (function() {
             // be processed it stops and shows the transaction history.
             if (timeoutCount === timeoutsToSimulate) {
                 clearInterval(moveProgressBar);
-                currentPctProgress += 3; // Advance the progress bar to simulate processing
-                if (currentPctProgress < 100) {
+                currentPctProgress += 1; // Advance the progress bar to simulate processing
+                if (currentPctProgress <= 100) {
                     $progressBar.attr("style", "width:" + currentPctProgress + "%");
                 } else {
-                    $progressBar.attr("style", "width:99%;");
+                    $progressBar.attr("style", "width:100%;");
                 }
                 browser.setURL(__browserTransactionBaseURL);
                 browser.setBrowserContent(htmlRootDir + "transaction-history.html");
