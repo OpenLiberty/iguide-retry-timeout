@@ -504,7 +504,7 @@
                                 "package io.openliberty.guides.retrytimeout.global.eBank.microservices;",
                                 "",
                                 "import javax.enterprise.context.ApplicationScoped;",
-                                "import java.io.FileNotFoundException",
+                                "import java.io.FileNotFoundException;",
                                 "import java.time.temporal.ChronoUnit;",
                                 "",
                                 "import org.eclipse.microprofile.faulttolerance.Retry;",
@@ -517,7 +517,7 @@
                                 "    @Retry(retryOn=TimeoutException.class,",
                                 "           maxRetries=4,",
                                 "           maxDuration=10000,",
-                                "           delay=400,",
+                                "           delay=200,",
                                 "           jitter=100)",
                                 "    @Timeout(2000)",
                                 "    public Service showTransactions() throws Exception {",
@@ -533,7 +533,7 @@
                                     "to": "13"
                                 },
                                 {
-                                    "from": "22",
+                                    "from": "20",
                                     "to": "27"
                                 }
                             ],
