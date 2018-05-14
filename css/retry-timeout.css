@@ -56,7 +56,16 @@
 
 .legendText {
     width: 100%;
-    line-height: 14px;
+    line-height: 12px;
+    font-weight: 500;
+}
+
+.legendTextTop {
+    margin-bottom: 5px;
+}
+
+.legendTextBottom {
+    margin-top: 5px;
 }
 
 .timelineContainer {
@@ -90,16 +99,31 @@
     background-image: linear-gradient(180deg, rgb(102, 153, 0) 0%, rgb(102, 153, 0) 47%, rgb(118, 177, 1) 48%, rgb(118, 177, 1) 100%);
     left: 10%;
 }
+
+.timelineLabel {
+    position: absolute;
+    font-size: 10px;
+    text-align: right;
+} 
+
+.timeoutLabel {
+    color: rgb(180,1,1);
+}
+
+.retryLabel {
+    color: rgb(85,128,0);
+}
+
 .timelineLegend {
     line-height: 14px;
     position: absolute;
     font-size: 12px;
 }
 
-.timelineLegendStart{
+.timelineLegendStart {
     left: 6%;
 }
 
 .timelineLegendEnd {
-    right: 5%;
+    left: 92%;
 }
