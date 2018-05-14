@@ -390,7 +390,7 @@ var retryTimeoutCallback = (function() {
         $(timeoutTickContainer).empty();
         $(retryTickContainer).empty();
 
-        setProgressBar(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, 0, timeoutTickContainer, retryTickContainer, $progressBar);
+        setProgressBar(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, 0, timeoutTickContainer, retryTickContainer, $progressBar, browser);
     };
 
     /**
@@ -410,8 +410,9 @@ var retryTimeoutCallback = (function() {
      * @param timeoutTickContainer - Where to place the timeout ticks
      * @param retryTickContainer   - Where to place the retry ticks
      * @param $progressBar         - JQuery object of the progress bar
+     * @param browser              - browser affected
      */
-    var setTicks = function(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar) {
+    var setTicks = function(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar, browser) {
         timeoutCount++;
 
         // Show the timeout tick
@@ -456,7 +457,7 @@ var retryTimeoutCallback = (function() {
                 elapsedRetryProgress = retryTickSpot;
 
                 // Advance the progress bar until the next timeout
-                setProgressBar(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar);
+                setProgressBar(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar, browser);
             }
         }, progress1pct);
     };
@@ -478,8 +479,9 @@ var retryTimeoutCallback = (function() {
      * @param timeoutTickContainer - Where to place the timeout ticks
      * @param retryTickContainer   - Where to place the retry ticks
      * @param $progressBar         - JQuery object of the progress bar
+     * @param browser              - browser affected
      */
-    var setProgressBar = function(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar){
+    var setProgressBar = function(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar, browser){
         var progress1pct = maxDurationInMS * .01;  // Number Milliseconds in 1% of timeline.
         var moveProgressBar = setInterval( function() {
             // Moves the timeline forward 1% at a time.  If no more timeouts should
@@ -514,7 +516,7 @@ var retryTimeoutCallback = (function() {
                     clearInterval(moveProgressBar);
                     elapsedRetryProgress += timeout;
                     //console.log("set elapsedRetryProgress up " + timeout + ":" + elapsedRetryProgress);
-                    setTicks(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar);
+                    setTicks(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar, browser);
                 }
             }
         }, progress1pct);  // Repeat -- moving the timeline 1% at a time
