@@ -338,10 +338,10 @@ var retryTimeoutCallback = (function() {
             contentManager.markCurrentInstructionComplete(stepName);
         }
         if (stepName === "TransactionHistory") {
-            if (numOfRequest === 1) {
+            if (numOfRequest === 0) {
                 browserContentHTML = htmlRootDir + "transaction-history.html";
                 contentManager.updateWithNewInstructionNoMarkComplete(stepName);
-            } else if (numOfRequest === 2) {
+            } else if (numOfRequest === 1) {
                 browserContentHTML = htmlRootDir + "transaction-history-loading.html";
             }
         } else if (stepName === "AddAbortOnRetry") {
@@ -353,6 +353,9 @@ var retryTimeoutCallback = (function() {
         browser.setBrowserContent(browserContentHTML);
 
         switch(stepName) {
+            case "TransactionHistory":
+                showBrowserOverlay(browser, numOfRequest, stepName);
+                break;
             case "AddRetryOnRetry":
                 showTransactionHistory(stepName, browser);
                 break;
@@ -367,6 +370,15 @@ var retryTimeoutCallback = (function() {
                 break;
         }
     };
+
+    var showBrowserOverlay = function(browser, numOfRequest, stepName) {
+        if (numOfRequest === 1) {
+            setTimeout(function () {
+                var overlayText = retryTimeoutMessages["OVERLAY_TEXT"];
+                browser.enableBrowserOverlay(overlayText);
+            }, 5000);
+        }
+    }
 
     var showTransactionHistory = function(stepName, browser) {
         var loadingTimeInterval = setInterval(function() {
@@ -547,18 +559,9 @@ var retryTimeoutCallback = (function() {
         var setBrowserContent = function(currentURL) {
             var stepName = webBrowser.getStepName();
             var currentInstructionIndex = contentManager.getCurrentInstructionIndex(stepName);
-            if (currentInstructionIndex === 0) {
-                if (webBrowser.getURL() === __browserTransactionBaseURL) {
-                    webBrowser.setBrowserContent(htmlRootDir + "transaction-history.html");
-                    contentManager.markCurrentInstructionComplete(stepName);
-                    contentManager.updateWithNewInstructionNoMarkComplete(stepName);
-                }               
-            } else if (currentInstructionIndex === 1) {
-                // Check if the url is correct before loading content
-                if (webBrowser.getURL() === __browserTransactionBaseURL) {
-                    webBrowser.setBrowserContent(htmlRootDir + "transaction-history-loading.html");
-                    contentManager.markCurrentInstructionComplete(stepName);
-                }                
+            // Check if the url is correct before loading content
+            if (webBrowser.getURL() === __browserTransactionBaseURL) {
+                handleTransactionRequestInBrowser(stepName, currentInstructionIndex);
             }
         }
         webBrowser.addUpdatedURLListener(setBrowserContent);

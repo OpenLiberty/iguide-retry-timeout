@@ -42,8 +42,8 @@
                         "Begin by requesting an online transaction history."
                     ],
                     "instruction": [
-                        "Enter the following URL into the browser that follows, or click <action title='URL' onclick=\"retryTimeoutCallback.populateURL(event, 'TransactionHistory')\"><b>https://global-ebank.openliberty.io/transactions</b></action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 1)\"><b>Enter</b></action> to retrieve a transaction history.",
-                        "Click <action title='Refresh' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 2)\"><b>Refresh</b></action> in the browser to see the page loads indefinitely unable to retrieve the transaction history."
+                        "Enter the following URL into the browser that follows, or click <action title='URL' onclick=\"retryTimeoutCallback.populateURL(event, 'TransactionHistory')\"><b>https://global-ebank.openliberty.io/transactions</b></action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 0)\"><b>Enter</b></action> to retrieve a transaction history.",
+                        "Click <action title='Refresh' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 1)\"><b>Refresh</b></action> in the browser to see the page loads indefinitely unable to retrieve the transaction history."
                     ],
                     "content":[
                         {
