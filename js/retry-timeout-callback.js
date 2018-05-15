@@ -218,6 +218,10 @@ var retryTimeoutCallback = (function() {
         editor.addSaveListener(__showStartingBrowser);
     };
 
+    var listenToPlayground = function(editor) {
+        editor.addSaveListener(updatePlayground);
+    };
+
     var __showStartingBrowser = function(editor) {
         var stepName = editor.getStepName();
         var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
@@ -526,12 +530,12 @@ var retryTimeoutCallback = (function() {
                 var forwardPctProgress = Math.round(((elapsedRetryProgress + timeout)/maxDurationInMS) * 1000) / 10;  // Round to 1 decimal place
                 if (currentPctProgress < forwardPctProgress) {
                     currentPctProgress++;
-                    //console.log("extend progress to " + currentPctProgress + "%");
+                    // console.log("extend progress to " + currentPctProgress + "%");
                     if (currentPctProgress <= 100) {
                         $progressBar.attr("style", "width:" + currentPctProgress + "%;");
                     } else {
                         // Exceeded maxDuration!
-                        //console.log("maxDuration exceeded....put up error");
+                        // console.log("maxDuration exceeded....put up error");
                         clearInterval(moveProgressBar);
                         browser.setURL(__browserTransactionBaseURL);
                         // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
@@ -819,6 +823,127 @@ var retryTimeoutCallback = (function() {
         return editorContents;
     };
 
+    var createPlayground = function(root, stepName) {
+        if(!root.selector){
+            root = root.contentRootElement;
+        }
+
+        var playground = retryTimeoutPlayground.create(root, stepName);
+        contentManager.setPlayground(stepName, playground, 0);
+    };
+
+    var updatePlayground = function(editor) {
+        var stepName = editor.getStepName();
+        var playground = contentManager.getPlayground(stepName);
+
+        var params = __getParamsFromEditor(editor.getEditorContent());
+        var paramsValid = __verifyParams(params, editor);
+        playground.resetPlayground();
+
+        if (paramsValid) {
+            playground.startTimeline(stepName, params);
+        } else {
+            editor.createCustomErrorMessage("Invalid parameter value");
+        }
+    };
+
+    var __getParamsFromEditor = function(content) {
+        var editorContents = {};
+        editorContents.retryParms = {};
+        try {
+            editorContents.retryParms = __getRetryParams(content);
+        } catch (e) { }
+        try {
+            editorContents.timeoutParms = __getTimeoutParams(content);
+        } catch (e) { }
+
+        return editorContents;
+    };
+
+    var __getRetryParams = function(content) {
+        var retryParms = {};
+        // [0] - original content
+        // [1] - Retry annotation
+        // [2] - retry parameters as a string
+        var retryRegexString = "(@Retry" + "\\s*" + "\\(" + "\\s*" +
+        "((?:\\s*(?:retryOn|maxRetries|maxDuration|durationUnit|delay|delayUnit|jitter|jitterDelayUnit|abortOn)\\s*=\\s*[-\\d\.,a-zA-Z]*)*)" +
+        "\\s*" + "\\))";
+        var retryRegex = new RegExp(retryRegexString, "g");
+        var retryMatch = retryRegex.exec(content);
+
+        // Turn string of params into array
+        var retryParamsString = retryMatch[2];
+        retryParams = __parmsToArray(retryParamsString);
+
+        var keyValueRegex = /(.*)=(.*)/;
+        var match = null;
+        $.each(retryParams, function(i, param) {
+            match = keyValueRegex.exec(param);
+            switch (match[1]) {
+                //TODO: possibly check for number-only for some params
+                case "retryOn":
+                case "maxRetries":
+                case "maxDuration":
+                case "delay":
+                case "jitter":
+                    retryParms[match[1]] = match[2];
+                    break;
+                default:
+                // TODO: unrecognized or unsupported parameter
+                // throw editor error message
+                    break;
+            }
+        });
+        return retryParms;
+    };
+
+    var __getTimeoutParams = function(content) {
+        // [0] - original content
+        // [1] - Timeout annotation
+        // [2] - parameter value inside parentheses
+        var timeoutRegexString = "\\s*(@Timeout)\\s*" + 
+        "(?:\\(\\s*([\\d]*)\\s*\\))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
+
+        var timeoutRegex = new RegExp(timeoutRegexString, "g");
+        var timeoutMatch = timeoutRegex.exec(content);
+
+        var timeoutParams = timeoutMatch[2] || "1000"; //default 1000 if none defined
+        timeoutParams = __parmsToArray(timeoutParams);
+
+        return timeoutParams;
+    };
+
+    var __verifyParams = function(params, editor) {
+        var retryParms = params.retryParms;
+        var paramsValid = true;
+        if (retryParms) {
+            if (retryParms.maxRetries && (parseInt(retryParms.maxRetries) < -1)) {
+                paramsValid = false;
+            }
+            if (retryParms.maxDuration && (parseInt(retryParms.maxDuration) < 0)) {
+                paramsValid = false;
+            }
+            if (retryParms.delay && (parseInt(retryParms.delay) < 0)) {
+                paramsValid = false;
+            }
+            if (retryParms.jitter && (parseInt(retryParms.jitter) < 0)) {
+                paramsValid = false;
+            }
+        }
+        return paramsValid;
+    };
+
+    // converts the string of parameters into an array
+    var __parmsToArray = function(parms) {
+        parms = parms.replace(/\s/g, '');  // Remove white space
+        if (parms.trim() !== "") {
+            parms = parms.split(',');
+        } else {
+            parms = [];
+        }
+        return parms;
+    };
+
     return {
         listenToEditorForFeatureInServerXML: listenToEditorForFeatureInServerXML,
         addMicroProfileFaultToleranceFeatureButton: addMicroProfileFaultToleranceFeatureButton,
@@ -833,7 +958,9 @@ var retryTimeoutCallback = (function() {
         listenToEditorForInitialRetryAnnotation: listenToEditorForInitialRetryAnnotation,
         listenToEditorForRetryAnnotation: listenToEditorForRetryAnnotation,
         listenToBrowserForTransactionHistoryAfterRetry: __listenToBrowserForTransactionHistoryAfterRetry,
+        listenToPlayground: listenToPlayground,
         populateURL: __populateURL,
-        addRetryAnnotationButton: addRetryAnnotationButton
+        addRetryAnnotationButton: addRetryAnnotationButton,
+        createPlayground: createPlayground
     }
 })();

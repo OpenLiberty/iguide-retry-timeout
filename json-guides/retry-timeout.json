@@ -490,6 +490,67 @@
             ]
         },
         {
+            "name": "Playground",
+            "title": "Interactive retry timeout playground",
+            "description": "Now that you've learned...",
+            "content": [
+                {
+                    "displayType": "tabbedEditor",
+                    "editorList": [
+                        {
+                            "displayType": "fileEditor",
+                            "fileName": "BankService.java",
+                            "preload": [
+                                "package io.openliberty.guides.retrytimeout.global.eBank.microservices;",
+                                "",
+                                "import javax.enterprise.context.ApplicationScoped;",
+                                "import java.io.FileNotFoundException;",
+                                "import java.time.temporal.ChronoUnit;",
+                                "",
+                                "import org.eclipse.microprofile.faulttolerance.Retry;",
+                                "import org.eclipse.microprofile.faulttolerance.Timeout;",
+                                "import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;",
+                                "",
+                                "@ApplicationScoped",
+                                "public class BankService {",
+                                "",
+                                "    @Retry(retryOn=TimeoutException.class,",
+                                "           maxRetries=4,",
+                                "           maxDuration=10000,",
+                                "           delay=200,",
+                                "           jitter=100)",
+                                "    @Timeout(2000)",
+                                "    public Service showTransactions() throws Exception {",
+                                "       Service transactions = new Transactions();",
+                                "       transactions.getTransactions();",
+                                "       return transactions;",
+                                "   }", 
+                                "}"
+                            ],
+                            "readonly": [
+                                {
+                                    "from": "1",
+                                    "to": "13"
+                                },
+                                {
+                                    "from": "20",
+                                    "to": "27"
+                                }
+                            ],
+                            "editorHeight": "468px",
+                            "save": false,
+                            "callback": "(function test(editor) {retryTimeoutCallback.listenToPlayground(editor); })"
+                        }
+                    ]
+                },
+                {
+                    "displayType": "pod",
+                    "content": "/guides/draft-iguide-retry-timeout/html/playground-dashboard.html",
+                    "callback": "(function(pod) {retryTimeoutCallback.createPlayground(pod, 'Playground')})"
+                }
+            ]
+        },
+        {
             "name": "WhatNext",
             "title": "Great work!  You're done!",
             "description": [
