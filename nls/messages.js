@@ -26,5 +26,6 @@ var messages = {
     MONTH: "APRIL",
     PLEASE_TRY_AGAIN: "Please try again at a later time.",
     TIMEOUT: "Timeout",
-    RETRY: "Retry"
+    RETRY: "Retry",
+    PAGENOTFOUND: "404 Page not found error"
 };
