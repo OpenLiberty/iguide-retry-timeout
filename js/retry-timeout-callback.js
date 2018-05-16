@@ -243,11 +243,21 @@ var retryTimeoutCallback = (function() {
                 contentManager.setPodContent(stepName, htmlFile);
 
                 if (stepName === "AddAbortOnRetry") {
-                    // Because of the excessive length of the parameters added
-                    // in this step, the editor had to be made very tall.  To
-                    // match the height with the browser created in the pod next
-                    // to the editor, increase the size of the browser.
-                    $("[data-step='AddAbortOnRetry']").find('.wbContent').attr("style", "height: 518px;");
+                    setTimeout(function () {
+                        // Use a interval timer to make sure the pod content is rendered 
+                        // before accessing the browser within.
+                        var waitingForPodContentTimeInterval = setInterval(function () {
+                            if (contentManager.getPod(stepName).contentRootElement.length === 1) {
+                                clearInterval(waitingForPodContentTimeInterval);
+                                var podContents = contentManager.getPod(stepName).contentRootElement;
+                                // resizeTabbedEditor resizes a small editor to be the same size
+                                // as the pod created.  But, on this page we have an editor that
+                                // is larger than the browser in the pod ... and we need to extend
+                                // the pod size to match the editor.
+                                podContents.find('.wbContent').attr("style", "height: 518px;");
+                            } 
+                        }, 10);
+                    }, 300);
                 }
                 
                 // resize the height of the tabbed editor
@@ -258,7 +268,7 @@ var retryTimeoutCallback = (function() {
             editor.createErrorLinkForCallBack(true, __correctEditorError);
         }
     };
-    
+
     var __checkEditorContent = function(stepName, content) {
         var contentIsCorrect = true;
         if (stepName === "TimeoutAnnotation") {
@@ -517,8 +527,8 @@ var retryTimeoutCallback = (function() {
             // be processed it stops and shows the transaction history.
             if (timeoutCount === timeoutsToSimulate) {
                 clearInterval(moveProgressBar);
-                currentPctProgress += 3; // Advance the progress bar to simulate processing
-                if (currentPctProgress < 100) {
+                currentPctProgress += 1; // Advance the progress bar to simulate processing
+                if (currentPctProgress <= 100) {
                     $progressBar.attr("style", "width:" + currentPctProgress + "%;");
                 } else {
                     $progressBar.attr("style", "width:100%;");
@@ -629,7 +639,7 @@ var retryTimeoutCallback = (function() {
 
     var __addAbortOnRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
-        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay=200, delayUnit = ChronoUnit.MILLIS,\n           jitter=100,\n           jitterDelayUnit = ChronoUnit.MILLIS,\n           abortOn=FileNotFoundException.class)";
+        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay=200, delayUnit = ChronoUnit.MILLIS,\n           jitter=100,\n           jitterDelayUnit = ChronoUnit.MILLIS,\n           abortOn = FileNotFoundException.class)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 14, 20, newContent, 8);
     }
 
