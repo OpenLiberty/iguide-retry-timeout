@@ -896,31 +896,32 @@ var retryTimeoutCallback = (function() {
         var stepName = editor.getStepName();
         var playground = contentManager.getPlayground(stepName);
 
-        var params = __getParamsFromEditor(editor.getEditorContent());
+        var params = __getParamsFromEditor(editor);
         var paramsValid = __verifyParams(params, editor);
         playground.resetPlayground();
 
         if (paramsValid) {
             playground.startTimeline(stepName, params);
         } else {
-            editor.createCustomErrorMessage("Invalid parameter value");
+            editor.createCustomErrorMessage(retryTimeoutMessages["INVALID_PARAMETER_VALUE"]);
         }
     };
 
-    var __getParamsFromEditor = function(content) {
+    var __getParamsFromEditor = function(editor) {
         var editorContents = {};
         editorContents.retryParms = {};
         try {
-            editorContents.retryParms = __getRetryParams(content);
+            editorContents.retryParms = __getRetryParams(editor);
         } catch (e) { }
         try {
-            editorContents.timeoutParms = __getTimeoutParams(content);
+            editorContents.timeoutParms = __getTimeoutParams(editor);
         } catch (e) { }
 
         return editorContents;
     };
 
-    var __getRetryParams = function(content) {
+    var __getRetryParams = function(editor) {
+        var content = editor.getEditorContent();
         var retryParms = {};
         // [0] - original content
         // [1] - Retry annotation
@@ -948,16 +949,23 @@ var retryTimeoutCallback = (function() {
                 case "jitter":
                     retryParms[match[1]] = match[2];
                     break;
+                case "durationUnit":
+                case "delayUnit":
+                case "jitterDelayUnit":
+                    editor.createCustomErrorMessage(retryTimeoutMessages["UNIT_PARAMS_DISABLED"]);
+                    break;
                 default:
-                // TODO: unrecognized or unsupported parameter
+                // TODO: unrecognized or unsupported parameter (including unit params)
                 // throw editor error message
+                    editor.createCustomErrorMessage(retryTimeoutMessages["UNSUPPORTED_RETRY_PARAM"]);
                     break;
             }
         });
         return retryParms;
     };
 
-    var __getTimeoutParams = function(content) {
+    var __getTimeoutParams = function(editor) {
+        var content = editor.getEditorContent();
         // [0] - original content
         // [1] - Timeout annotation
         // [2] - parameter value inside parentheses
