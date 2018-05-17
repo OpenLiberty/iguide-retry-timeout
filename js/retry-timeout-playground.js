@@ -18,6 +18,7 @@ var retryTimeoutPlayground = function() {
             // TODO: probably handle setting defaults in __getParamsFromEditor
             var maxRetries = parseInt(retryParams.maxRetries) || 3;
             var maxDuration = parseInt(retryParams.maxDuration) || 180000;
+            this.setMaxDurationOnTimeline(maxDuration);
             var delay = parseInt(retryParams.delay) || 0;
             var jitter = parseInt(retryParams.jitter) || 200;
             var timeout = parseInt(params.timeoutParms[0]) || 1000;
@@ -44,6 +45,24 @@ var retryTimeoutPlayground = function() {
 
             $(timeoutTickContainer).empty();
             $(retryTickContainer).empty();
+        },
+
+        setMaxDurationOnTimeline: function(maxDurationValueInMS) {
+            // Convert the inputted MS value to Seconds
+            var maxDurationSeconds = Math.round((maxDurationValueInMS/1000) * 10)/10;
+            if (maxDurationSeconds === 0) {
+                // If the converted value is less than .1s, convert to the 
+                // smallest amount of time greater than 0 seconds.
+                var convertedToSeconds = maxDurationValueInMS/1000;
+                var decimalPoints = 100;
+                while (maxDurationSeconds === 0) {
+                    maxDurationSeconds = Math.round(convertedToSeconds * decimalPoints)/decimalPoints;
+                    decimalPoints = decimalPoints * 10
+                }
+            }
+            // Add to the timeline in the playground.
+            $maxDuration = $('[data-step=\'' + this.stepName + '\']').find('.timelineLegendEnd');
+            $maxDuration.html(maxDurationSeconds + "s");
         },
 
         /**
