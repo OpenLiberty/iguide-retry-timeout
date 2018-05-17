@@ -505,8 +505,7 @@
                 "<li><b>jitter:</b> A random variation applied to the <b>delay</b> interval between retries. The integer value must be greater than or equal to <code>0</code>. A value of <code>0</code> means that it is not set. If the specified jitter value is larger than the delay value then the jitter is set to the delay value. The default is <code>200</code> milliseconds.",
                 "<li><b>abortOn:</b>  Specifies an exception class that will stop retries and fail immediately. You can identify more than one exception as an array of values. There is no default value.",
                 "</ul>",
-                "All values for the <code>@Timeout</code> annotation, maxDuration, delay, jitter will be in milliseconds in this playground.",
-                "<instruction class='playgroundInstructionStyle' tabindex='0'><b>Modify</b> the parameters for the <code>@Timeout</code> and the <code>@Retry</code> annotations in the following file. Repeat the process as many times as you want. <br><br> Click <b>Run</b> and observe the timeout and retry simulation on the timeline. </instruction>"
+                "<instruction class='playgroundInstructionStyle' tabindex='0'><b>Modify</b> the parameters for the <code>@Timeout</code> and the <code>@Retry</code> annotations in the following file. In this simulation, the maximum value for <code>maxDuration</code> is 10 seconds. Repeat the process as many times as you want. <br><br> Click <b>Run</b> in the editor and observe the simulation in the timeline. <br><br>All values for the <code>@Timeout</code> annotation, maxDuration, delay, jitter will be in milliseconds in this simulation. </instruction>"
             ],
             "content": [
                 {
