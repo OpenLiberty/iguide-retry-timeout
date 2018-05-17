@@ -10,7 +10,7 @@
  *******************************************************************************/
 var messages = {
     YOUR_ACCOUNT: "Your Account",
-    TRANSACTION_UNABLE_TO_LOAD: "Your recent transactions were unable to load.",
+    TRANSACTION_UNABLE_TO_LOAD: "Your recent transactions are unavailable at this time.",
     RECENT_TRANSACTIONS: "Recent Transactions",
     DESCRIPTION: "DESCRIPTION",
     TYPE: "TYPE",
@@ -24,7 +24,7 @@ var messages = {
     TYPE_CREDIT: "Credit",
     TYPE_DEPOSIT: "Deposit",
     MONTH: "APRIL",
-    PLEASE_TRY_AGAIN: "Please try again at a later time.",
+    PLEASE_TRY_AGAIN: "Please try again later.",
     TIMEOUT: "Timeout",
     RETRY: "Retry"
 };

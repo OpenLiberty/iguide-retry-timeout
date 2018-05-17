@@ -1,7 +1,7 @@
 {
     "name": "RetryTimeout",
-    "title": "Retry and Timeout",
-    "description": "Learn how to use the MicroProfile Retry and Timeout policies.",
+    "title": "Failing fast and recovering from errors",
+    "description": "Use MicroProfile's Timeout and Retry policies to fail fast and recover when running into failures.",
     "duration": "20 minutes",
     "audience": "developer",
     "repo": "https://github.com/OpenLiberty/draft-iguide-retry-timeout",
@@ -11,19 +11,19 @@
             "title": "What you'll learn",
             "guide_duration" : "20 minutes",
             "description": [
-                "Explore how to use <a href='https://microprofile.io/' target='_blank'>MicroProfile</a> Retry and Timeout policies from the <a href='https://github.com/eclipse/microprofile-fault-tolerance' target='_blank'>Fault Tolerance feature</a> to make your microservice more resilient to common failures.",
-                "You'll start with a sample bank scenario and experience a not-so-uncommon network blip. You'll then enable MicroProfile Fault Tolerance and use the Timeout policy to quickly fail requests that are hanging for too long. Finally, you'll explore the Retry policy and how it can help overcome brief unpredictable failures your application may experience."
+                "Explore how to use <a href='https://microprofile.io/' target='_blank'>MicroProfile</a> Timeout and Retry policies from the <a href='https://github.com/eclipse/microprofile-fault-tolerance' target='_blank'>Fault Tolerance feature</a> to make your microservice more resilient to common failures like network problems or <code>IOException</code>.",
+                "You'll start with a sample bank scenario and experience a network blip. You'll then enable MicroProfile Fault Tolerance and use the Timeout policy to quickly fail requests that are hanging for too long. Finally, you'll explore the Retry policy and how it can help overcome temporary intermittent failures your application may experience."
             ],
             "sections" : [
                 {
                     "name": "backgroundConcepts",
                     "title": "Background concepts",
                     "description": [
-                        "In this guide, we use the MicroProfile <b>Timeout</b> and <b>Retry</b> policies to fail quickly and recover from brief intermittent issues. An application may experience these <b>transient failures</b>, especially when it needs to fetch data remotely. Perhaps the database was overloaded by queries, the network connection became unstable, or the site host had a brief downtime. Using Timeout and Retry together can help overcome or alleviate these kinds of transient failures.",
+                        "In this guide, we use the MicroProfile <b>Timeout</b> and <b>Retry</b> policies to fail quickly and recover from brief intermittent issues. An application may experience these <b>transient failures</b> when a database is overloaded by queries, the network connection becomes unstable, or the site host has a brief downtime. Using Timeout and Retry together helps overcome or alleviate these kinds of transient failures.",
                         "<h4>Timeout</h4>",
-                        "In some cases, the user may experience a page loading for a long time, only to never finish. Timeout can help by ending requests that have taken too long and are unlikely to return successfully. This is useful to fail quickly without drawing out the waiting time.",
+                        "Sometimes users experience pages that never finish loading. Timeout helps by ending requests that have taken too long and are unlikely to return successfully.",
                         "<h4>Retry</h4>",
-                        "Sometimes, the underlying issues may be short-lived. In these cases, rather than failing quickly on these transient failures, give the request another chance with the Retry policy. Simply retrying the request after a few seconds may be all you need to avoid showing a dreaded error page."
+                        "Sometimes, the underlying issues may be short-lived. In these cases, rather than failing quickly on these transient failures, the Retry policy provides another chance for the request to succeed. Simply retrying the request may be all you need to do to make it succeed."
                     ]
                 }
             ]
@@ -32,7 +32,7 @@
             "name": "BankScenario",
             "title": "Example: bank scenario",
             "description": [
-                "Imagine that you're developing an online transaction history microservice for a bank to allow clients to check their transaction history. When a customer tries to view their transaction history, occasionally an unforeseen problem may prevent the data from loading and result in a needlessly long or indefinite page load."
+                "Imagine that you’re developing a microservice that allows bank clients to check their transaction history. Occasionally, when a customer tries to view their transaction history, an unforeseen problem may prevent the data from loading and result in an indefinite page load."
             ],
             "sections": [
                 {
@@ -43,7 +43,7 @@
                     ],
                     "instruction": [
                         "Enter the following URL into the browser that follows, or click <action title='URL' onclick=\"retryTimeoutCallback.populateURL(event, 'TransactionHistory')\"><b>https://global-ebank.openliberty.io/transactions</b></action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 0)\"><b>Enter</b></action> to retrieve a transaction history.",
-                        "Click <action title='Refresh' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 1)\"><b>Refresh</b></action> in the browser to see the page loads indefinitely unable to retrieve the transaction history."
+                        "Click <action title='Refresh' onclick=\"retryTimeoutCallback.clickTransaction(event, 'TransactionHistory', 1)\"><b>Refresh</b></action> in the browser to see that the page loads indefinitely unable to retrieve the transaction history."
                     ],
                     "content":[
                         {
@@ -60,7 +60,7 @@
             "name": "AddLibertyMPFaultTolerance",
             "title": "Enabling MicroProfile Fault Tolerance in Open Liberty",
             "description": [
-                "Microprofile Fault Tolerance allows microservices to handle unavailable services. It uses different policies to guide the execution and result of some logic. The MicroProfile Fault Tolerance 1.0 feature provides an environment to support resilient microservices through patterns that include retry and timeout. Enable the MicroProfile Fault Tolerance 1.0 feature in the <code>server.xml</code> file of the Open Liberty server."
+                "Microprofile Fault Tolerance allows microservices to handle unavailable services. It uses different policies to guide the execution and result of some logic. The MicroProfile Fault Tolerance 1.0 feature provides an environment to support resilient microservices through patterns that include timeout and retry. Enable the MicroProfile Fault Tolerance 1.0 feature in the <code>server.xml</code> file of the Open Liberty server."
             ],
             "instruction": [
                 "Add the following element declaration inside the featureManager element of the <code>server.xml</code> file, or click <action title='Enable MicroProfile Fault Tolerance' onclick=\"retryTimeoutCallback.addMicroProfileFaultToleranceFeatureButton(event)\"><b>&lt;feature>mpFaultTolerance-1.0&lt;/feature&gt;</b></action>. Then, click <action title='Save' onclick=\"retryTimeoutCallback.saveServerXMLButton(event)\"><b>Save</b></action> on the editor menu pane."
@@ -103,11 +103,10 @@
             "name": "TimeoutAnnotation",
             "title": "Adding the @Timeout annotation",
             "description": [
-                "Now that you’ve seen the page loads indefinitely when there is some problem on the server end, let's apply a Timeout policy to limit the time the request is made to a transaction history and to prevent the page from loading for a long time.",
-                "The <code>@Timeout</code> annotation takes an integer value that specifies the time allowed for the request to finish. The value must be greater than or equal to <code>0</code>. A value of <code>0</code> means that no timeout is configured. If the value is not specified, the default is <code>1000</code> milliseconds.",
-                "The <code>@Timeout</code> annotation can also be configured to change the default time unit from milliseconds, for example, <code>@Timeout(value=2, unit=ChronoUnit.SECONDS)</code> with the following parameters:",
-                "<ul><li><b>value</b>: The value that specifies the time allowed for the request to finish.</li><li><b>unit</b>: The unit of time for the <code>value</code> parameter as described by <code>java.time.temporal.ChronoUnit</code>. The default is <code>ChronoUnit.MILLIS</code> for milliseconds.</li>The java.time.temporal.ChronoUnit</code> class defines a standard set of date period units, including <code>NANOS, MICROS, MILLIS, SECONDS, MINUTES</code>, and <code>HOURS.</code></ul>",
-                "With a Timeout policy, the microservice fails with a <code>TimeoutException</code> when the set amount of time passes after the request is made.",
+                "Now that you’ve seen the page load indefinitely due to a server side problem, let's apply a Timeout policy to limit the time the request waits.",
+                "The <code>@Timeout</code> annotation specifies the time in milliseconds allowed for the request to finish. Optionally, the <code>@Timeout</code> annotation can be configured to change the default time unit from milliseconds, for example, <code>@Timeout(value=2, unit=ChronoUnit.SECONDS)</code> with the following parameters:",
+                "<ul><li><b>value</b>: The time allowed for the request to finish. The integer value must be greater than or equal to <code>0</code>. A value of <code>0</code> means that Timeout policy is not applied. If the value is not specified, the default is <code>1000</code> milliseconds.</li><li><b>unit</b>: The unit of time for the <code>value</code> parameter as described by <code>java.time.temporal.ChronoUnit</code>. The default is <code>ChronoUnit.MILLIS</code> for milliseconds.</li>The java.time.temporal.ChronoUnit</code> class defines a standard set of date period units, including <code>NANOS, MICROS, MILLIS, SECONDS, MINUTES</code>, and <code>HOURS.</code></ul>",
+                "With a Timeout policy, a <code>TimeoutException</code> occurs when the timeout value has elapsed.",
                 "After you modify your <code>server.xml</code> file to <a href='#enabling-microprofile-fault-tolerance-in-open-liberty'> include the Fault Tolerance feature</a>, add a Timeout policy to the transaction history microservice."
             ],
             "instruction": [
@@ -491,8 +490,23 @@
         },
         {
             "name": "Playground",
-            "title": "Interactive retry timeout playground",
-            "description": "Now that you've learned...",
+            "title": "Interactive timeout retry playground",
+            "description": [
+                "Now that you learned about Timeout and Retry, you can explore the parameters in the <code>@Timeout</code> and <code>@Retry</code> annotations and see how they all work together.",
+                "You learned about the following parameters:",
+                "<code>@Timeout</code>:",
+                "<ul><li><b>value</b>: The time allowed for the request to finish. The integer value must be greater than or equal to <code>0</code>. A value of <code>0</code> means that Timeout policy is not applied. If the value is not specified, the default is <code>1000</code> milliseconds.</li>",
+                "</ul>",
+                "<code>@Retry</code>:",
+                "<ul><li><b>retryOn:</b> Specifies an exception class that triggers a retry. You can identify more than one exception as an array of values. The default is <code>java.lang.Exception.class</code>.",
+                "<li><b>maxRetries:</b> The maximum number of retry requests. The integer value must be greater than or equal to -1.  A value of <code>-1</code> indicates to continue retrying forever. The default is <code>3</code> requests.",
+                "<li><b>maxDuration:</b> The maximum amount of time to perform all requests, including the initial request and all retry attempts. Once the duration is reached, no more retry attempts are initiated. This integer value must be greater than or equal to 0. The default is <code>180000</code> milliseconds",
+                "<li><b>delay:</b> The amount of time to wait before retrying a request.  The value must be an integer greater than or equal to <code>0</code> and be less than the value for <b>maxDuration</b>. The default is <code>0</code>.",
+                "<li><b>jitter:</b> A random variation applied to the <b>delay</b> interval between retries. The integer value must be greater than or equal to <code>0</code>. A value of <code>0</code> means that it is not set. If the specified jitter value is larger than the delay value then the jitter is set to the delay value. The default is <code>200</code> milliseconds.",
+                "<li><b>abortOn:</b>  Specifies an exception class that will stop retries and fail immediately. You can identify more than one exception as an array of values. There is no default value.",
+                "</ul>",
+                "<instruction class='playgroundInstructionStyle' tabindex='0'><b>Modify</b> the parameters for the <code>@Timeout</code> and the <code>@Retry</code> annotations in the following file. In this simulation, the maximum value for <code>maxDuration</code> is 10 seconds. Repeat the process as many times as you want. <br><br> Click <b>Run</b> in the editor and observe the simulation. <br><br>All values for the <code>@Timeout</code> annotation, maxDuration, delay, jitter will be in milliseconds. </instruction>"
+            ],
             "content": [
                 {
                     "displayType": "tabbedEditor",
@@ -554,7 +568,7 @@
             "name": "WhatNext",
             "title": "Great work!  You're done!",
             "description": [
-                "You learned about the benefits of Retry and Timeout policies and how to make your microservice more resilient to failures. You learned that the Timeout policy can be used to quickly fail requests that are hanging for too long. You learned to use the Retry policy to re-attempt an operation that has failed and therefore recover from transient failures your application may experience.",
+                "You learned about the benefits of the Microprofile Fault Tolerance feature's Timeout and Retry policies and how to make your microservice more resilient to failures. You learned that the Timeout policy can be used to quickly fail requests that are hanging for too long. You learned to use the Retry policy to re-attempt an operation that has failed and therefore recover from transient failures your application may experience.",
                 "<p> <a href='https://github.com/OpenLiberty/iguide-retry-timeout/tree/master/finish' >Download the sample retry timeout application on github</a>.</p>"
              ]
         }
