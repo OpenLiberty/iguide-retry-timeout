@@ -346,42 +346,49 @@ var retryTimeoutCallback = (function() {
         var browser = contentManager.getBrowser(stepName);
         var browserContentHTML = htmlRootDir + "global-eBank.html";
 
-        browser.setURL(__browserTransactionBaseURL); 
-
-        if (numOfRequest !== -1) {
-            contentManager.markCurrentInstructionComplete(stepName);
-        }
-        if (stepName === "TransactionHistory") {
-            if (numOfRequest === 0) {
-                browserContentHTML = htmlRootDir + "transaction-history.html";
-                contentManager.updateWithNewInstructionNoMarkComplete(stepName);
-            } else if (numOfRequest === 1) {
+        var checkURL = browser.getURL().trim();
+        if (checkURL === __browserTransactionBaseURL) {
+            if (numOfRequest !== -1) {
+                contentManager.markCurrentInstructionComplete(stepName);
+            }
+            if (stepName === "TransactionHistory") {
+                if (numOfRequest === 0) {
+                    browserContentHTML = htmlRootDir + "transaction-history.html";
+                    contentManager.updateWithNewInstructionNoMarkComplete(stepName);
+                } else if (numOfRequest === 1) {
+                    browserContentHTML = htmlRootDir + "transaction-history-loading.html";
+                }
+            } else if (stepName === "AddAbortOnRetry") {
+                browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";   
+            } else /** if (stepName === "AddRetryOnRetry" || stepName === "AddLimitsRetry", etc....)**/ {
                 browserContentHTML = htmlRootDir + "transaction-history-loading.html";
             }
-        } else if (stepName === "AddAbortOnRetry") {
-            browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";   
-        } else /** if (stepName === "AddRetryOnRetry" || stepName === "AddLimitsRetry", etc....)**/ {
-            browserContentHTML = htmlRootDir + "transaction-history-loading.html";
-        }
-
-        browser.setBrowserContent(browserContentHTML);
-
-        switch(stepName) {
-            case "TransactionHistory":
-                showBrowserOverlay(browser, numOfRequest, stepName);
-                break;
-            case "AddRetryOnRetry":
-                showTransactionHistory(stepName, browser);
-                break;
-            case "AddLimitsRetry":
-                showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 0 /* Not set */, 0 /* Not set */);
-                break;
-            case "AddDelayRetry":
-                showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 200, 0 /* Not set */);
-                break;
-            case "AddJitterRetry":
-                showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 200, 100);
-                break;
+    
+            browser.setBrowserContent(browserContentHTML);
+    
+            switch(stepName) {
+                case "TransactionHistory":
+                    showBrowserOverlay(browser, numOfRequest, stepName);
+                    break;
+                case "AddRetryOnRetry":
+                    showTransactionHistory(stepName, browser);
+                    break;
+                case "AddLimitsRetry":
+                    showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 0 /* Not set */, 0 /* Not set */);
+                    break;
+                case "AddDelayRetry":
+                    showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 200, 0 /* Not set */);
+                    break;
+                case "AddJitterRetry":
+                    showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 200, 100);
+                    break;
+            }    
+        } else {
+            if (checkURL !== ""){
+                browser.setBrowserContent("/guides/draft-iguide-retry-timeout/html/page-not-found.html");
+            } else {
+                browser.setBrowserContent("");
+            }
         }
     };
 
@@ -680,13 +687,16 @@ var retryTimeoutCallback = (function() {
 
         if (__checkRetryAnnotationInContent(content, paramsToCheck)) {
             editor.closeEditorErrorBox(stepName);
-            contentManager.markCurrentInstructionComplete(stepName);
-            contentManager.updateWithNewInstructionNoMarkComplete(stepName);
-
-            // Display the pod with dashboard and web browser in it
-            var htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
-            contentManager.setPodContent(stepName, htmlFile);
-            contentManager.resizeTabbedEditor(stepName);
+            var index = contentManager.getCurrentInstructionIndex();
+            if (index === 0) {
+                contentManager.markCurrentInstructionComplete(stepName);
+                contentManager.updateWithNewInstructionNoMarkComplete(stepName);
+    
+                // Display the pod with dashboard and web browser in it
+                var htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
+                contentManager.setPodContent(stepName, htmlFile);
+                contentManager.resizeTabbedEditor(stepName);
+            }
         } else {
             // display error and provide link to fix it
             editor.createErrorLinkForCallBack(true, __correctEditorError);
