@@ -451,10 +451,14 @@ var retryTimeoutCallback = (function() {
         // Show the timeout tick
         // Do the math...
         var timeoutTickPlacement = Math.round((elapsedRetryProgress/maxDurationInMS) * 1000) / 10;  // Round to 1 decimal place
-        //console.log("Timeout: " + timeoutCount + " timeoutTickPlacement: " + timeoutTickPlacement);
-        $progressBar.attr("style", "width:" + timeoutTickPlacement + "%;");
+        if (currentPctProgress < timeoutTickPlacement) {
+            $progressBar.attr("style", "width:" + timeoutTickPlacement + "%;");
+            //console.log("set: " + timeoutTickPlacement + " -1");            
+            currentPctProgress = timeoutTickPlacement;           
+        }
 
         // Determine label for the timeout tick...convert from ms to seconds and round to 1 decimal place
+        //console.log("Timeout: " + timeoutCount + " timeoutTickPlacement: " + timeoutTickPlacement);
         var timeoutLabel = (elapsedRetryProgress/1000).toFixed(2) + "s";
         $('<div/>').attr('class','timelineTick timeoutTick').attr('style','left:calc(' + timeoutTickPlacement + '% - 5px);').attr('title', timeoutLabel).appendTo(timeoutTickContainer);
         if (stepName !== 'Playground') {
@@ -478,30 +482,37 @@ var retryTimeoutCallback = (function() {
             // Advance the blue progress bar 1% at a time until we reach the spot
             // for the retry tick.
             currentPctProgress++;
-            //console.log("currentPctProgress: " + currentPctProgress + "  :retryTickPctPlacement: " + retryTickPctPlacement);
-            if (currentPctProgress < retryTickPctPlacement) {
-                // Advance blue progress bar until we reach the place where
-                // the retry tick should go.
-                $progressBar.attr("style", "width:" + currentPctProgress + "%;");
-            } else {
+            if (currentPctProgress < retryTickPctPlacement) {                
+                if (currentPctProgress <= 100) {
+                    $progressBar.attr("style", "width:" + currentPctProgress + "%;");
+                    //console.log("set: " + currentPctProgress + " -2"); 
+                } else {
+                    // Exceeded maxDuration!
+                    clearInterval(moveProgressBar);
+                    $progressBar.attr("style", "width: 100%;");
+                    // console.log("set: 100% -3"); 
+                    // console.log("maxDuration exceeded....put up error");                    browser.setURL(__browserTransactionBaseURL);
+                    // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
+                    browser.setBrowserContent(htmlRootDir + "transaction-history-timeout-error.html");
+                }
+            }  else {
                 clearInterval(moveProgressBar);
                 currentPctProgress = retryTickPctPlacement;
-                //console.log("retry tick placed.  CurrentPctProgress: " + currentPctProgress);
 
                 // Move the blue progress bar exactly to the retry tick spot
                 $progressBar.attr("style", "width:" + retryTickPctPlacement + "%;");
+                //console.log("set: " + retryTickPctPlacement + " -4"); 
                 elapsedRetryProgress = retryTickSpot;
 
                 // Put up the retry tick at its spot...
                 // Determine label for the retry tick...convert from ms to seconds and round to 1 decimal place
                 var retryLabel = (elapsedRetryProgress/1000).toFixed(2) + "s";
+                //console.log("retry tick placed.  CurrentPctProgress: " + currentPctProgress);
                 $('<div/>').attr('class','timelineTick retryTick').attr('style','left:calc(' + retryTickPctPlacement + '% - 5px);').attr('title', retryLabel).appendTo(retryTickContainer);
                 if (stepName !== 'Playground') {
                     $('<div/>', {"class": "timelineLabel retryLabel", text: retryLabel, style: 'left:calc(' + retryTickPctPlacement + '% - 29px);'}).appendTo(retryTickContainer);
                 }
         
-
-
                 // Advance the progress bar until the next timeout
                 setProgressBar(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar, browser);
             }
@@ -537,8 +548,10 @@ var retryTimeoutCallback = (function() {
                 currentPctProgress += 1; // Advance the progress bar to simulate processing
                 if (currentPctProgress <= 100) {
                     $progressBar.attr("style", "width:" + currentPctProgress + "%;");
+                    //console.log("set: " + currentPctProgress + " -5"); 
                 } else {
                     $progressBar.attr("style", "width:100%;");
+                    //console.log("set: 100% -6"); 
                 }
                 browser.setURL(__browserTransactionBaseURL);
                 browser.setBrowserContent(htmlRootDir + "transaction-history.html");
@@ -546,14 +559,16 @@ var retryTimeoutCallback = (function() {
                 // Determine how far (% of timeline) we would travel in <timeout> milliseconds.
                 var forwardPctProgress = Math.round(((elapsedRetryProgress + timeout)/maxDurationInMS) * 1000) / 10;  // Round to 1 decimal place
                 if (currentPctProgress < forwardPctProgress) {
-                    currentPctProgress++;
-                    // console.log("extend progress to " + currentPctProgress + "%");
+                    currentPctProgress++;                   
                     if (currentPctProgress <= 100) {
                         $progressBar.attr("style", "width:" + currentPctProgress + "%;");
+                        //console.log("set: " + currentPctProgress + " -7"); 
                     } else {
                         // Exceeded maxDuration!
-                        // console.log("maxDuration exceeded....put up error");
+                        // console.log("maxDuration exceeded....put up message");
                         clearInterval(moveProgressBar);
+                        $progressBar.attr("style", "width: 100%;")
+                        //console.log("set: " + 100 + " -8");                        
                         browser.setURL(__browserTransactionBaseURL);
                         // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
                         browser.setBrowserContent(htmlRootDir + "transaction-history-timeout-error.html");
