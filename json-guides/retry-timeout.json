@@ -493,19 +493,17 @@
             "title": "Interactive timeout retry playground",
             "description": [
                 "Now that you learned about Timeout and Retry, you can explore the parameters in the <code>@Timeout</code> and <code>@Retry</code> annotations and see how they all work together.",
-                "You learned about the following parameters:",
+                "You can make change to the following parameters:",
                 "<code>@Timeout</code>:",
                 "<ul><li><b>value</b>: The time allowed for the request to finish. The integer value must be greater than or equal to <code>0</code>. A value of <code>0</code> means that Timeout policy is not applied. If the value is not specified, the default is <code>1000</code> milliseconds.</li>",
                 "</ul>",
                 "<code>@Retry</code>:",
-                "<ul><li><b>retryOn:</b> Specifies an exception class that triggers a retry. You can identify more than one exception as an array of values. The default is <code>java.lang.Exception.class</code>.",
-                "<li><b>maxRetries:</b> The maximum number of retry requests. The integer value must be greater than or equal to -1.  A value of <code>-1</code> indicates to continue retrying forever. The default is <code>3</code> requests.",
-                "<li><b>maxDuration:</b> The maximum amount of time to perform all requests, including the initial request and all retry attempts. Once the duration is reached, no more retry attempts are initiated. This integer value must be greater than or equal to 0. The default is <code>180000</code> milliseconds",
-                "<li><b>delay:</b> The amount of time to wait before retrying a request.  The value must be an integer greater than or equal to <code>0</code> and be less than the value for <b>maxDuration</b>. The default is <code>0</code>.",
-                "<li><b>jitter:</b> A random variation applied to the <b>delay</b> interval between retries. The integer value must be greater than or equal to <code>0</code>. A value of <code>0</code> means that it is not set. If the specified jitter value is larger than the delay value then the jitter is set to the delay value. The default is <code>200</code> milliseconds.",
-                "<li><b>abortOn:</b>  Specifies an exception class that will stop retries and fail immediately. You can identify more than one exception as an array of values. There is no default value.",
-                "</ul>",
-                "<instruction class='playgroundInstructionStyle' tabindex='0'><b>Modify</b> the parameters for the <code>@Timeout</code> and the <code>@Retry</code> annotations in the following file. In this simulation, the maximum value for <code>maxDuration</code> is 10 seconds. Repeat the process as many times as you want. <br><br> Click <b>Run</b> in the editor and observe the simulation. <br><br>All values for the <code>@Timeout</code> annotation, maxDuration, delay, jitter will be in milliseconds. </instruction>"
+                "<li><b>maxRetries:</b> The maximum number of retry requests. The integer value must be greater than or equal to -1.  A value of -1 indicates to continue retrying forever. The default is <code>3</code> requests.",
+                "<li><b>maxDuration:</b> The maximum amount of time to perform all requests, including the initial request and all retry attempts. Once the duration is reached, no more retry attempts are initiated. This integer value must be greater than or equal to 0. The default is <code>180000</code> milliseconds.",
+                "<li><b>delay:</b> The amount of time to wait before retrying a request.  The value must be an integer greater than or equal to 0 and be less than the value for <b>maxDuration</b>. The default is <code>0</code>.",
+                "<li><b>jitter:</b> A random variation applied to the <b>delay</b> interval between retries. The integer value must be greater than or equal to 0. A value of 0 means that it is not set. If the specified jitter value is larger than the delay value then the jitter is set to the delay value. The default is <code>200</code> milliseconds.",
+                "</ul><br><br>",
+                "<instruction class='playgroundInstructionStyle' tabindex='0'><b>Modify</b> the parameters for the <code>@Timeout</code> and the <code>@Retry</code> annotations in the following file. In this simulation, we do not support <code>retryOn</code>, <code>abortOn</code> and units parameters. <code>retryOn</code> will default to <code>TimeoutException</code> and can not be altered. All values for the <code>@Timeout</code> annotation and the <code>maxDuration</code>, <code>delay</code>, <code>jitter</code> parameters for the <code>@Retry</code> annotation will default to milliseconds. Repeat the process as many times as you want. <br><br> Click <b>Run</b> in the editor and observe the timeline. The simulation ends when the message 'Your recent transactions are unavailable at this time. Please try again later.' is shown in the browser .</instruction>"
             ],
             "content": [
                 {
