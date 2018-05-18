@@ -896,14 +896,15 @@ var retryTimeoutCallback = (function() {
         var stepName = editor.getStepName();
         var playground = contentManager.getPlayground(stepName);
 
-        var params = __getParamsFromEditor(editor);
-        var paramsValid = __verifyParams(params, editor);
         playground.resetPlayground();
+
+        var params = __getParamsFromEditor(editor);
+        var paramsValid = __verifyAndCorrectParams(params, editor);
 
         if (paramsValid) {
             playground.startTimeline(stepName, params);
         } else {
-            editor.createCustomErrorMessage(retryTimeoutMessages["INVALID_PARAMETER_VALUE"]);
+            editor.createCustomErrorMessage(retryTimeoutMessages.INVALID_PARAMETER_VALUE);
         }
     };
 
@@ -912,10 +913,14 @@ var retryTimeoutCallback = (function() {
         editorContents.retryParms = {};
         try {
             editorContents.retryParms = __getRetryParams(editor);
-        } catch (e) { }
+        } catch (e) {
+            throw e;
+        }
         try {
             editorContents.timeoutParms = __getTimeoutParams(editor);
-        } catch (e) { }
+        } catch (e) {
+            throw e;
+        }
 
         return editorContents;
     };
@@ -932,6 +937,10 @@ var retryTimeoutCallback = (function() {
         var retryRegex = new RegExp(retryRegexString, "g");
         var retryMatch = retryRegex.exec(content);
 
+        // if no parameters, return empty params
+        if (!retryMatch) { 
+            return retryParms;
+        }
         // Turn string of params into array
         var retryParamsString = retryMatch[2];
         retryParams = __parmsToArray(retryParamsString);
@@ -943,6 +952,9 @@ var retryTimeoutCallback = (function() {
             switch (match[1]) {
                 //TODO: possibly check for number-only for some params
                 case "retryOn":
+                case "abortOn":
+                    editor.createCustomErrorMessage(retryTimeoutMessages.RETRY_ABORT_UNSUPPORTED);
+                    throw retryTimeoutMessages.RETRY_ABORT_UNSUPPORTED;
                 case "maxRetries":
                 case "maxDuration":
                 case "delay":
@@ -952,13 +964,11 @@ var retryTimeoutCallback = (function() {
                 case "durationUnit":
                 case "delayUnit":
                 case "jitterDelayUnit":
-                    editor.createCustomErrorMessage(retryTimeoutMessages["UNIT_PARAMS_DISABLED"]);
-                    break;
+                    editor.createCustomErrorMessage(retryTimeoutMessages.UNIT_PARAMS_DISABLED);
+                    throw retryTimeoutMessages.UNIT_PARAMS_DISABLED;
                 default:
-                // TODO: unrecognized or unsupported parameter (including unit params)
-                // throw editor error message
-                    editor.createCustomErrorMessage(retryTimeoutMessages["UNSUPPORTED_RETRY_PARAM"]);
-                    break;
+                    editor.createCustomErrorMessage(retryTimeoutMessages.UNSUPPORTED_RETRY_PARAM);
+                    throw retryTimeoutMessages.UNSUPPORTED_RETRY_PARAM;
             }
         });
         return retryParms;
@@ -981,24 +991,74 @@ var retryTimeoutCallback = (function() {
         return timeoutParams;
     };
 
-    var __verifyParams = function(params, editor) {
+    // Checks if parameters are valid (all in milliseconds)
+    // returns false if something is invalid
+    // returns corrected parameters otherwise
+    var __verifyAndCorrectParams = function(params, editor) {
         var retryParms = params.retryParms;
-        var paramsValid = true;
         if (retryParms) {
-            if (retryParms.maxRetries && (parseInt(retryParms.maxRetries) < -1)) {
-                paramsValid = false;
+            var maxRetries = __getValueIfInteger(retryParms.maxRetries);
+            var maxDuration = __getValueIfInteger(retryParms.maxDuration);
+            var delay = __getValueIfInteger(retryParms.delay);
+            var jitter = __getValueIfInteger(retryParms.jitter);
+    
+            if (maxRetries) {
+                if (maxRetries < -1) {
+                    return false;
+                }
+            } else {
+                maxRetries = 3;
+                params.retryParms.maxRetries = 3;
             }
-            if (retryParms.maxDuration && (parseInt(retryParms.maxDuration) < 0)) {
-                paramsValid = false;
+
+            if (maxDuration) {
+                if (maxDuration < 0) {
+                    return false;
+                }
+            } else {
+                maxDuration = 180000;
+                params.retryParms.maxDuration = 180000;
             }
-            if (retryParms.delay && (parseInt(retryParms.delay) < 0)) {
-                paramsValid = false;
+
+            if (delay) {
+                if (delay < 0) {
+                    return false;
+                }
+                if (delay > maxDuration) {
+                    editor.createCustomErrorMessage(retryTimeoutMessages.DURATION_LESS_THAN_DELAY);
+                    return false;
+                }
+            } else {
+                delay = 0;
+                params.retryParms.delay = 0;
             }
-            if (retryParms.jitter && (parseInt(retryParms.jitter) < 0)) {
-                paramsValid = false;
+
+            if (jitter) {
+                if (jitter < 0) {
+                    return false;
+                }
+            } else {
+                jitter = 200;
+                params.retryParms.jitter = 200;
+            }
+
+            // jitter clamp
+            if (jitter > delay) {
+                params.retryParms.jitter = params.retryParms.delay;
             }
         }
-        return paramsValid;
+        return params.retryParms;
+    };
+
+    var __getValueIfInteger = function(paramValueString) {
+        var regex =/^[-]?\d+$/gm; // regex for matching integer format
+        var match = regex.exec(paramValueString);
+        if (match) {
+            var param = match[0];
+            return parseInt(param);
+        } else {
+            return null;
+        }
     };
 
     // converts the string of parameters into an array

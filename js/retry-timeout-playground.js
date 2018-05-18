@@ -16,11 +16,11 @@ var retryTimeoutPlayground = function() {
 
             // Set params, or use default param values
             // TODO: probably handle setting defaults in __getParamsFromEditor
-            var maxRetries = parseInt(retryParams.maxRetries) || 3;
-            var maxDuration = parseInt(retryParams.maxDuration) || 180000;
+            var maxRetries = parseInt(retryParams.maxRetries);
+            var maxDuration = parseInt(retryParams.maxDuration);
             this.setMaxDurationOnTimeline(maxDuration);
-            var delay = parseInt(retryParams.delay) || 0;
-            var jitter = parseInt(retryParams.jitter) || 200;
+            var delay = parseInt(retryParams.delay);
+            var jitter = parseInt(retryParams.jitter);
             var timeout = parseInt(params.timeoutParms[0]) || 1000;
 
             var timeoutCount = 0;
