@@ -382,7 +382,15 @@ var retryTimeoutCallback = (function() {
                 case "AddJitterRetry":
                     showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 200, 100);
                     break;
-            }    
+            } 
+        } else if (checkURL === __browserTransactionBaseURL + "/error") {
+            if (numOfRequest !== -1) {
+                contentManager.markCurrentInstructionComplete(stepName);
+            }
+            if (stepName === "TimeoutAnnotation") {
+                browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";
+            }
+            browser.setBrowserContent(browserContentHTML);   
         } else {
             if (checkURL !== ""){
                 browser.setBrowserContent("/guides/draft-iguide-retry-timeout/html/page-not-found.html");
@@ -580,10 +588,7 @@ var retryTimeoutCallback = (function() {
         var setBrowserContent = function(currentURL) {
             var stepName = webBrowser.getStepName();
             var currentInstructionIndex = contentManager.getCurrentInstructionIndex(stepName);
-            // Check if the url is correct before loading content
-            if (webBrowser.getURL() === __browserTransactionBaseURL) {
-                handleTransactionRequestInBrowser(stepName, currentInstructionIndex);
-            }
+            handleTransactionRequestInBrowser(stepName, currentInstructionIndex);
         }
         webBrowser.addUpdatedURLListener(setBrowserContent);
     };

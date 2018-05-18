@@ -19,7 +19,7 @@
         url: "https://global-ebank.openliberty.io/transactions/error",
         browserContent: "/guides/draft-iguide-retry-timeout/html/transaction-history-timeout-error.html",
         enableStatusBar: false,
-        enableRefreshButton: false
+        callback: function test(webBrowser) {retryTimeoutCallback.listenToBrowserForTransactionHistory(webBrowser); }
     };
     webBrowser.create($('#' + stepElementId).find('.browserHolder'), stepName, content).done(function (newWebBrowser) {
         contentManager.setWebBrowser(stepName, newWebBrowser, 0);
