@@ -914,12 +914,12 @@ var retryTimeoutCallback = (function() {
         try {
             editorContents.retryParms = __getRetryParams(editor);
         } catch (e) {
-            throw e;
+            editor.createCustomErrorMessage(e);
         }
         try {
             editorContents.timeoutParms = __getTimeoutParams(editor);
         } catch (e) {
-            throw e;
+            editor.createCustomErrorMessage(e);
         }
 
         return editorContents;
@@ -931,14 +931,14 @@ var retryTimeoutCallback = (function() {
         // [0] - original content
         // [1] - Retry annotation
         // [2] - retry parameters as a string
-        var retryRegexString = "(@Retry" + "\\s*" + "\\(" + "\\s*" +
+        var retryRegexString = "(@Retry\\s*\\(\\s*" +
         "((?:\\s*(?:retryOn|maxRetries|maxDuration|durationUnit|delay|delayUnit|jitter|jitterDelayUnit|abortOn)\\s*=\\s*[-\\d\.,a-zA-Z]*)*)" +
-        "\\s*" + "\\))";
+        "\\s*\\))";
         var retryRegex = new RegExp(retryRegexString, "g");
         var retryMatch = retryRegex.exec(content);
 
         // if no parameters, return empty params
-        if (!retryMatch) { 
+        if (!retryMatch || !retryMatch[2]) { 
             return retryParms;
         }
         // Turn string of params into array
@@ -953,21 +953,23 @@ var retryTimeoutCallback = (function() {
                 //TODO: possibly check for number-only for some params
                 case "retryOn":
                 case "abortOn":
-                    editor.createCustomErrorMessage(retryTimeoutMessages.RETRY_ABORT_UNSUPPORTED);
                     throw retryTimeoutMessages.RETRY_ABORT_UNSUPPORTED;
                 case "maxRetries":
                 case "maxDuration":
                 case "delay":
                 case "jitter":
-                    retryParms[match[1]] = match[2];
+                    var value = __getValueIfInteger(match[2]);
+                    if (value) {
+                        retryParms[match[1]] = value;
+                    } else {
+                        throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                    }
                     break;
                 case "durationUnit":
                 case "delayUnit":
                 case "jitterDelayUnit":
-                    editor.createCustomErrorMessage(retryTimeoutMessages.UNIT_PARAMS_DISABLED);
                     throw retryTimeoutMessages.UNIT_PARAMS_DISABLED;
                 default:
-                    editor.createCustomErrorMessage(retryTimeoutMessages.UNSUPPORTED_RETRY_PARAM);
                     throw retryTimeoutMessages.UNSUPPORTED_RETRY_PARAM;
             }
         });
@@ -978,17 +980,25 @@ var retryTimeoutCallback = (function() {
         var content = editor.getEditorContent();
         // [0] - original content
         // [1] - Timeout annotation
-        // [2] - parameter value inside parentheses
+        // [2] - 'value=' parameter if it exists
+        // [3] - integer value parameter if it exists
         var timeoutRegexString = "\\s*(@Timeout)\\s*" + 
-        "(?:\\(\\s*([\\d]*)\\s*\\))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
+        "(?:\\((?:\\s*value\\s*=\\s*([\\d]+)\\s*\\))|(?:\\(\\s*([\\w]*)\\s*\\)))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
 
         var timeoutRegex = new RegExp(timeoutRegexString, "g");
         var timeoutMatch = timeoutRegex.exec(content);
 
-        var timeoutParams = timeoutMatch[2] || "1000"; //default 1000 if none defined
-        timeoutParams = __parmsToArray(timeoutParams);
-
-        return timeoutParams;
+        var paramString = timeoutMatch[2] || timeoutMatch[3];
+        var timeoutParms = {};
+        if (paramString) {
+            var value = __getValueIfInteger(paramString);
+            if (value) {
+                timeoutParms = __parmsToArray(paramString);
+            } else {
+                throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+            }
+        }
+        return timeoutParms;
     };
 
     // Checks if parameters are valid (all in milliseconds)
@@ -1047,7 +1057,8 @@ var retryTimeoutCallback = (function() {
                 params.retryParms.jitter = params.retryParms.delay;
             }
         }
-        return params.retryParms;
+
+        return params;
     };
 
     var __getValueIfInteger = function(paramValueString) {
@@ -1063,6 +1074,9 @@ var retryTimeoutCallback = (function() {
 
     // converts the string of parameters into an array
     var __parmsToArray = function(parms) {
+        if (!parms) {
+            throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+        }
         parms = parms.replace(/\s/g, '');  // Remove white space
         if (parms.trim() !== "") {
             parms = parms.split(',');
