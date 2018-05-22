@@ -978,16 +978,16 @@ var retryTimeoutCallback = (function() {
         // [2] - 'value=' parameter if it exists
         // [3] - integer value parameter if it exists
         var timeoutRegexString = "\\s*(@Timeout)\\s*" + 
-        "(?:\\((?:\\s*value\\s*=\\s*([\\d]+)\\s*\\))|(?:\\(\\s*([\\w]*)\\s*\\)))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
+        "(?:\\((?:\\s*value\\s*=\\s*([\\d]*)\\s*\\))|(?:\\(\\s*([\\w]*)\\s*\\)))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
 
         var timeoutRegex = new RegExp(timeoutRegexString, "g");
         var timeoutMatch = timeoutRegex.exec(content);
 
         var timeoutParms = {};
-        timeoutParms.value = timeoutMatch[2] || timeoutMatch[3];
-        if (timeoutParms.value === undefined) {
+        if (timeoutMatch[2] == "") {
             throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
         }
+        timeoutParms.value = timeoutMatch[2] || timeoutMatch[3];
         return timeoutParms;
     };
 
