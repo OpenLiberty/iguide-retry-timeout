@@ -21,7 +21,7 @@ var retryTimeoutPlayground = function() {
             this.setMaxDurationOnTimeline(maxDuration);
             var delay = parseInt(retryParams.delay);
             var jitter = parseInt(retryParams.jitter);
-            var timeout = parseInt(params.timeoutParms[0]) || 1000;
+            var timeout = parseInt(params.timeoutParms.value);
 
             var timeoutCount = 0;
             var elapsedRetryProgress = 0;
@@ -38,6 +38,7 @@ var retryTimeoutPlayground = function() {
             this.browser.setBrowserContent(null);
             clearInterval(this.moveProgressBar);
             //TODO: reset progress bar to 0
+            //TODO: clear editor error messages
 
             var $tickContainers = $('[data-step=\'' + this.stepName + '\']').find('.tickContainer');
             var timeoutTickContainer = $tickContainers[0];

@@ -898,8 +898,12 @@ var retryTimeoutCallback = (function() {
 
         playground.resetPlayground();
 
-        var params = __getParamsFromEditor(editor);
-        var paramsValid = __verifyAndCorrectParams(params, editor);
+        try {
+            var params = __getParamsFromEditor(editor);
+            var paramsValid = __verifyAndCorrectParams(params, editor);    
+        } catch(e) {
+            editor.createCustomErrorMessage(e);
+        }
 
         if (paramsValid) {
             playground.startTimeline(stepName, params);
@@ -911,16 +915,9 @@ var retryTimeoutCallback = (function() {
     var __getParamsFromEditor = function(editor) {
         var editorContents = {};
         editorContents.retryParms = {};
-        try {
-            editorContents.retryParms = __getRetryParams(editor);
-        } catch (e) {
-            editor.createCustomErrorMessage(e);
-        }
-        try {
-            editorContents.timeoutParms = __getTimeoutParams(editor);
-        } catch (e) {
-            editor.createCustomErrorMessage(e);
-        }
+        
+        editorContents.retryParms = __getRetryParams(editor);
+        editorContents.timeoutParms = __getTimeoutParams(editor);
 
         return editorContents;
     };
@@ -958,12 +955,10 @@ var retryTimeoutCallback = (function() {
                 case "maxDuration":
                 case "delay":
                 case "jitter":
-                    var value = __getValueIfInteger(match[2]);
-                    if (value) {
-                        retryParms[match[1]] = value;
-                    } else {
+                    if (!match[2]) {
                         throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
                     }
+                    retryParms[match[1]] = match[2];
                     break;
                 case "durationUnit":
                 case "delayUnit":
@@ -988,15 +983,10 @@ var retryTimeoutCallback = (function() {
         var timeoutRegex = new RegExp(timeoutRegexString, "g");
         var timeoutMatch = timeoutRegex.exec(content);
 
-        var paramString = timeoutMatch[2] || timeoutMatch[3];
         var timeoutParms = {};
-        if (paramString) {
-            var value = __getValueIfInteger(paramString);
-            if (value) {
-                timeoutParms = __parmsToArray(paramString);
-            } else {
-                throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
-            }
+        timeoutParms.value = timeoutMatch[2] || timeoutMatch[3];
+        if (timeoutParms.value === undefined) {
+            throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
         }
         return timeoutParms;
     };
@@ -1012,11 +1002,16 @@ var retryTimeoutCallback = (function() {
             var delay = __getValueIfInteger(retryParms.delay);
             var jitter = __getValueIfInteger(retryParms.jitter);
     
+            // If any variable is invalid, return false
+            if ((maxRetries && maxDuration && delay && jitter) === false) {
+                return false;
+            }
+
             if (maxRetries) {
                 if (maxRetries < -1) {
                     return false;
                 }
-            } else {
+            } else if (maxRetries === null) {
                 maxRetries = 3;
                 params.retryParms.maxRetries = 3;
             }
@@ -1025,7 +1020,7 @@ var retryTimeoutCallback = (function() {
                 if (maxDuration < 0) {
                     return false;
                 }
-            } else {
+            } else if (maxDuration === null) {
                 maxDuration = 180000;
                 params.retryParms.maxDuration = 180000;
             }
@@ -1038,7 +1033,7 @@ var retryTimeoutCallback = (function() {
                     editor.createCustomErrorMessage(retryTimeoutMessages.DURATION_LESS_THAN_DELAY);
                     return false;
                 }
-            } else {
+            } else if (delay === null) {
                 delay = 0;
                 params.retryParms.delay = 0;
             }
@@ -1047,7 +1042,7 @@ var retryTimeoutCallback = (function() {
                 if (jitter < 0) {
                     return false;
                 }
-            } else {
+            } else if (jitter === null) {
                 jitter = 200;
                 params.retryParms.jitter = 200;
             }
@@ -1058,15 +1053,36 @@ var retryTimeoutCallback = (function() {
             }
         }
 
+        var timeoutParms = params.timeoutParms;
+        if (timeoutParms) {
+            var value = __getValueIfInteger(timeoutParms.value);
+            if (value) {
+                if (value < 0) {
+                    return false;
+                }
+            } else if (value === null) {
+                value = 1000;
+                params.timeoutParms.value = 1000;
+            } else {
+                return false;
+            }
+        }
         return params;
     };
 
+    // returns the Integer value if the parameter string is an integer
+    // returns null if nothing passed in
+    // returns false if invalid input is passed in
     var __getValueIfInteger = function(paramValueString) {
-        var regex =/^[-]?\d+$/gm; // regex for matching integer format
-        var match = regex.exec(paramValueString);
-        if (match) {
-            var param = match[0];
-            return parseInt(param);
+        if (paramValueString) {
+            var regex =/^[-]?\d+$/gm; // regex for matching integer format
+            var match = regex.exec(paramValueString);
+            if (match) {
+                var param = match[0];
+                return parseInt(param);
+            } else {
+                return false;
+            }
         } else {
             return null;
         }
