@@ -16,7 +16,6 @@ var retryTimeoutPlayground = function() {
             var retryParams = params.retryParms;
 
             // Set params, or use default param values
-            // TODO: probably handle setting defaults in __getParamsFromEditor
             var maxRetries = parseInt(retryParams.maxRetries);
             var maxDuration = parseInt(retryParams.maxDuration);
             this.setMaxDurationOnTimeline(maxDuration);
@@ -59,7 +58,7 @@ var retryTimeoutPlayground = function() {
                 var decimalPoints = 100;
                 while (maxDurationSeconds === 0) {
                     maxDurationSeconds = Math.round(convertedToSeconds * decimalPoints)/decimalPoints;
-                    decimalPoints = decimalPoints * 10
+                    decimalPoints = decimalPoints * 10;
                 }
             }
             // Add to the timeline in the playground.
@@ -139,7 +138,7 @@ var retryTimeoutPlayground = function() {
                         //console.log("set: " + currentPctProgress + " -3"); 
                     } else {    
                         // Exceeded maxDuration!
-                        clearInterval(moveProgressBar);
+                        clearInterval(me.moveProgressBar);
                         $progressBar.attr("style", "width: 100%;");
                         //console.log("set: 100% -4"); 
                         //console.log("maxDuration exceeded....put up error");                    browser.setURL(__browserTransactionBaseURL);

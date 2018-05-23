@@ -929,9 +929,9 @@ var retryTimeoutCallback = (function() {
         // [0] - original content
         // [1] - Retry annotation
         // [2] - retry parameters as a string
-        var retryRegexString = "(@Retry\\s*\\(\\s*" +
-        "((?:\\s*(?:retryOn|maxRetries|maxDuration|durationUnit|delay|delayUnit|jitter|jitterDelayUnit|abortOn)\\s*=\\s*[-\\d\.,a-zA-Z]*)*)" +
-        "\\s*\\))";
+        var retryRegexString = "@Retry\\s*" + "(\\(" +
+        "((?:\\s*(?:retryOn|maxRetries|maxDuration|durationUnit|delay|delayUnit|jitter|jitterDelayUnit|abortOn)\\s*=\\s*[-\\d\.,a-zA-Z]*)*)*" +
+        "\\s*\\))?";
         var retryRegex = new RegExp(retryRegexString, "g");
         var retryMatch = retryRegex.exec(content);
 
@@ -992,7 +992,7 @@ var retryTimeoutCallback = (function() {
         if (timeoutMatch[2] == "") {
             throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
         }
-        
+
         timeoutParms.value = timeoutMatch[2] || timeoutMatch[3];
         return timeoutParms;
     };
