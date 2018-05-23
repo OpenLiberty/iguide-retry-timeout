@@ -19,7 +19,7 @@
                     "name": "backgroundConcepts",
                     "title": "Background concepts",
                     "description": [
-                        "In this guide, we use the MicroProfile <b>Timeout</b> and <b>Retry</b> policies to fail quickly and recover from brief intermittent issues. An application may experience these <b>transient failures</b> when a database is overloaded by queries, the network connection becomes unstable, or the site host has a brief downtime. Using Timeout and Retry together helps overcome or alleviate these kinds of transient failures.",
+                        "In this guide, we use the MicroProfile <b><i>Timeout</i></b> and <b><i>Retry</i></b> policies to fail quickly and recover from brief intermittent issues. An application may experience these <b><i>transient failures</i></b> when a database is overloaded by queries, the network connection becomes unstable, or the site host has a brief downtime. Using Timeout and Retry together helps overcome or alleviate these kinds of transient failures.",
                         "<h4>Timeout</h4>",
                         "Sometimes users experience pages that never finish loading. Timeout helps by ending requests that have taken too long and are unlikely to return successfully.",
                         "<h4>Retry</h4>",
@@ -568,7 +568,7 @@
             "title": "Great work!  You're done!",
             "description": [
                 "You learned about the benefits of the Microprofile Fault Tolerance feature's Timeout and Retry policies and how to make your microservice more resilient to failures. You learned that the Timeout policy can be used to quickly fail requests that are hanging for too long. You learned to use the Retry policy to re-attempt an operation that has failed and therefore recover from transient failures your application may experience.",
-                "<p> <a href='https://github.com/OpenLiberty/iguide-retry-timeout/tree/master/finish' >Download the sample retry timeout application on github</a>.</p>"
+                "<p> <a href='https://github.com/OpenLiberty/iguide-retry-timeout/tree/master/finish' >Download the sample retry timeout application bundled with Open Liberty on github</a>.</p>"
              ]
         }
     ]
