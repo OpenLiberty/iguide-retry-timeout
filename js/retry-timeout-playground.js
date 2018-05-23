@@ -3,10 +3,11 @@ var retryTimeoutPlayground = function() {
     var __browserTransactionBaseURL = "https://global-ebank.openliberty.io/transactions";
 
     var _playground = function(root, stepName, params) {
+        this.fileName = "BankService.java";
         this.root = root;
         this.stepName = stepName;
         this.browser = contentManager.getBrowser(stepName);
-        // this.editor = contentManager.getEditor(stepName);
+        this.editor = contentManager.getEditorInstanceFromTabbedEditor(stepName, this.fileName);
     };
 
     _playground.prototype = {
@@ -38,7 +39,7 @@ var retryTimeoutPlayground = function() {
             this.browser.setBrowserContent(null);
             clearInterval(this.moveProgressBar);
             //TODO: reset progress bar to 0
-            //TODO: clear editor error messages
+            this.editor.closeEditorErrorBox();
 
             var $tickContainers = $('[data-step=\'' + this.stepName + '\']').find('.tickContainer');
             var timeoutTickContainer = $tickContainers[0];

@@ -898,17 +898,18 @@ var retryTimeoutCallback = (function() {
 
         playground.resetPlayground();
 
+        var params, paramsValid;
         try {
-            var params = __getParamsFromEditor(editor);
-            var paramsValid = __verifyAndCorrectParams(params, editor);    
+            params = __getParamsFromEditor(editor);
+            paramsValid = __verifyAndCorrectParams(params, editor);  
+            
+            if (paramsValid) {
+                playground.startTimeline(stepName, params);
+            } else {
+                editor.createCustomErrorMessage(retryTimeoutMessages.INVALID_PARAMETER_VALUE);
+            }
         } catch(e) {
             editor.createCustomErrorMessage(e);
-        }
-
-        if (paramsValid) {
-            playground.startTimeline(stepName, params);
-        } else {
-            editor.createCustomErrorMessage(retryTimeoutMessages.INVALID_PARAMETER_VALUE);
         }
     };
 
@@ -934,8 +935,9 @@ var retryTimeoutCallback = (function() {
         var retryRegex = new RegExp(retryRegexString, "g");
         var retryMatch = retryRegex.exec(content);
 
-        // if no parameters, return empty params
-        if (!retryMatch || !retryMatch[2]) { 
+        if (!retryMatch) {
+            throw retryTimeoutMessages.RETRY_REQUIRED;
+        } else if (!retryMatch[2]) { // if no parameters, return empty params
             return retryParms;
         }
         // Turn string of params into array
@@ -947,7 +949,6 @@ var retryTimeoutCallback = (function() {
         $.each(retryParams, function(i, param) {
             match = keyValueRegex.exec(param);
             switch (match[1]) {
-                //TODO: possibly check for number-only for some params
                 case "retryOn":
                 case "abortOn":
                     throw retryTimeoutMessages.RETRY_ABORT_UNSUPPORTED;
@@ -973,6 +974,8 @@ var retryTimeoutCallback = (function() {
 
     var __getTimeoutParams = function(editor) {
         var content = editor.getEditorContent();
+        var timeoutParms = {};
+
         // [0] - original content
         // [1] - Timeout annotation
         // [2] - 'value=' parameter if it exists
@@ -983,10 +986,13 @@ var retryTimeoutCallback = (function() {
         var timeoutRegex = new RegExp(timeoutRegexString, "g");
         var timeoutMatch = timeoutRegex.exec(content);
 
-        var timeoutParms = {};
+        if (!timeoutMatch) {
+            throw retryTimeoutMessages.TIMEOUT_REQUIRED;
+        }
         if (timeoutMatch[2] == "") {
             throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
         }
+        
         timeoutParms.value = timeoutMatch[2] || timeoutMatch[3];
         return timeoutParms;
     };
