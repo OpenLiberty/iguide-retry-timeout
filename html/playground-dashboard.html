@@ -51,6 +51,7 @@
 
     var content = {
         enableStatusBar: false,
+        enableRefreshButton: false,
         callback: function test(webBrowser) {retryTimeoutCallback.listenToBrowserForTransactionHistoryAfterRetry(webBrowser); }
     };
     webBrowser.create($('#' + stepElementId).find('.browserHolder'), stepName, content).done(function(newWebBrowser){
