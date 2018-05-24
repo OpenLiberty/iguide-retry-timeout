@@ -21,22 +21,10 @@
         };
         script.src = '/guides/iguides-common/js/interactive-guides/externalized-string.js';
         document.getElementsByTagName('head')[0].appendChild(script);
-
-        function timeout() {
-            setTimeout(
-                function displaySystemDown() {
-                    document.getElementById("loader").style.display = "none";
-                    document.getElementById("fail").style.display = "flex";
-                }, 2000);
-        }
     </script>
     <style>
         html, body {
             height: 100%;
-        }
-
-        #fail {
-            display: none;
         }
 
         #errorImg {        
@@ -66,7 +54,7 @@
         <div class="stepIntroText" data-externalizedString="YOUR_ACCOUNT"></div>
     </div>
     
-    <div id="loader" class="loader"></div>
+    <!-- <div id="loader" class="loader"></div> -->
     <div id="fail">
         <div class="flexWarningContainer">
             <div id="imgHolder">
@@ -78,9 +66,5 @@
             </div>
         </div>
     </div>
-   
-    <script type="text/javascript">
-        timeout();
-    </script>
 </body>
 </html>

@@ -1022,11 +1022,14 @@ var retryTimeoutCallback = (function() {
                 params.retryParms.maxRetries = 3;
             }
 
-            if (maxDuration) {
+            if (maxDuration !== null) { // 0 case matters and would get skipped in `if (maxDuration)`
                 if (maxDuration < 0) {
                     return false;
+                } else if (maxDuration === 0) {
+                    maxDuration = Number.MAX_SAFE_INTEGER;
+                    params.retryParms.maxDuration = Number.MAX_SAFE_INTEGER;
                 }
-            } else if (maxDuration === null) {
+            } else {
                 maxDuration = 180000;
                 params.retryParms.maxDuration = 180000;
             }
@@ -1036,8 +1039,7 @@ var retryTimeoutCallback = (function() {
                     return false;
                 }
                 if (delay > maxDuration) {
-                    editor.createCustomErrorMessage(retryTimeoutMessages.DURATION_LESS_THAN_DELAY);
-                    return false;
+                    throw retryTimeoutMessages.DURATION_LESS_THAN_DELAY;
                 }
             } else if (delay === null) {
                 delay = 0;

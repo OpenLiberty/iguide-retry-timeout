@@ -28,16 +28,18 @@ var retryTimeoutPlayground = function() {
             var $tickContainers = $('[data-step=\'' + this.stepName + '\']').find('.tickContainer');
             var timeoutTickContainer = $tickContainers[0];
             var retryTickContainer = $tickContainers[1];
-            var $progressBar = $('[data-step=\'' + this.stepName + '\']').find('.progressBar').find('div');
+            this.progressBar = $('[data-step=\'' + this.stepName + '\']').find('.progressBar').find('div');
 
             this.browser.setBrowserContent(htmlRootDir + "transaction-history-loading.html");
-            this.setProgressBar(maxDuration, delay, jitter, timeout, timeoutCount, maxRetries, elapsedRetryProgress, 0, timeoutTickContainer, retryTickContainer, $progressBar);
+            this.setProgressBar(maxDuration, delay, jitter, timeout, timeoutCount, maxRetries, elapsedRetryProgress, 0, timeoutTickContainer, retryTickContainer);
         },
 
         resetPlayground: function() {
             this.browser.setBrowserContent(null);
             clearInterval(this.moveProgressBar);
-            //TODO: reset progress bar to 0
+            if (this.progressBar) {
+                this.resetProgressBar();
+            }
             this.editor.closeEditorErrorBox();
 
             var $tickContainers = $('[data-step=\'' + this.stepName + '\']').find('.tickContainer');
@@ -47,20 +49,30 @@ var retryTimeoutPlayground = function() {
             $(timeoutTickContainer).empty();
             $(retryTickContainer).empty();
         },
+        
+        resetProgressBar: function() {
+            this.progressBar.attr("style", "width: 0%;");
+        },
 
         setMaxDurationOnTimeline: function(maxDurationValueInMS) {
-            // Convert the inputted MS value to Seconds
-            var maxDurationSeconds = Math.round((maxDurationValueInMS/1000) * 10)/10;
-            if (maxDurationSeconds === 0) {
-                // If the converted value is less than .1s, convert to the 
-                // smallest amount of time greater than 0 seconds.
-                var convertedToSeconds = maxDurationValueInMS/1000;
-                var decimalPoints = 100;
-                while (maxDurationSeconds === 0) {
-                    maxDurationSeconds = Math.round(convertedToSeconds * decimalPoints)/decimalPoints;
-                    decimalPoints = decimalPoints * 10;
+            var maxDurationSeconds;
+            if (maxDurationValueInMS === Number.MAX_SAFE_INTEGER) {
+                maxDurationSeconds = "&infin; ";
+            } else {
+                // Convert the inputted MS value to Seconds
+                maxDurationSeconds = Math.round((maxDurationValueInMS/1000) * 10)/10;
+                if (maxDurationSeconds === 0) {
+                    // If the converted value is less than .1s, convert to the 
+                    // smallest amount of time greater than 0 seconds.
+                    var convertedToSeconds = maxDurationValueInMS/1000;
+                    var decimalPoints = 100;
+                    while (maxDurationSeconds === 0) {
+                        maxDurationSeconds = Math.round(convertedToSeconds * decimalPoints)/decimalPoints;
+                        decimalPoints = decimalPoints * 10;
+                    }
                 }
             }
+            
             // Add to the timeline in the playground.
             $maxDuration = $('[data-step=\'' + this.stepName + '\']').find('.timelineLegendEnd');
             $maxDuration.html(maxDurationSeconds + "s");
@@ -82,24 +94,22 @@ var retryTimeoutPlayground = function() {
          * @param currentPctProgress   - Percent completed on timeline
          * @param timeoutTickContainer - Where to place the timeout ticks
          * @param retryTickContainer   - Where to place the retry ticks
-         * @param $progressBar         - JQuery object of the progress bar
          */
-        setTicks: function(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar) {
+        setTicks: function(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer) {
             timeoutCount++;
-
             // Show the timeout tick
             // Do the math...
             var timeoutTickPctPlacement = Math.round((elapsedRetryProgress/maxDurationInMS) * 1000) / 10;  // Round to 1 decimal place
             if (currentPctProgress < timeoutTickPctPlacement) {
                 if (timeoutTickPctPlacement <= 100) {
-                    $progressBar.attr("style", "width:" + timeoutTickPctPlacement + "%;");
+                    this.progressBar.attr("style", "width:" + timeoutTickPctPlacement + "%;");
                     //console.log("set: " + timeoutTickPctPlacement + " -1");            
                     currentPctProgress = timeoutTickPctPlacement;           
                 } else {
-                    $progressBar.attr("style", "width: 100%");
+                    this.progressBar.attr("style", "width: 100%");
                     //console.log("set: 100 - 2");               browser.setURL(__browserTransactionBaseURL);
                     // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
-                    this.browser.setBrowserContent(htmlRootDir + "transaction-history-timeout-error.html");
+                    this.browser.setBrowserContent(htmlRootDir + "playground-timeout-error.html");
                     return;
                 }
             }
@@ -134,16 +144,17 @@ var retryTimeoutPlayground = function() {
                 if (retryTickPctPlacement < 100  &&  (currentPctProgress+1) < retryTickPctPlacement) { 
                     currentPctProgress++;               
                     if (currentPctProgress <= 100) {
-                        $progressBar.attr("style", "width:" + currentPctProgress + "%;");
+                        me.progressBar.attr("style", "width:" + currentPctProgress + "%;");
                         //console.log("set: " + currentPctProgress + " -3"); 
-                    } else {    
+                    } else {
                         // Exceeded maxDuration!
                         clearInterval(me.moveProgressBar);
-                        $progressBar.attr("style", "width: 100%;");
+                        me.progressBar.attr("style", "width: 100%;");
                         //console.log("set: 100% -4"); 
-                        //console.log("maxDuration exceeded....put up error");                    browser.setURL(__browserTransactionBaseURL);
+                        //console.log("maxDuration exceeded....put up error");
+                        this.browser.setURL(__browserTransactionBaseURL);
                         // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
-                        this.browser.setBrowserContent(htmlRootDir + "transaction-history-timeout-error.html");
+                        this.browser.setBrowserContent(htmlRootDir + "playground-timeout-error.html");
                     }
                 }  else {
                     clearInterval(me.moveProgressBar);
@@ -151,7 +162,7 @@ var retryTimeoutPlayground = function() {
                         currentPctProgress = retryTickPctPlacement;
         
                         // Move the blue progress bar exactly to the retry tick spot
-                        $progressBar.attr("style", "width:" + retryTickPctPlacement + "%;");
+                        me.progressBar.attr("style", "width:" + retryTickPctPlacement + "%;");
                         //console.log("set: " + retryTickPctPlacement + " -5"); 
                         elapsedRetryProgress = retryTickSpot;
         
@@ -166,14 +177,14 @@ var retryTimeoutPlayground = function() {
                         }
                 
                         // Advance the progress bar until the next timeout
-                        me.setProgressBar(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar, browser);    
+                        me.setProgressBar(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, browser);    
                     } else {
                         // Hit max duration time limit before initiating a Retry.  Error out.
-                        $progressBar.attr("style", "width: 100%;");
+                        me.progressBar.attr("style", "width: 100%;");
                         //console.log("set: 100% -6"); 
                         //console.log("maxDuration exceeded....put up error");                    browser.setURL(__browserTransactionBaseURL);
                         // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
-                        this.browser.setBrowserContent(htmlRootDir + "transaction-history-timeout-error.html");
+                        this.browser.setBrowserContent(htmlRootDir + "playground-timeout-error.html");
                     }
                 }
             }, progress1pct);
@@ -195,49 +206,49 @@ var retryTimeoutPlayground = function() {
          * @param currentPctProgress   - Percent completed on timeline
          * @param timeoutTickContainer - Where to place the timeout ticks
          * @param retryTickContainer   - Where to place the retry ticks
-         * @param $progressBar         - JQuery object of the progress bar
          */
-        setProgressBar: function(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar){
+        setProgressBar: function(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer){
             var progress1pct = maxDurationInMS * .01;  // Number Milliseconds in 1% of timeline.
             var me = this;
             this.moveProgressBar = setInterval( function() {
                 // Moves the timeline forward 1% at a time.  If no more timeouts should
                 // be processed it stops and shows the transaction history.
                 if (timeoutCount === timeoutsToSimulate) {
+                    //TODO: this should finish one more timeout and show failure page
                     clearInterval(me.moveProgressBar);
                     currentPctProgress += 1; // Advance the progress bar to simulate processing
                     if (currentPctProgress <= 100) {
-                        $progressBar.attr("style", "width:" + currentPctProgress + "%;");
+                        me.progressBar.attr("style", "width:" + currentPctProgress + "%;");
                         //console.log("set: " + currentPctProgress + " -7"); 
-                } else {
-                        $progressBar.attr("style", "width:100%;");
+                    } else {
+                        me.progressBar.attr("style", "width:100%;");
                         //console.log("set: 100% -8"); 
                     }
                     this.browser.setURL(__browserTransactionBaseURL);
-                    this.browser.setBrowserContent(htmlRootDir + "transaction-history.html");
+                    this.browser.setBrowserContent(htmlRootDir + "playground-timeout-error.html");
                 } else {
                     // Determine how far (% of timeline) we would travel in <timeout> milliseconds.
                     var forwardPctProgress = Math.round(((elapsedRetryProgress + timeout)/maxDurationInMS) * 1000) / 10;  // Round to 1 decimal place
                     if ((currentPctProgress + 1) < forwardPctProgress) {
                         currentPctProgress++;
                         if (currentPctProgress < 100) {
-                            $progressBar.attr("style", "width:" + currentPctProgress + "%;");
+                            me.progressBar.attr("style", "width:" + currentPctProgress + "%;");
                             //console.log("set: " + currentPctProgress + " -9"); 
                         } else {
                             // Exceeded maxDuration!
                             // console.log("maxDuration exceeded....put up message");
                             clearInterval(me.moveProgressBar);
-                            $progressBar.attr("style", "width: 100%;");
+                            me.progressBar.attr("style", "width: 100%;");
                             //console.log("set: " + 100 + " -10");                        
                             this.browser.setURL(__browserTransactionBaseURL);
                             // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
-                            this.browser.setBrowserContent(htmlRootDir + "transaction-history-timeout-error.html");
+                            this.browser.setBrowserContent(htmlRootDir + "playground-timeout-error.html");
                         }
                     }  else {
                         clearInterval(me.moveProgressBar);
                         elapsedRetryProgress += timeout;
                         // console.log("set elapsedRetryProgress up " + timeout + ":" + elapsedRetryProgress);
-                        me.setTicks(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer, $progressBar);
+                        me.setTicks(maxDurationInMS, delayInMS, jitterInMS, timeout, timeoutCount, timeoutsToSimulate, elapsedRetryProgress, currentPctProgress, timeoutTickContainer, retryTickContainer);
                     }
                 }
             }, progress1pct);  // Repeat -- moving the timeline 1% at a time
