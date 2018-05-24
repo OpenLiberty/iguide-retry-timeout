@@ -930,7 +930,7 @@ var retryTimeoutCallback = (function() {
         // [1] - Retry annotation
         // [2] - retry parameters as a string
         var retryRegexString = "@Retry\\s*" + "(\\(" +
-        "((?:\\s*(?:retryOn|maxRetries|maxDuration|durationUnit|delay|delayUnit|jitter|jitterDelayUnit|abortOn)\\s*=\\s*[-\\d\.,a-zA-Z]*)*)*" +
+        "((?:\\s*(?:\\w*)\\s*=\\s*[-\\d\.,a-zA-Z]*)*)*" +
         "\\s*\\))?";
         var retryRegex = new RegExp(retryRegexString, "g");
         var retryMatch = retryRegex.exec(content);
