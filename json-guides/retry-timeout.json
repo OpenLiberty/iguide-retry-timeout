@@ -527,8 +527,7 @@
                                 "@ApplicationScoped",
                                 "public class BankService {",
                                 "",
-                                "    @Retry(retryOn=TimeoutException.class,",
-                                "           maxRetries=4,",
+                                "    @Retry(maxRetries=4,",
                                 "           maxDuration=10000,",
                                 "           delay=200,",
                                 "           jitter=100)",
@@ -546,8 +545,8 @@
                                     "to": "13"
                                 },
                                 {
-                                    "from": "20",
-                                    "to": "27"
+                                    "from": "19",
+                                    "to": "25"
                                 }
                             ],
                             "editorHeight": "468px",

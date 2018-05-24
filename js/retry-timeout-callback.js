@@ -896,41 +896,50 @@ var retryTimeoutCallback = (function() {
         var stepName = editor.getStepName();
         var playground = contentManager.getPlayground(stepName);
 
-        var params = __getParamsFromEditor(editor.getEditorContent());
-        var paramsValid = __verifyParams(params, editor);
         playground.resetPlayground();
 
-        if (paramsValid) {
-            playground.startTimeline(stepName, params);
-        } else {
-            editor.createCustomErrorMessage("Invalid parameter value");
+        var params, paramsValid;
+        try {
+            params = __getParamsFromEditor(editor);
+            paramsValid = __verifyAndCorrectParams(params, editor);  
+            
+            if (paramsValid) {
+                playground.startTimeline(stepName, params);
+            } else {
+                editor.createCustomErrorMessage(retryTimeoutMessages.INVALID_PARAMETER_VALUE);
+            }
+        } catch(e) {
+            editor.createCustomErrorMessage(e);
         }
     };
 
-    var __getParamsFromEditor = function(content) {
+    var __getParamsFromEditor = function(editor) {
         var editorContents = {};
         editorContents.retryParms = {};
-        try {
-            editorContents.retryParms = __getRetryParams(content);
-        } catch (e) { }
-        try {
-            editorContents.timeoutParms = __getTimeoutParams(content);
-        } catch (e) { }
+        
+        editorContents.retryParms = __getRetryParams(editor);
+        editorContents.timeoutParms = __getTimeoutParams(editor);
 
         return editorContents;
     };
 
-    var __getRetryParams = function(content) {
+    var __getRetryParams = function(editor) {
+        var content = editor.getEditorContent();
         var retryParms = {};
         // [0] - original content
         // [1] - Retry annotation
         // [2] - retry parameters as a string
-        var retryRegexString = "(@Retry" + "\\s*" + "\\(" + "\\s*" +
-        "((?:\\s*(?:retryOn|maxRetries|maxDuration|durationUnit|delay|delayUnit|jitter|jitterDelayUnit|abortOn)\\s*=\\s*[-\\d\.,a-zA-Z]*)*)" +
-        "\\s*" + "\\))";
+        var retryRegexString = "@Retry\\s*" + "(\\(" +
+        "((?:\\s*(?:retryOn|maxRetries|maxDuration|durationUnit|delay|delayUnit|jitter|jitterDelayUnit|abortOn)\\s*=\\s*[-\\d\.,a-zA-Z]*)*)*" +
+        "\\s*\\))?";
         var retryRegex = new RegExp(retryRegexString, "g");
         var retryMatch = retryRegex.exec(content);
 
+        if (!retryMatch) {
+            throw retryTimeoutMessages.RETRY_REQUIRED;
+        } else if (!retryMatch[2]) { // if no parameters, return empty params
+            return retryParms;
+        }
         // Turn string of params into array
         var retryParamsString = retryMatch[2];
         retryParams = __parmsToArray(retryParamsString);
@@ -940,61 +949,158 @@ var retryTimeoutCallback = (function() {
         $.each(retryParams, function(i, param) {
             match = keyValueRegex.exec(param);
             switch (match[1]) {
-                //TODO: possibly check for number-only for some params
                 case "retryOn":
+                case "abortOn":
+                    throw retryTimeoutMessages.RETRY_ABORT_UNSUPPORTED;
                 case "maxRetries":
                 case "maxDuration":
                 case "delay":
                 case "jitter":
+                    if (!match[2]) {
+                        throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                    }
                     retryParms[match[1]] = match[2];
                     break;
+                case "durationUnit":
+                case "delayUnit":
+                case "jitterDelayUnit":
+                    throw retryTimeoutMessages.UNIT_PARAMS_DISABLED;
                 default:
-                // TODO: unrecognized or unsupported parameter
-                // throw editor error message
-                    break;
+                    throw retryTimeoutMessages.UNSUPPORTED_RETRY_PARAM;
             }
         });
         return retryParms;
     };
 
-    var __getTimeoutParams = function(content) {
+    var __getTimeoutParams = function(editor) {
+        var content = editor.getEditorContent();
+        var timeoutParms = {};
+
         // [0] - original content
         // [1] - Timeout annotation
-        // [2] - parameter value inside parentheses
+        // [2] - 'value=' parameter if it exists
+        // [3] - integer value parameter if it exists
         var timeoutRegexString = "\\s*(@Timeout)\\s*" + 
-        "(?:\\(\\s*([\\d]*)\\s*\\))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
+        "(?:\\((?:\\s*value\\s*=\\s*([\\d]*)\\s*\\))|(?:\\(\\s*([\\w]*)\\s*\\)))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
 
         var timeoutRegex = new RegExp(timeoutRegexString, "g");
         var timeoutMatch = timeoutRegex.exec(content);
 
-        var timeoutParams = timeoutMatch[2] || "1000"; //default 1000 if none defined
-        timeoutParams = __parmsToArray(timeoutParams);
+        if (!timeoutMatch) {
+            throw retryTimeoutMessages.TIMEOUT_REQUIRED;
+        }
+        if (timeoutMatch[2] == "") {
+            throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+        }
 
-        return timeoutParams;
+        timeoutParms.value = timeoutMatch[2] || timeoutMatch[3];
+        return timeoutParms;
     };
 
-    var __verifyParams = function(params, editor) {
+    // Checks if parameters are valid (all in milliseconds)
+    // returns false if something is invalid
+    // returns corrected parameters otherwise
+    var __verifyAndCorrectParams = function(params, editor) {
         var retryParms = params.retryParms;
-        var paramsValid = true;
         if (retryParms) {
-            if (retryParms.maxRetries && (parseInt(retryParms.maxRetries) < -1)) {
-                paramsValid = false;
+            var maxRetries = __getValueIfInteger(retryParms.maxRetries);
+            var maxDuration = __getValueIfInteger(retryParms.maxDuration);
+            var delay = __getValueIfInteger(retryParms.delay);
+            var jitter = __getValueIfInteger(retryParms.jitter);
+    
+            // If any variable is invalid, return false
+            if ((maxRetries && maxDuration && delay && jitter) === false) {
+                return false;
             }
-            if (retryParms.maxDuration && (parseInt(retryParms.maxDuration) < 0)) {
-                paramsValid = false;
+
+            if (maxRetries) {
+                if (maxRetries < -1) {
+                    return false;
+                }
+            } else if (maxRetries === null) {
+                maxRetries = 3;
+                params.retryParms.maxRetries = 3;
             }
-            if (retryParms.delay && (parseInt(retryParms.delay) < 0)) {
-                paramsValid = false;
+
+            if (maxDuration !== null) { // 0 case matters and would get skipped in `if (maxDuration)`
+                if (maxDuration < 0) {
+                    return false;
+                } else if (maxDuration === 0) {
+                    maxDuration = Number.MAX_SAFE_INTEGER;
+                    params.retryParms.maxDuration = Number.MAX_SAFE_INTEGER;
+                }
+            } else {
+                maxDuration = 180000;
+                params.retryParms.maxDuration = 180000;
             }
-            if (retryParms.jitter && (parseInt(retryParms.jitter) < 0)) {
-                paramsValid = false;
+
+            if (delay) {
+                if (delay < 0) {
+                    return false;
+                }
+                if (delay > maxDuration) {
+                    throw retryTimeoutMessages.DURATION_LESS_THAN_DELAY;
+                }
+            } else if (delay === null) {
+                delay = 0;
+                params.retryParms.delay = 0;
+            }
+
+            if (jitter) {
+                if (jitter < 0) {
+                    return false;
+                }
+            } else if (jitter === null) {
+                jitter = 200;
+                params.retryParms.jitter = 200;
+            }
+
+            // jitter clamp
+            if (jitter > delay) {
+                params.retryParms.jitter = params.retryParms.delay;
             }
         }
-        return paramsValid;
+
+        var timeoutParms = params.timeoutParms;
+        if (timeoutParms) {
+            var value = __getValueIfInteger(timeoutParms.value);
+            if (value) {
+                if (value < 0) {
+                    return false;
+                }
+            } else if (value === null) {
+                value = 1000;
+                params.timeoutParms.value = 1000;
+            } else {
+                return false;
+            }
+        }
+        return params;
+    };
+
+    // returns the Integer value if the parameter string is an integer
+    // returns null if nothing passed in
+    // returns false if invalid input is passed in
+    var __getValueIfInteger = function(paramValueString) {
+        if (paramValueString) {
+            var regex =/^[-]?\d+$/gm; // regex for matching integer format
+            var match = regex.exec(paramValueString);
+            if (match) {
+                var param = match[0];
+                return parseInt(param);
+            } else {
+                return false;
+            }
+        } else {
+            return null;
+        }
     };
 
     // converts the string of parameters into an array
     var __parmsToArray = function(parms) {
+        if (!parms) {
+            throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+        }
         parms = parms.replace(/\s/g, '');  // Remove white space
         if (parms.trim() !== "") {
             parms = parms.split(',');
