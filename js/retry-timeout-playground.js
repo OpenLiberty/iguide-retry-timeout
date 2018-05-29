@@ -23,6 +23,11 @@ var retryTimeoutPlayground = function() {
             var jitter = parseInt(retryParams.jitter);
             var timeout = parseInt(params.timeoutParms.value);
 
+            // If unlimited max duration, calculate theoretical using other params
+            if (maxDuration === Number.MAX_SAFE_INTEGER && maxRetries !== -1) {
+                maxDuration = this.calcMaxDuration(timeout, maxRetries, delay, jitter);
+            }
+
             var timeoutCount = 0;
             var elapsedRetryProgress = 0;
             var $tickContainers = $('[data-step=\'' + this.stepName + '\']').find('.tickContainer');
@@ -42,7 +47,7 @@ var retryTimeoutPlayground = function() {
                 this.browser = contentManager.getBrowser(stepName);
             }
             this.browser.setBrowserContent(null);
-            
+
             clearInterval(this.moveProgressBar);
             if (this.progressBar) {
                 this.resetProgressBar();
@@ -59,6 +64,10 @@ var retryTimeoutPlayground = function() {
         
         resetProgressBar: function() {
             this.progressBar.attr("style", "width: 0%;");
+        },
+
+        calcMaxDuration: function(timeout, maxRetries, delay, jitter) {
+            return (maxRetries + 1) * (timeout + delay + jitter);
         },
 
         setMaxDurationOnTimeline: function(maxDurationValueInMS) {
