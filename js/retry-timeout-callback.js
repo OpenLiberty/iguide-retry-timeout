@@ -988,7 +988,7 @@ var retryTimeoutCallback = (function() {
         // [2] - 'value=' parameter if it exists
         // [3] - integer value parameter if it exists
         var timeoutRegexString = "\\s*(@Timeout)\\s*" + 
-        "(?:\\((?:\\s*\\w+\\s*=\\s*([\\d]*)\\s*\\))|(?:\\(\\s*([\\w]*)\\s*\\)))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
+        "(?:\\((?:\\s*\\w+\\s*=\\s*(\\w*)\\s*\\))|(?:\\(\\s*([\\w]*)\\s*\\)))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
         // TODO: accept any parameter name, use switch/case for verifying parameter names
         var timeoutRegex = new RegExp(timeoutRegexString, "g");
         var timeoutMatch = timeoutRegex.exec(content);
