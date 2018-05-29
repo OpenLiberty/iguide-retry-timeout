@@ -52,6 +52,7 @@
     var content = {
         enableStatusBar: false,
         enableRefreshButton: false,
+        url: "https://global-ebank.openliberty.io/transactions",
         callback: function test(webBrowser) {retryTimeoutCallback.listenToBrowserForTransactionHistoryAfterRetry(webBrowser); }
     };
     webBrowser.create($('#' + stepElementId).find('.browserHolder'), stepName, content).done(function(newWebBrowser){
