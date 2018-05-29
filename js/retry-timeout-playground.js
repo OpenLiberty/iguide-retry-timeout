@@ -30,12 +30,19 @@ var retryTimeoutPlayground = function() {
             var retryTickContainer = $tickContainers[1];
             this.progressBar = $('[data-step=\'' + this.stepName + '\']').find('.progressBar').find('div');
 
+            if (!this.browser) {
+                this.browser = contentManager.getBrowser(stepName);
+            }
             this.browser.setBrowserContent(htmlRootDir + "transaction-history-loading.html");
             this.setProgressBar(maxDuration, delay, jitter, timeout, timeoutCount, maxRetries, elapsedRetryProgress, 0, timeoutTickContainer, retryTickContainer);
         },
 
         resetPlayground: function() {
+            if (!this.browser) {
+                this.browser = contentManager.getBrowser(stepName);
+            }
             this.browser.setBrowserContent(null);
+            
             clearInterval(this.moveProgressBar);
             if (this.progressBar) {
                 this.resetProgressBar();
