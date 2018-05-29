@@ -938,6 +938,13 @@ var retryTimeoutCallback = (function() {
         if (!retryMatch) {
             throw retryTimeoutMessages.RETRY_REQUIRED;
         } else if (!retryMatch[2]) { // if no parameters, return empty params
+            // This just means the input didn't match the expected format.
+            // Any non-empty code inside the parentheses should be invalid.
+            var retryParamRegex = /@Retry\s*\((\w*)\)/g;
+            var paramMatch = retryParamRegex.exec(content);
+            if (paramMatch) {
+                throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+            }
             return retryParms;
         }
         // Turn string of params into array
@@ -981,8 +988,8 @@ var retryTimeoutCallback = (function() {
         // [2] - 'value=' parameter if it exists
         // [3] - integer value parameter if it exists
         var timeoutRegexString = "\\s*(@Timeout)\\s*" + 
-        "(?:\\((?:\\s*value\\s*=\\s*([\\d]*)\\s*\\))|(?:\\(\\s*([\\w]*)\\s*\\)))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
-
+        "(?:\\((?:\\s*\\w+\\s*=\\s*([\\d]*)\\s*\\))|(?:\\(\\s*([\\w]*)\\s*\\)))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
+        // TODO: accept any parameter name, use switch/case for verifying parameter names
         var timeoutRegex = new RegExp(timeoutRegexString, "g");
         var timeoutMatch = timeoutRegex.exec(content);
 
@@ -1009,7 +1016,10 @@ var retryTimeoutCallback = (function() {
             var jitter = __getValueIfInteger(retryParms.jitter);
     
             // If any variable is invalid, return false
-            if ((maxRetries && maxDuration && delay && jitter) === false) {
+            if (maxRetries === false ||
+                maxDuration === false ||
+                delay === false ||
+                jitter === false ) {
                 return false;
             }
 
