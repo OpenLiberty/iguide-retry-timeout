@@ -989,10 +989,11 @@ var retryTimeoutCallback = (function() {
 
         // [0] - original content
         // [1] - Timeout annotation
-        // [2] - 'value=' parameter if it exists
-        // [3] - integer value parameter if it exists
-        var timeoutRegexString = "\\s*(@Timeout)\\s*" + 
-        "(?:\\((?:\\s*\\w+\\s*=\\s*(\\w*)\\s*\\))|(?:\\(\\s*([\\w]*)\\s*\\)))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
+        // [2] - 'value=xyz' parameter if it exists
+        // [3] - 'xyz' in `value=xyz' from above
+        // [4] - standalone integer value parameter if it exists
+        var timeoutRegexString = "\\s*(@Timeout)\\s*" + "(?:\\(" + 
+        "((?:\\s*\\w+\\s*=\\s*([-\\w,.]*)\\s*)*)" + "\\)|(?:\\(\\s*([\\w]*)\\s*\\)))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
         // TODO: accept any parameter name, use switch/case for verifying parameter names
         var timeoutRegex = new RegExp(timeoutRegexString, "g");
         var timeoutMatch = timeoutRegex.exec(content);
@@ -1000,11 +1001,44 @@ var retryTimeoutCallback = (function() {
         if (!timeoutMatch) {
             throw retryTimeoutMessages.TIMEOUT_REQUIRED;
         }
-        if (timeoutMatch[2] == "") {
+        if (timeoutMatch[3] == "") {
             throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
         }
 
-        timeoutParms.value = timeoutMatch[2] || timeoutMatch[3];
+        if (timeoutMatch[2]) { // valid parameter format
+            var timeoutMatchString = timeoutMatch[2];
+            var timeoutParams = __parmsToArray(timeoutMatch[2]);
+
+            var keyValueRegex = /(.*)=(.*)/;
+            var match = null;
+            $.each(timeoutParams, function(i, param) {
+                match = keyValueRegex.exec(param);
+                if (!match) { // invalid param format for @Retry
+                    throw retryTimeoutMessages.SYNTAX_ERROR; 
+                }
+                switch (match[1]) {
+                    case "value":
+                        if (!match[2]) {
+                            throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                        }
+                        timeoutParms[match[1]] = match[2];
+                        break;
+                    case "unit":
+                        throw retryTimeoutMessages.UNIT_PARAMS_DISABLED;
+                    default:
+                        throw retryTimeoutMessages.UNSUPPORTED_TIMEOUT_PARAM;
+                }
+            });
+        } else if (timeoutMatch[4]) { // else, standalone value (to be validated later)
+            timeoutParms.value = timeoutMatch[4];
+        } else { // else empty or some wrong format
+            var timeoutParamRegex = /@Timeout\s*\(([\s\S]*?)\)/g;
+            //TODO: also capture the parentheses to check for incomplete @Retry( 
+            var paramMatch = timeoutParamRegex.exec(content);
+            if (paramMatch) {
+                throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+            }
+        }
         return timeoutParms;
     };
 
