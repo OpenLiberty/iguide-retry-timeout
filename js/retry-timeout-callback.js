@@ -937,10 +937,11 @@ var retryTimeoutCallback = (function() {
 
         if (!retryMatch) {
             throw retryTimeoutMessages.RETRY_REQUIRED;
-        } else if (!retryMatch[2]) { // if no parameters, return empty params
+        } else if (!retryMatch[2]) {
             // This just means the input didn't match the expected format.
             // Any non-empty code inside the parentheses should be invalid.
-            var retryParamRegex = /@Retry\s*\((\w*)\)/g;
+            var retryParamRegex = /@Retry\s*\(([\s\S]*?)\)/g;
+            //TODO: also capture the parentheses to check for incomplete @Retry( 
             var paramMatch = retryParamRegex.exec(content);
             if (paramMatch) {
                 throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
@@ -955,6 +956,9 @@ var retryTimeoutCallback = (function() {
         var match = null;
         $.each(retryParams, function(i, param) {
             match = keyValueRegex.exec(param);
+            if (!match) { // invalid param format for @Retry
+                throw retryTimeoutMessages.SYNTAX_ERROR; 
+            }
             switch (match[1]) {
                 case "retryOn":
                 case "abortOn":
@@ -1019,8 +1023,12 @@ var retryTimeoutCallback = (function() {
             if (maxRetries === false ||
                 maxDuration === false ||
                 delay === false ||
-                jitter === false ) {
+                jitter === false) {
                 return false;
+            }
+
+            if (maxRetries === -1 && maxDuration === 0) {
+                throw retryTimeoutMessages.UNLIMITED_RETRIES;
             }
 
             if (maxRetries) {
