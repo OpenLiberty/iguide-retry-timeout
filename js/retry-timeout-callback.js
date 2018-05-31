@@ -943,7 +943,7 @@ var retryTimeoutCallback = (function() {
             var retryParamRegex = /@Retry\s*\(([\s\S]*?)\)/g;
             //TODO: also capture the parentheses to check for incomplete @Retry( 
             var paramMatch = retryParamRegex.exec(content);
-            if (paramMatch) {
+            if (paramMatch && paramMatch[1]) { // contains non-empty value inside parentheses
                 throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
             }
             return retryParms;
@@ -1035,7 +1035,7 @@ var retryTimeoutCallback = (function() {
             var timeoutParamRegex = /@Timeout\s*\(([\s\S]*?)\)/g;
             //TODO: also capture the parentheses to check for incomplete @Retry( 
             var paramMatch = timeoutParamRegex.exec(content);
-            if (paramMatch) {
+            if (paramMatch && paramMatch[1]) { // contains non-empty value inside parentheses
                 throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
             }
         }
