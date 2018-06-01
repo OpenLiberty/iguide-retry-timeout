@@ -18,7 +18,7 @@ To stop the server, press <kbd>Ctrl</kbd> + <kbd>C</kbd> or close the terminal w
 
 To access the sample application, visit the http://localhost:9080/retryTimeoutSample/transactions URL.
 
-You see a long loading sequence because the app is retrying and timing out without any configuration.
+Without any further configuration, you see a long loading sequence because the application is retrying and timing out using the Retry and Timeout policies from the guide.
 
 You can edit the Java files to change the parameter values of the @Timeout and @Retry annotations.
 Changes to the Java files automatically restart the server and take effect immediately.
