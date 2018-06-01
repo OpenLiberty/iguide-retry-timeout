@@ -913,6 +913,15 @@ var retryTimeoutCallback = (function() {
         }
     };
 
+    var listenToBrowserForRefresh = function(webBrowser) {
+        var replayPlayground = function(currentURL) {
+            var stepName = webBrowser.getStepName();
+            var playground = contentManager.getPlayground(stepName);
+            playground.replayPlayground();
+        };
+        webBrowser.addUpdatedURLListener(replayPlayground);
+    };
+
     var __getParamsFromEditor = function(editor) {
         var editorContents = {};
         editorContents.retryParms = {};
@@ -1177,6 +1186,7 @@ var retryTimeoutCallback = (function() {
         listenToEditorForRetryAnnotation: listenToEditorForRetryAnnotation,
         listenToBrowserForTransactionHistoryAfterRetry: __listenToBrowserForTransactionHistoryAfterRetry,
         listenToPlayground: listenToPlayground,
+        listenToBrowserForRefresh: listenToBrowserForRefresh,
         populateURL: __populateURL,
         addRetryAnnotationButton: addRetryAnnotationButton,
         createPlayground: createPlayground

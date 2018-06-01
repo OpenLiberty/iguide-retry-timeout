@@ -13,6 +13,7 @@ var retryTimeoutPlayground = function() {
     _playground.prototype = {
         startTimeline: function(params) {
             this.resetPlayground();
+            this.ranOnce = true;
             var retryParams = params.retryParms;
 
             // Set params, or use default param values
@@ -21,6 +22,7 @@ var retryTimeoutPlayground = function() {
             this.setMaxDurationOnTimeline(this.maxDuration);
             this.delay = parseInt(retryParams.delay);
             this.jitter = parseInt(retryParams.jitter);
+
             this.timeout = parseInt(params.timeoutParms.value);
 
             // If unlimited max duration, calculate theoretical using other params
@@ -28,9 +30,6 @@ var retryTimeoutPlayground = function() {
                 this.maxDuration = this.calcMaxDuration();
             }
 
-            this.timeoutCount = 0;
-            this.elapsedRetryProgress = 0;
-            this.currentPctProgress = 0;
             // maxRetries+1 is for timeoutsToSimulate. workaround to simulate the last timeout
             this.timeoutsToSimulate = this.maxRetries + 1;
 
@@ -47,7 +46,11 @@ var retryTimeoutPlayground = function() {
         },
 
         replayPlayground: function() {
-
+            this.resetPlayground();
+            if (this.ranOnce) {
+                this.browser.setBrowserContent(htmlRootDir + "transaction-history-loading.html");
+                this.setProgressBar();
+            }
         },
 
         resetPlayground: function() {
@@ -65,6 +68,10 @@ var retryTimeoutPlayground = function() {
             if (this.progressBar) {
                 this.resetProgressBar();
             }
+
+            this.timeoutCount = 0;
+            this.elapsedRetryProgress = 0;
+            this.currentPctProgress = 0;
 
             $(this.timeoutTickContainer).empty();
             $(this.retryTickContainer).empty();
@@ -239,8 +246,8 @@ var retryTimeoutPlayground = function() {
                         me.progressBar.attr("style", "width:100%;");
                         //console.log("set: 100% -8"); 
                     }
-                    this.browser.setURL(__browserTransactionBaseURL);
-                    this.browser.setBrowserContent(htmlRootDir + "playground-timeout-error.html");
+                    me.browser.setURL(__browserTransactionBaseURL);
+                    me.browser.setBrowserContent(htmlRootDir + "playground-timeout-error.html");
                 } else {
                     // Determine how far (% of timeline) we would travel in <timeout> milliseconds.
                     var forwardPctProgress = Math.round(((me.elapsedRetryProgress + me.timeout)/me.maxDuration) * 1000) / 10;  // Round to 1 decimal place
@@ -255,9 +262,9 @@ var retryTimeoutPlayground = function() {
                             clearInterval(me.moveProgressBar);
                             me.progressBar.attr("style", "width: 100%;");
                             //console.log("set: " + 100 + " -10");                        
-                            this.browser.setURL(__browserTransactionBaseURL);
+                            me.browser.setURL(__browserTransactionBaseURL);
                             // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
-                            this.browser.setBrowserContent(htmlRootDir + "playground-timeout-error.html");
+                            me.browser.setBrowserContent(htmlRootDir + "playground-timeout-error.html");
                         }
                     }  else {
                         clearInterval(me.moveProgressBar);
