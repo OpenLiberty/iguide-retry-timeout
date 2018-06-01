@@ -39,7 +39,8 @@ var retryTimeoutPlayground = function() {
                 this.browser = contentManager.getBrowser(stepName);
             }
             this.browser.setBrowserContent(htmlRootDir + "transaction-history-loading.html");
-            this.setProgressBar(maxDuration, delay, jitter, timeout, timeoutCount, maxRetries, elapsedRetryProgress, 0, timeoutTickContainer, retryTickContainer);
+            // maxRetries+1 is for timeoutsToSimulate. workaround to simulate the last timeout
+            this.setProgressBar(maxDuration, delay, jitter, timeout, timeoutCount, maxRetries+1, elapsedRetryProgress, 0, timeoutTickContainer, retryTickContainer);
         },
 
         resetPlayground: function() {
@@ -48,11 +49,15 @@ var retryTimeoutPlayground = function() {
             }
             this.browser.setBrowserContent(null);
 
+            if (!this.editor) {
+                this.editor = contentManager.getEditorInstanceFromTabbedEditor(stepName, this.fileName);
+            }
+            this.editor.closeEditorErrorBox();
+
             clearInterval(this.moveProgressBar);
             if (this.progressBar) {
                 this.resetProgressBar();
             }
-            this.editor.closeEditorErrorBox();
 
             var $tickContainers = $('[data-step=\'' + this.stepName + '\']').find('.tickContainer');
             var timeoutTickContainer = $tickContainers[0];
@@ -137,6 +142,21 @@ var retryTimeoutPlayground = function() {
             $('<div/>').attr('class','timelineTick timeoutTick').attr('style','left:calc(' + timeoutTickPctPlacement + timeoutTickAdjustment).attr('title', timeoutLabel).appendTo(timeoutTickContainer);
             if (stepName !== 'Playground') {
                 $('<div/>', {"class": "timelineLabel timeoutLabel", text: timeoutLabel, style: 'left:calc(' + timeoutTickPctPlacement + '% - 29px);'}).appendTo(timeoutTickContainer);
+            }
+
+            if ((stepName === 'Playground') && (timeoutCount === timeoutsToSimulate)) {
+                clearInterval(this.moveProgressBar);
+                currentPctProgress += 1; // Advance the progress bar to simulate processing
+                if (currentPctProgress <= 100) {
+                    this.progressBar.attr("style", "width:" + currentPctProgress + "%;");
+                    //console.log("set: " + currentPctProgress + " -7"); 
+                } else {
+                    this.progressBar.attr("style", "width:100%;");
+                    //console.log("set: 100% -8"); 
+                }
+                this.browser.setURL(__browserTransactionBaseURL);
+                this.browser.setBrowserContent(htmlRootDir + "playground-timeout-error.html");
+                return;
             }
 
             // Show the retry tick
