@@ -904,7 +904,7 @@ var retryTimeoutCallback = (function() {
             paramsValid = __verifyAndCorrectParams(params, editor);  
             
             if (paramsValid) {
-                playground.startTimeline(stepName, params);
+                playground.startTimeline(params);
             } else {
                 editor.createCustomErrorMessage(retryTimeoutMessages.INVALID_PARAMETER_VALUE);
             }
