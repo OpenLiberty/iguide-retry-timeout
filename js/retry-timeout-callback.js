@@ -117,7 +117,7 @@ var retryTimeoutCallback = (function() {
         try {
             var featureMatches = features.match(/<feature>[\s\S]*?<\/feature>/g);
             $(featureMatches).each(function (index, feature) {
-                if (feature.indexOf("<feature>cdi-1.2</feature>") !== -1) {
+                if (feature.indexOf("<feature>webProfile-7.0</feature>") !== -1) {
                     match = true;
                     return false; // break out of each loop
                 }
@@ -139,7 +139,7 @@ var retryTimeoutCallback = (function() {
                 var features = editorContentBreakdown.features;
                 features = features.replace('\n', '');
                 features = features.replace(/\s/g, '');
-                if (features.length !== "<feature>mpFaultTolerance-1.0</feature><feature>cdi-1.2</feature>".length) {
+                if (features.length !== "<feature>mpFaultTolerance-1.0</feature><feature>webProfile-7.0</feature>".length) {
                     isFTFeatureThere = false; // contains extra text
                 }
             }
@@ -668,25 +668,25 @@ var retryTimeoutCallback = (function() {
 
     var __addLimitsRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
-        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS)";
+        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 13, newContent, 4);
     };
 
     var __addDelayRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
-        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay=200, delayUnit = ChronoUnit.MILLIS)";
+        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 16, newContent, 5);
     }
 
     var __addJitterRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
-        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay=200, delayUnit = ChronoUnit.MILLIS,\n           jitter=100,\n           jitterDelayUnit = ChronoUnit.MILLIS)";
+        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS,\n           jitter = 100,\n           jitterDelayUnit = ChronoUnit.MILLIS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 17, newContent, 7);
     }
 
     var __addAbortOnRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
-        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries=4,\n           maxDuration=10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay=200, delayUnit = ChronoUnit.MILLIS,\n           jitter=100,\n           jitterDelayUnit = ChronoUnit.MILLIS,\n           abortOn = FileNotFoundException.class)";
+        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS,\n           jitter = 100,\n           jitterDelayUnit = ChronoUnit.MILLIS,\n           abortOn = FileNotFoundException.class)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 14, 20, newContent, 8);
     }
 
