@@ -904,13 +904,22 @@ var retryTimeoutCallback = (function() {
             paramsValid = __verifyAndCorrectParams(params, editor);  
             
             if (paramsValid) {
-                playground.startTimeline(stepName, params);
+                playground.startTimeline(params);
             } else {
                 editor.createCustomErrorMessage(retryTimeoutMessages.INVALID_PARAMETER_VALUE);
             }
         } catch(e) {
             editor.createCustomErrorMessage(e);
         }
+    };
+
+    var listenToBrowserForRefresh = function(webBrowser) {
+        var replayPlayground = function(currentURL) {
+            var stepName = webBrowser.getStepName();
+            var playground = contentManager.getPlayground(stepName);
+            playground.replayPlayground();
+        };
+        webBrowser.addUpdatedURLListener(replayPlayground);
     };
 
     var __getParamsFromEditor = function(editor) {
@@ -1177,6 +1186,7 @@ var retryTimeoutCallback = (function() {
         listenToEditorForRetryAnnotation: listenToEditorForRetryAnnotation,
         listenToBrowserForTransactionHistoryAfterRetry: __listenToBrowserForTransactionHistoryAfterRetry,
         listenToPlayground: listenToPlayground,
+        listenToBrowserForRefresh: listenToBrowserForRefresh,
         populateURL: __populateURL,
         addRetryAnnotationButton: addRetryAnnotationButton,
         createPlayground: createPlayground
