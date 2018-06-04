@@ -55,12 +55,12 @@ var retryTimeoutPlayground = function() {
 
         resetPlayground: function() {
             if (!this.browser) {
-                this.browser = contentManager.getBrowser(stepName);
+                this.browser = contentManager.getBrowser(this.stepName);
             }
             this.browser.setBrowserContent(null);
 
             if (!this.editor) {
-                this.editor = contentManager.getEditorInstanceFromTabbedEditor(stepName, this.fileName);
+                this.editor = contentManager.getEditorInstanceFromTabbedEditor(this.stepName, this.fileName);
             }
             this.editor.closeEditorErrorBox();
 
@@ -138,11 +138,11 @@ var retryTimeoutPlayground = function() {
             var timeoutLabel = (this.elapsedRetryProgress/1000).toFixed(2) + "s";
             var timeoutTickAdjustment = timeoutTickPctPlacement <= 1 ? "%);": "% - 3px);";
             $('<div/>').attr('class','timelineTick timeoutTick').attr('style','left:calc(' + timeoutTickPctPlacement + timeoutTickAdjustment).attr('title', timeoutLabel).appendTo(this.timeoutTickContainer);
-            if (stepName !== 'Playground') {
+            if (this.stepName !== 'Playground') {
                 $('<div/>', {"class": "timelineLabel timeoutLabel", text: timeoutLabel, style: 'left:calc(' + timeoutTickPctPlacement + '% - 29px);'}).appendTo(this.timeoutTickContainer);
             }
 
-            if ((stepName === 'Playground') && (this.timeoutCount === this.timeoutsToSimulate)) {
+            if ((this.stepName === 'Playground') && (this.timeoutCount === this.timeoutsToSimulate)) {
                 clearInterval(this.moveProgressBar);
                 this.currentPctProgress += 1; // Advance the progress bar to simulate processing
                 if (this.currentPctProgress <= 100) {
@@ -206,7 +206,7 @@ var retryTimeoutPlayground = function() {
                         //console.log("retry tick placed.  CurrentPctProgress: " + currentPctProgress);
                         var retryTickAdjustment = retryTickPctPlacement <= 1 ? "%);": "% - 3px);";
                         $('<div/>').attr('class','timelineTick retryTick').attr('style','left:calc(' + retryTickPctPlacement + retryTickAdjustment).attr('title', retryLabel).appendTo(me.retryTickContainer);
-                        if (stepName !== 'Playground') {
+                        if (me.stepName !== 'Playground') {
                             $('<div/>', {"class": "timelineLabel retryLabel", text: retryLabel, style: 'left:calc(' + retryTickPctPlacement + '% - 29px);'}).appendTo(me.retryTickContainer);
                         }
                 
