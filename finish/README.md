@@ -16,7 +16,7 @@ To view the console logs in realtime as the application is retrying requests, ru
 To access the sample application, visit the http://localhost:9080/retryTimeoutSample/transactions URL.
 
 To start simulating the transaction history request, refresh the page. The console log will update 	
-showing the number of retries and the time (ms) at which each retry occurred.
+showing the number of retries and the time (ms) at which each retry occurred. The time between retry requests is equal to the timeout + delay +- jitter. 
 
 Without any further configuration, you see a long loading sequence because the application is retrying and timing out using the Retry and Timeout policies from the guide.
 
@@ -45,7 +45,7 @@ The `@Retry` annotation has many parameters to configure its usage.
 * **jitterUnit** specifies the unit of time for `jitter`. The default is `ChronoUnit.MILLIS`.
 * **abortOn** specifies the type of Exception that immediately ends the retry attempts.
 
-In this sample app, the **retryOn** parameter is set to `TimeoutException.class`, telling the policy to retry the showTransactions() method when it returns with a `TimeoutException`, which comes from the 	`@Timeout` annotation. 	
+In this sample app, the **retryOn** parameter is set to `TimeoutException.class`, telling the policy to retry the showTransactions() method when it returns with a `TimeoutException`, which comes from the `@Timeout` annotation. 	
 The **maxRetries** is set to 4, allowing a maximum of 4 attempts to retry the request. The **maxDuration** is set to 10, with **durationUnit** set to `ChronoUnit.SECONDS`, which allows a total of 10 seconds for the request to retry. The retry attempts will end when either of the two conditions, **maxRetries** or **maxDuration**, is met.	
 The value for **delay** is set to 200, with **delayUnit** set to `ChronoUnit.MILLIS`, indicating a delay time of 200 ms. This delay time is the wait time between the end of each request and the beginning of 	
 the next retry request.	
