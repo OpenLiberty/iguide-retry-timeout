@@ -35,7 +35,7 @@ public class Transactions {
     }
 
     public void getTransactions() throws Exception {
-        System.out.println(((count == 0) ? "Trying..." : "Retrying...") + count + " at " + (System.currentTimeMillis() - timeStart) + "ms");
+        System.out.println(((count == 0) ? "Initial request" : "Retrying..." + count) + " at " + (System.currentTimeMillis() - timeStart) + "ms");
         count++;
         if (!fetchSuccessful) {
             throwException();
