@@ -949,10 +949,10 @@ var retryTimeoutCallback = (function() {
         } else if (!retryMatch[2]) {
             // This just means the input didn't match the expected format.
             // Any non-empty code inside the parentheses should be invalid.
-            var retryParamRegex = /@Retry\s*\(([\s\S]*?)\)/g;
-            //TODO: also capture the parentheses to check for incomplete @Retry( 
+            var retryParamRegex = /@Retry\s*((?:\((.*\s*)\)?)|[\s\S]*\))?/g;
             var paramMatch = retryParamRegex.exec(content);
-            if (paramMatch && paramMatch[1]) { // contains non-empty value inside parentheses
+            // ensure empty parentheses match if they exist. else input is invalid
+            if (paramMatch && paramMatch[1] && paramMatch[1].replace(/\s*/g, "") !== "()") {
                 throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
             }
             return retryParms;
@@ -1003,7 +1003,6 @@ var retryTimeoutCallback = (function() {
         // [4] - standalone integer value parameter if it exists
         var timeoutRegexString = "\\s*(@Timeout)\\s*" + "(?:\\(" + 
         "((?:\\s*\\w+\\s*=\\s*([-\\w,.]*)\\s*)*)" + "\\)|(?:\\(\\s*([\\w]*)\\s*\\)))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
-        // TODO: accept any parameter name, use switch/case for verifying parameter names
         var timeoutRegex = new RegExp(timeoutRegexString, "g");
         var timeoutMatch = timeoutRegex.exec(content);
 
@@ -1041,10 +1040,10 @@ var retryTimeoutCallback = (function() {
         } else if (timeoutMatch[4]) { // else, standalone value (to be validated later)
             timeoutParms.value = timeoutMatch[4];
         } else { // else empty or some wrong format
-            var timeoutParamRegex = /@Timeout\s*\(([\s\S]*?)\)/g;
-            //TODO: also capture the parentheses to check for incomplete @Retry( 
+            var timeoutParamRegex = /@Timeout\s*((?:\((.*\s*)\)?)|[\s\S]*\))?/g;
             var paramMatch = timeoutParamRegex.exec(content);
-            if (paramMatch && paramMatch[1]) { // contains non-empty value inside parentheses
+            // ensure empty parentheses match if they exist. else input is invalid
+            if (paramMatch && paramMatch[1] && paramMatch[1].replace(/\s*/g, "") !== "()") {
                 throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
             }
         }
