@@ -49,7 +49,7 @@ The value for **delay** is set to 200, with **delayUnit** set to `ChronoUnit.MIL
 the next retry request.	
 The **jitter** value is set to 100, with **jitterDelayUnit** set to `ChronoUnit.MILLIS`, indicating a jitter of 100 ms. The jitter indicates the variance in the delay time. With the delay of 200 ms and 	
 jitter of 100 ms, we can expect delays of 200 +/- 100 ms, resulting in delays between 100 ms to 300 ms.	
-The **abortOn** parameter is set to `FileNotException.class`, indicating that the Retry policy will end immediately if the request throws a `FileNotFoundException`.
+The **abortOn** parameter is set to `FileNotFoundException.class`, indicating that the Retry policy will end immediately if the request throws a `FileNotFoundException`.
 
 ## Transactions.java
 The Transactions.java file contains some configurable variables to control the outcome of the transaction history request.
