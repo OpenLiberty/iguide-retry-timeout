@@ -949,7 +949,7 @@ var retryTimeoutCallback = (function() {
         } else if (!retryMatch[2]) {
             // This just means the input didn't match the expected format.
             // Any non-empty code inside the parentheses should be invalid.
-            var retryParamRegex = /@Retry\s*((?:\((.*\s*)\)?)|\))?/g;
+            var retryParamRegex = /@Retry\s*((?:\((.*\s*)\)?)|.*\))?/g;
             var paramMatch = retryParamRegex.exec(content);
             // ensure empty parentheses match if they exist. else input is invalid
             if (paramMatch && paramMatch[1] && paramMatch[1].replace(/\s*/g, "") !== "()") {
@@ -1040,7 +1040,7 @@ var retryTimeoutCallback = (function() {
         } else if (timeoutMatch[4]) { // else, standalone value (to be validated later)
             timeoutParms.value = timeoutMatch[4];
         } else { // else empty or some wrong format
-            var timeoutParamRegex = /@Timeout\s*((?:\((.*\s*)\)?)|\))?/g;
+            var timeoutParamRegex = /@Timeout\s*((?:\((.*\s*)\)?)|.*\))?/g;
             var paramMatch = timeoutParamRegex.exec(content);
             // ensure empty parentheses match if they exist. else input is invalid
             if (paramMatch && paramMatch[1] && paramMatch[1].replace(/\s*/g, "") !== "()") {
