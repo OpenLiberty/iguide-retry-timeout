@@ -71,7 +71,8 @@ body {
 
 #fail {
     display: flex;  /** Initially the spinner is showing so hide this div **/
-    height: calc(100% - 85px);    /** 85px is height of check balance + global ebank headers **/
+    /*height: calc(100% - 85px);  */ /** 85px is height of check balance + global ebank headers **/
+    height: 90%;
 }
 
 .flexWarningContainer {
