@@ -17,13 +17,13 @@ import java.lang.Thread;
 public class Transactions {
     /*
     Use these variables to control the execution of the sample app
-        * abortOnCondition (boolean) - true will result in transaction history page if 
+        * abortOnCondition (boolean) - false will result in transaction history page if 
             sleepTime value is less than @Timeout value. 
-            false will result instantly in error page.
+            true will result instantly in error page.
         * sleepTime (long) - sleep time in ms. if shorter than @Timeout in BankService.java,
             the request will successfully finish.
     */
-    private boolean abortOnCondition = true;
+    private boolean abortOnCondition = false;
     private long sleepTime = 2100;
 
 
@@ -38,7 +38,7 @@ public class Transactions {
     public void getTransactions() throws Exception {
         System.out.println(((count == 0) ? "Initial request" : "Retrying..." + count) + " at " + (System.currentTimeMillis() - timeStart) + "ms");
         count++;
-        if (!abortOnCondition) {
+        if (abortOnCondition) {
             throwException();
         }
         Thread.sleep(this.sleepTime);
