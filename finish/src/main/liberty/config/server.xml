@@ -10,11 +10,8 @@
 -->
 <server description="RetryTimeoutSample server">
     <featureManager>
-        <feature>servlet-3.1</feature>
-        <feature>cdi-1.2</feature>
+        <feature>webProfile-7.0</feature>
         <feature>mpFaultTolerance-1.0</feature>
-        <feature>jaxrs-2.0</feature>
     </featureManager>
-    
-    <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}" id="defaultHttpEndpoint"  host="*" />
+   <httpEndpoint host="*" id="defaultHttpEndpoint" httpsPort="${default.https.port}" httpPort="{default.http.port}"/>
 </server>
