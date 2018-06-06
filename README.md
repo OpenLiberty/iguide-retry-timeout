@@ -1,4 +1,4 @@
-# draft-iguide-retry-timeout
+# iguide-retry-timeout
 
 Link to the guide on Openliberty.io: https://openliberty.io/guides/retry-timeout.html
 
