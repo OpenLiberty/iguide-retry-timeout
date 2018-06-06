@@ -1,0 +1,67 @@
+<!--
+  Copyright (c) 2018 IBM Corporation and others.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+ 
+  Contributors:
+      IBM Corporation - initial API and implementation
+-->
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Asap" rel="stylesheet">
+    <script type="text/javascript"> 
+        var script = document.createElement('script');
+        
+        script.onload = function() {
+            var guideRootDir = "/guides/draft-iguide-retry-timeout/nls/"
+            retrieveExternalizedStrings(guideRootDir);
+        };
+        script.src = '/guides/iguides-common/js/interactive-guides/externalized-string.js';
+        document.getElementsByTagName('head')[0].appendChild(script);
+    </script>
+    <style>
+        .browserHolder {
+            position: relative;
+            width: 100%;           
+        }
+    </style>
+</head>
+<body>    
+    <div class="pod-animation-slide-from-right" tabindex="0" aria-label="Timeout and Retry timeline and transaction history sample browser window">
+
+        <div class='dashboardHolder' tabindex="0" aria-label="Timeout and Retry timeline">
+            <div class="timeline">
+                <div class="legendText legendTextTop" data-externalizedString="TIMEOUT"></div>
+                <div class="timelineContainer">
+                    <div class="tickContainer">
+                    </div>
+                </div>
+                <div class="progressBar">
+                    <div></div>
+                </div>
+                <div class="timelineContainer">
+                    <div class="tickContainer">
+                    </div>                    
+                    <div class="timelineLegend timelineLegendStart">0</div>
+                    <div class="timelineLegend timelineLegendEnd">10s</div>
+                </div>    
+                <div class="legendText legendTextBottom" data-externalizedString="RETRY"></div>
+            </div>
+        </div>
+
+        <div class='browserHolder'></div>
+    </div>
+</body>
+
+<script>
+    var stepName = stepContent.getCurrentStepName();
+
+    var content = {
+        enableStatusBar: false,
+        callback: function test(webBrowser) {retryTimeoutCallback.listenToBrowserForTransactionHistoryAfterRetry(webBrowser); }
+    };
+    webBrowser.create($("[data-step='" + stepName + "']").find('.browserHolder'), stepName, content).done(function(newWebBrowser){
+        contentManager.setWebBrowser(stepName, newWebBrowser, 0);
+    });
+</script>
