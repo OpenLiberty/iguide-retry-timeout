@@ -11,7 +11,7 @@ the retryTimeoutSampleServer, run the Maven command `mvn liberty:start-server`.
 
 To access the sample application, visit the http://localhost:9080/retryTimeoutSample/transactions URL.
 
-Without any further configuration, the application is ready to run.  You will see a long loading sequence because the application is timing out and retrying using the Timeout and Retry policies from the guide. The server's console log records the number of retries and the time (milliseconds) at which each retry occurred. The time between retry requests is equal to the timeout + delay +- jitter. 
+Without any further configuration, the application is ready to run.  You will see a long loading sequence because the application is timing out and retrying using the Timeout and Retry policies from the guide. The server's console log records the number of retries and the time (milliseconds) at which each retry occurred. The time between retry requests is equal to the timeout + delay &#177; jitter. 
 
 To view the console log in real time as the application is retrying requests, run the following or other alternative way to view the file:
 
@@ -43,12 +43,15 @@ The `@Retry` annotation has many parameters to configure its usage.
 * **jitterDelayUnit** specifies the unit of time for `jitter`. The default is `ChronoUnit.MILLIS`.
 * **abortOn** specifies an exception class that stops all retry attempts and fails immediately.
 
-In this sample application, the **retryOn** parameter is set to `TimeoutException.class`, telling the Retry policy to retry the showTransactions() method when it returns with a `TimeoutException`, which comes from the `@Timeout` annotation. 	
-The **maxRetries** parameter is set to 4, allowing a maximum of 4 retry requests. The **maxDuration** is set to 10 and **durationUnit** is set to `ChronoUnit.SECONDS` which specifies that the total duration of all retry requests should not last more than 10 seconds. The retry attempts will end when either of the two conditions, **maxRetries** or **maxDuration**, is met.	
+In this sample application, the **retryOn** parameter is set to `TimeoutException.class`, telling the Retry policy to retry the showTransactions() method when it returns with a `TimeoutException`, which comes from the `@Timeout` annotation.
+
+The **maxRetries** parameter is set to 4, allowing a maximum of 4 retry requests. The **maxDuration** is set to 10 and **durationUnit** is set to `ChronoUnit.SECONDS` which specifies that the total duration of all retry requests should not last more than 10 seconds. The retry attempts will end when either of the two conditions, **maxRetries** or **maxDuration**, is met.
+
 The value for **delay** is set to 200 and **delayUnit** is set to `ChronoUnit.MILLIS` indicating a delay time of 200 milliseconds. The delay time is the wait time between the end of each request and the beginning of 	
-the next retry request.	
-The **jitter** value is set to 100 and **jitterDelayUnit** is set to `ChronoUnit.MILLIS` indicating a jitter of 100 milliseconds. The jitter specifies the variance in the delay time. With the delay of 200 ms and 	
-jitter of 100 ms, we can expect delays of 200 +/- 100 ms, resulting in delays between 100 to 300 ms.	
+the next retry request.
+
+The **jitter** value is set to 100 and **jitterDelayUnit** is set to `ChronoUnit.MILLIS` indicating a jitter of 100 milliseconds. The jitter specifies the variance in the delay time. With the delay of 200 ms and jitter of 100 ms, we can expect delays of 200 &#177; 100 ms, resulting in delays between 100 to 300 ms.
+
 The **abortOn** parameter is set to `FileNotFoundException.class`, indicating that the Retry policy will end immediately if the request throws a `FileNotFoundException`.
 
 ## Transactions.java
