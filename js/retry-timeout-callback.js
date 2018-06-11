@@ -117,7 +117,7 @@ var retryTimeoutCallback = (function() {
         try {
             var featureMatches = features.match(/<feature>[\s\S]*?<\/feature>/g);
             $(featureMatches).each(function (index, feature) {
-                if (feature.indexOf("<feature>webProfile-7.0</feature>") !== -1) {
+                if (feature.indexOf("<feature>cdi-1.2</feature>") !== -1) {
                     match = true;
                     return false; // break out of each loop
                 }
@@ -139,7 +139,7 @@ var retryTimeoutCallback = (function() {
                 var features = editorContentBreakdown.features;
                 features = features.replace('\n', '');
                 features = features.replace(/\s/g, '');
-                if (features.length !== "<feature>mpFaultTolerance-1.0</feature><feature>webProfile-7.0</feature>".length) {
+                if (features.length !== "<feature>mpFaultTolerance-1.0</feature><feature>servlet-3.1</feature><feature>cdi-1.2</feature><feature>jaxrs-2.0</feature>".length) {
                     isFTFeatureThere = false; // contains extra text
                 }
             }
