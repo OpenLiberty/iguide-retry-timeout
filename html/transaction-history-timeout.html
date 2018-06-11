@@ -16,8 +16,6 @@
     var stepElementId = "timeoutStep";
     var browser;
     var content = {
-        url: "https://global-ebank.openliberty.io/transactions/error",
-        browserContent: "/guides/draft-iguide-retry-timeout/html/transaction-history-timeout-error.html",
         enableStatusBar: false,
         callback: function test(webBrowser) {retryTimeoutCallback.listenToBrowserForTransactionHistory(webBrowser); }
     };
