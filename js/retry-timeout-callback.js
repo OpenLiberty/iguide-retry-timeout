@@ -39,12 +39,12 @@ var retryTimeoutCallback = (function() {
         contentManager.resetTabbedEditorContents(stepName, serverFileName);
         var content = contentManager.getTabbedEditorContents(stepName, serverFileName);
 
-        contentManager.insertTabbedEditorContents(stepName, serverFileName, 5, FTFeature);
+        contentManager.insertTabbedEditorContents(stepName, serverFileName, 7, FTFeature);
         var readOnlyLines = [];
         // mark cdi feature line readonly
         readOnlyLines.push({
-            from: 4,
-            to: 4
+            from: 6,
+            to: 6
         });
         contentManager.markTabbedEditorReadOnlyLines(stepName, serverFileName, readOnlyLines);
     };
