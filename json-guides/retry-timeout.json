@@ -77,20 +77,22 @@
                                 "<?xml version=\"1.0\"?>",
                                 "<server description=\"Sample Liberty server\">",
                                 "   <featureManager>",
-                                "      <feature>webProfile-7.0</feature>",
+                                "      <feature>servlet-3.1</feature>",
+                                "      <feature>cdi-1.2</feature>",
+                                "      <feature>jaxrs-2.0</feature>",
                                 "   </featureManager>",
-                                "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpsPort=\"${default.https.port}\" httpPort=\"{default.http.port}\"/>",
+                                "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
                             "save": true,
                             "readonly": [
                                 {
                                     "from": "1",
-                                    "to": "3"
+                                    "to": "5"
                                 },
                                 {
-                                    "from": "5",
-                                    "to": "7"
+                                    "from": "7",
+                                    "to": "9"
                                 }
                             ],
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForFeatureInServerXML(editor); })"
