@@ -358,7 +358,7 @@ var retryTimeoutCallback = (function() {
                 } else if (numOfRequest === 1) {
                     browserContentHTML = htmlRootDir + "transaction-history-loading.html";
                 }
-            } else if (stepName === "AddAbortOnRetry") {
+            } else if (stepName === "TimeoutAnnotation" || stepName === "AddAbortOnRetry") {
                 browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";   
             } else /** if (stepName === "AddRetryOnRetry" || stepName === "AddLimitsRetry", etc....)**/ {
                 browserContentHTML = htmlRootDir + "transaction-history-loading.html";
@@ -383,14 +383,6 @@ var retryTimeoutCallback = (function() {
                     showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 200, 100);
                     break;
             } 
-        } else if (checkURL === __browserTransactionBaseURL + "/error") {
-            if (numOfRequest !== -1) {
-                contentManager.markCurrentInstructionComplete(stepName);
-            }
-            if (stepName === "TimeoutAnnotation") {
-                browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";
-            }
-            browser.setBrowserContent(browserContentHTML);   
         } else {
             if (checkURL !== ""){
                 browser.setBrowserContent("/guides/draft-iguide-retry-timeout/html/page-not-found.html");
