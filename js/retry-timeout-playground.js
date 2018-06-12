@@ -1,5 +1,5 @@
 var retryTimeoutPlayground = function() {
-    var htmlRootDir = "/guides/draft-iguide-retry-timeout/html/";
+    var htmlRootDir = "/guides/iguide-retry-timeout/html/";
     var __browserTransactionBaseURL = "https://global-ebank.openliberty.io/transactions";
 
     var _playground = function(root, stepName, params) {
