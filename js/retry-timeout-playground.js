@@ -229,7 +229,7 @@ var retryTimeoutPlayground = function() {
          * up the timeout and retry ticks.
          * 
          */
-        setProgressBar: function(){
+        setProgressBar: function() {
             var progress1pct = this.maxDuration * .01;  // Number Milliseconds in 1% of timeline.
             var me = this;
             this.moveProgressBar = setInterval( function() {
@@ -274,6 +274,254 @@ var retryTimeoutPlayground = function() {
                     }
                 }
             }, progress1pct);  // Repeat -- moving the timeline 1% at a time
+        },
+
+        getParamsFromEditor: function() {
+            var editorContents = {};
+            editorContents.retryParms = {};
+            
+            editorContents.retryParms = this.__getRetryParams();
+            editorContents.timeoutParms = this.__getTimeoutParams();
+
+            return editorContents;
+        },
+
+        __getRetryParams: function() {
+            var content = this.editor.getEditorContent();
+            var retryParms = {};
+            // [0] - original content
+            // [1] - Retry annotation
+            // [2] - retry parameters as a string
+            var retryRegexString = "@Retry\\s*" + "(\\(" +
+            "((?:\\s*(?:\\w*)\\s*=\\s*[-\\d\.,a-zA-Z]*)*)*" +
+            "\\s*\\))?";
+            var retryRegex = new RegExp(retryRegexString, "g");
+            var retryMatch = retryRegex.exec(content);
+
+            if (!retryMatch) {
+                throw retryTimeoutMessages.RETRY_REQUIRED;
+            } else if (!retryMatch[2]) {
+                // This just means the input didn't match the expected format.
+                // Any non-empty code inside the parentheses should be invalid.
+                var retryParamRegex = /@Retry\s*((?:\((.*\s*)\)?)|[\s\S]*\))?/g;
+                var paramMatch = retryParamRegex.exec(content);
+                // ensure empty parentheses match if they exist. else input is invalid
+                if (paramMatch && paramMatch[1] && paramMatch[1].replace(/\s*/g, "") !== "()") {
+                    throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                }
+                return retryParms;
+            }
+            // Turn string of params into array
+            var retryParamsString = retryMatch[2];
+            retryParams = this.__parmsToArray(retryParamsString);
+
+            var keyValueRegex = /(.*)=(.*)/;
+            var match = null;
+            $.each(retryParams, function(i, param) {
+                match = keyValueRegex.exec(param);
+                if (!match) { // invalid param format for @Retry
+                    throw retryTimeoutMessages.SYNTAX_ERROR; 
+                }
+                switch (match[1]) {
+                    case "retryOn":
+                    case "abortOn":
+                        throw retryTimeoutMessages.RETRY_ABORT_UNSUPPORTED;
+                    case "maxRetries":
+                    case "maxDuration":
+                    case "delay":
+                    case "jitter":
+                        if (!match[2]) {
+                            throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                        }
+                        retryParms[match[1]] = match[2];
+                        break;
+                    case "durationUnit":
+                    case "delayUnit":
+                    case "jitterDelayUnit":
+                        throw retryTimeoutMessages.UNIT_PARAMS_DISABLED;
+                    default:
+                        throw retryTimeoutMessages.UNSUPPORTED_RETRY_PARAM;
+                }
+            });
+            return retryParms;
+        },
+
+        __getTimeoutParams: function() {
+            var content = this.editor.getEditorContent();
+            var timeoutParms = {};
+
+            // [0] - original content
+            // [1] - Timeout annotation
+            // [2] - 'value=xyz' parameter if it exists
+            // [3] - 'xyz' in `value=xyz' from above
+            // [4] - standalone integer value parameter if it exists
+            var timeoutRegexString = "\\s*(@Timeout)\\s*" + "(?:\\(" + 
+            "((?:\\s*\\w+\\s*=\\s*([-\\w,.]*)\\s*)*)" + "\\)|(?:\\(\\s*([\\w]*)\\s*\\)))?"; // "(?:(?:unit|value)\\s*=\\s*[\\d\\.,a-zA-Z]+\\s*)*|"
+            var timeoutRegex = new RegExp(timeoutRegexString, "g");
+            var timeoutMatch = timeoutRegex.exec(content);
+
+            if (!timeoutMatch) {
+                throw retryTimeoutMessages.TIMEOUT_REQUIRED;
+            }
+            if (timeoutMatch[3] == "") {
+                throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+            }
+
+            if (timeoutMatch[2]) { // valid parameter format
+                var timeoutMatchString = timeoutMatch[2];
+                var timeoutParams = this.__parmsToArray(timeoutMatch[2]);
+
+                var keyValueRegex = /(.*)=(.*)/;
+                var match = null;
+                $.each(timeoutParams, function(i, param) {
+                    match = keyValueRegex.exec(param);
+                    if (!match) { // invalid param format for @Retry
+                        throw retryTimeoutMessages.SYNTAX_ERROR; 
+                    }
+                    switch (match[1]) {
+                        case "value":
+                            if (!match[2]) {
+                                throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                            }
+                            timeoutParms[match[1]] = match[2];
+                            break;
+                        case "unit":
+                            throw retryTimeoutMessages.UNIT_PARAMS_DISABLED;
+                        default:
+                            throw retryTimeoutMessages.UNSUPPORTED_TIMEOUT_PARAM;
+                    }
+                });
+            } else if (timeoutMatch[4]) { // else, standalone value (to be validated later)
+                timeoutParms.value = timeoutMatch[4];
+            } else { // else empty or some wrong format
+                var timeoutParamRegex = /@Timeout\s*((?:\((.*\s*)\)?)|[\s\S]*\))?/g;
+                var paramMatch = timeoutParamRegex.exec(content);
+                // ensure empty parentheses match if they exist. else input is invalid
+                if (paramMatch && paramMatch[1] && paramMatch[1].replace(/\s*/g, "") !== "()") {
+                    throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                }
+            }
+            return timeoutParms;
+        },
+        
+        // Checks if parameters are valid (all in milliseconds)
+        // returns false if something is invalid
+        // returns corrected parameters otherwise
+        verifyAndCorrectParams: function(params) {
+            var retryParms = params.retryParms;
+            if (retryParms) {
+                var maxRetries = this.__getValueIfInteger(retryParms.maxRetries);
+                var maxDuration = this.__getValueIfInteger(retryParms.maxDuration);
+                var delay = this.__getValueIfInteger(retryParms.delay);
+                var jitter = this.__getValueIfInteger(retryParms.jitter);
+        
+                // If any variable is invalid, return false
+                if (maxRetries === false ||
+                    maxDuration === false ||
+                    delay === false ||
+                    jitter === false) {
+                    return false;
+                }
+
+                if (maxRetries === -1 && maxDuration === 0) {
+                    throw retryTimeoutMessages.UNLIMITED_RETRIES;
+                }
+
+                if (maxRetries) {
+                    if (maxRetries < -1) {
+                        return false;
+                    }
+                } else if (maxRetries === null) {
+                    maxRetries = 3;
+                    params.retryParms.maxRetries = 3;
+                }
+
+                if (maxDuration !== null) { // 0 case matters and would get skipped in `if (maxDuration)`
+                    if (maxDuration < 0) {
+                        return false;
+                    } else if (maxDuration === 0) {
+                        maxDuration = Number.MAX_SAFE_INTEGER;
+                        params.retryParms.maxDuration = Number.MAX_SAFE_INTEGER;
+                    }
+                } else {
+                    maxDuration = 180000;
+                    params.retryParms.maxDuration = 180000;
+                }
+
+                if (delay) {
+                    if (delay < 0) {
+                        return false;
+                    }
+                    if (delay > maxDuration) {
+                        throw retryTimeoutMessages.DURATION_LESS_THAN_DELAY;
+                    }
+                } else if (delay === null) {
+                    delay = 0;
+                    params.retryParms.delay = 0;
+                }
+
+                if (jitter) {
+                    if (jitter < 0) {
+                        return false;
+                    }
+                } else if (jitter === null) {
+                    jitter = 200;
+                    params.retryParms.jitter = 200;
+                }
+
+                // jitter clamp
+                if (jitter > delay) {
+                    params.retryParms.jitter = params.retryParms.delay;
+                }
+            }
+
+            var timeoutParms = params.timeoutParms;
+            if (timeoutParms) {
+                var value = this.__getValueIfInteger(timeoutParms.value);
+                if (value) {
+                    if (value < 0) {
+                        return false;
+                    }
+                } else if (value === null) {
+                    value = 1000;
+                    params.timeoutParms.value = 1000;
+                } else {
+                    return false;
+                }
+            }
+            return params;
+        },
+
+        // returns the Integer value if the parameter string is an integer
+        // returns null if nothing passed in
+        // returns false if invalid input is passed in
+        __getValueIfInteger: function(paramValueString) {
+            if (paramValueString) {
+                var regex =/^[-]?\d+$/gm; // regex for matching integer format
+                var match = regex.exec(paramValueString);
+                if (match) {
+                    var param = match[0];
+                    return parseInt(param);
+                } else {
+                    return false;
+                }
+            } else {
+                return null;
+            }
+        },
+        
+        // converts the string of parameters into an array
+        __parmsToArray: function(parms) {
+            if (!parms) {
+                throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+            }
+            parms = parms.replace(/\s/g, '');  // Remove white space
+            if (parms.trim() !== "") {
+                parms = parms.split(',');
+            } else {
+                parms = [];
+            }
+            return parms;
         }
     };
 
