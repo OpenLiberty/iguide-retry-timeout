@@ -560,7 +560,7 @@
                 },
                 {
                     "displayType": "pod",
-                    "content": "/guides/draft-iguide-retry-timeout/html/playground-dashboard.html",
+                    "content": "/guides/iguide-retry-timeout/html/playground-dashboard.html",
                     "callback": "(function(pod) {retryTimeoutCallback.createPlayground(pod, 'Playground')})"
                 }
             ]
