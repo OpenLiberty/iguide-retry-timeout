@@ -4,7 +4,7 @@
     "description": "Use MicroProfile's Timeout and Retry policies to fail fast and recover when running into failures.",
     "duration": "20 minutes",
     "audience": "developer",
-    "repo": "https://github.com/OpenLiberty/draft-iguide-retry-timeout",
+    "repo": "https://github.com/OpenLiberty/iguide-retry-timeout",
     "steps": [
         {
             "name": "Intro",
@@ -560,7 +560,7 @@
                 },
                 {
                     "displayType": "pod",
-                    "content": "/guides/draft-iguide-retry-timeout/html/playground-dashboard.html",
+                    "content": "/guides/iguide-retry-timeout/html/playground-dashboard.html",
                     "callback": "(function(pod) {retryTimeoutCallback.createPlayground(pod, 'Playground')})"
                 }
             ]

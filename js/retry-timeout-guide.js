@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 $(document).ready(function() {
-    var iguideJsonName = "/guides/draft-iguide-retry-timeout/json-guides/retry-timeout.json";
+    var iguideJsonName = "/guides/iguide-retry-timeout/json-guides/retry-timeout.json";
     var iguideContextRoot = "RetryTimeout";
 
     jsonGuide.getAGuide(iguideJsonName).done(function() {

@@ -11,7 +11,7 @@
 var retryTimeoutCallback = (function() {
 
     var bankServiceFileName = "BankService.java";
-    var htmlRootDir = "/guides/draft-iguide-retry-timeout/html/";
+    var htmlRootDir = "/guides/iguide-retry-timeout/html/";
     var __browserTransactionBaseURL = "https://global-ebank.openliberty.io/transactions";
 
     var listenToEditorForFeatureInServerXML = function(editor) {
@@ -385,7 +385,7 @@ var retryTimeoutCallback = (function() {
             } 
         } else {
             if (checkURL !== ""){
-                browser.setBrowserContent("/guides/draft-iguide-retry-timeout/html/page-not-found.html");
+                browser.setBrowserContent("/guides/iguide-retry-timeout/html/page-not-found.html");
             } else {
                 browser.setBrowserContent("");
             }
