@@ -45,6 +45,24 @@ var retryTimeoutPlayground = function() {
             this.setProgressBar();
         },
 
+        updatePlayground: function() {
+            this.resetPlayground();
+
+            var params, paramsValid;
+            try {
+                params = this.getParamsFromEditor();
+                paramsValid = this.verifyAndCorrectParams(params);
+
+                if (paramsValid) {
+                    this.startTimeline(params);
+                } else {
+                    this.editor.createCustomErrorMessage(retryTimeoutMessages.INVALID_PARAMETER_VALUE);
+                }
+            } catch(e) {
+                this.editor.createCustomErrorMessage(e);
+            }
+        },
+
         replayPlayground: function() {
             this.resetPlayground();
             if (this.ranOnce) {

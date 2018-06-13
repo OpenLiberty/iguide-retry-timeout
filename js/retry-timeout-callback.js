@@ -888,21 +888,7 @@ var retryTimeoutCallback = (function() {
         var stepName = editor.getStepName();
         var playground = contentManager.getPlayground(stepName);
 
-        playground.resetPlayground();
-
-        var params, paramsValid;
-        try {
-            params = playground.getParamsFromEditor();
-            paramsValid = playground.verifyAndCorrectParams(params);  
-            
-            if (paramsValid) {
-                playground.startTimeline(params);
-            } else {
-                editor.createCustomErrorMessage(retryTimeoutMessages.INVALID_PARAMETER_VALUE);
-            }
-        } catch(e) {
-            editor.createCustomErrorMessage(e);
-        }
+        playground.updatePlayground();
     };
 
     var listenToBrowserForRefresh = function(webBrowser) {
