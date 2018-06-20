@@ -338,9 +338,15 @@ var retryTimeoutCallback = (function() {
     var clickTransaction = function(event, stepName, numOfRequest) {
         if (event.type === "click" ||
            (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
-               handleTransactionRequestInBrowser(stepName, numOfRequest);
+            //    handleTransactionRequestInBrowser(stepName, numOfRequest);
+            startTimeline(stepName);
         }
     };
+
+    var startTimeline = function(stepName) {
+        var playground = contentManager.getPlayground(stepName);
+        playground.startTimeline();
+    }
 
     var handleTransactionRequestInBrowser = function(stepName, numOfRequest) {
         var browser = contentManager.getBrowser(stepName);
@@ -714,7 +720,7 @@ var retryTimeoutCallback = (function() {
                              "delayUnit=ChronoUnit.MILLIS",
                              "jitter=100",
                              "jitterDelayUnit=ChronoUnit.MILLIS"
-                            ]
+                            ];
         }
 
         if (__checkRetryAnnotationInContent(content, paramsToCheck)) {
@@ -725,9 +731,13 @@ var retryTimeoutCallback = (function() {
                 contentManager.updateWithNewInstructionNoMarkComplete(stepName);
     
                 // Display the pod with dashboard and web browser in it
-                var htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
+                // var htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
+                // contentManager.setPodContent(stepName, htmlFile);
+                // contentManager.resizeTabbedEditor(stepName);
+                var htmlFile = htmlRootDir + "playground-dashboard.html";
+                var pod = contentManager.getPod(stepName);
+                var playground = createPlayground(pod, stepName);
                 contentManager.setPodContent(stepName, htmlFile);
-                contentManager.resizeTabbedEditor(stepName);
             }
         } else {
             // display error and provide link to fix it
@@ -887,8 +897,18 @@ var retryTimeoutCallback = (function() {
     var updatePlayground = function(editor) {
         var stepName = editor.getStepName();
         var playground = contentManager.getPlayground(stepName);
+        if (playground) {
+            playground.updatePlayground();
+        } else {
+            var htmlFile = htmlRootDir + "playground-dashboard.html";
+            contentManager.setPodContent(stepName, htmlFile);
 
-        playground.updatePlayground();
+            var pod = contentManager.getPod(stepName);
+            createPlayground(pod, stepName);
+            playground = contentManager.getPlayground(stepName);
+            playground.updatePlayground();
+        }
+
     };
 
     var listenToBrowserForRefresh = function(webBrowser) {

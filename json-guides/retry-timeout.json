@@ -278,7 +278,7 @@
                             ],
                             "editorHeight": "468px",
                             "save": false,
-                            "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForRetryAnnotation(editor); })" 
+                            "callback": "(function test(editor) {retryTimeoutCallback.listenToPlayground(editor); })" 
                         }    
                     ]
                 },
