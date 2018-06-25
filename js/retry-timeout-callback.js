@@ -899,16 +899,70 @@ var retryTimeoutCallback = (function() {
         var playground = contentManager.getPlayground(stepName);
         if (playground) {
             playground.updatePlayground();
-        } else {
-            var htmlFile = htmlRootDir + "playground-dashboard.html";
-            contentManager.setPodContent(stepName, htmlFile);
+        } else { //usually should be all non-playground steps because not initialized
+            if (stepName !== 'Playground') {
+                var contentValid = __validateContent(editor);
 
-            var pod = contentManager.getPod(stepName);
-            createPlayground(pod, stepName);
-            playground = contentManager.getPlayground(stepName);
-            playground.updatePlayground();
+                if (contentValid) {
+                    var htmlFile = htmlRootDir + "playground-dashboard.html";
+                    contentManager.setPodContent(stepName, htmlFile);
+    
+                    var pod = contentManager.getPod(stepName);
+                    createPlayground(pod, stepName);
+                    playground = contentManager.getPlayground(stepName);
+                    playground.updatePlayground();
+                }
+            }
         }
+    };
 
+    var __validateContent = function(editor) {
+        var stepName = editor.getStepName();
+        var content = editor.getEditorContent();
+        var paramsToCheck = getParamsToCheck(stepName);
+        if (__checkRetryAnnotationInContent(content, paramsToCheck)) {
+            editor.closeEditorErrorBox(stepName);
+            var index = contentManager.getCurrentInstructionIndex();
+            if (index === 0) {
+                contentManager.markCurrentInstructionComplete(stepName);
+                contentManager.updateWithNewInstructionNoMarkComplete(stepName);
+            }
+            return true;
+        } else {
+            // display error and provide link to fix it
+            editor.createErrorLinkForCallBack(true, __correctEditorError);
+            return false;
+        }
+    };
+
+    var getParamsToCheck = function(stepName) {
+        var paramsToCheck = [];
+        if (stepName === "AddLimitsRetry") {
+            paramsToCheck = ["retryOn=TimeoutException.class",
+                            "maxRetries=4",
+                            "maxDuration=10",
+                            "durationUnit=ChronoUnit.SECONDS"
+                            ];
+        } else if (stepName === "AddDelayRetry") {
+            paramsToCheck = ["retryOn=TimeoutException.class",
+                            "maxRetries=4",
+                            "maxDuration=10",
+                            "durationUnit=ChronoUnit.SECONDS",
+                            "delay=200",
+                            "delayUnit=ChronoUnit.MILLIS"
+                            ];
+        } else if (stepName === "AddJitterRetry") {
+            paramsToCheck = ["retryOn=TimeoutException.class",
+                            "maxRetries=4",
+                            "maxDuration=10",
+                            "durationUnit=ChronoUnit.SECONDS",
+                            "delay=200",
+                            "delayUnit=ChronoUnit.MILLIS",
+                            "jitter=100",
+                            "jitterDelayUnit=ChronoUnit.MILLIS"
+                            ];
+        }
+        return paramsToCheck;
     };
 
     var listenToBrowserForRefresh = function(webBrowser) {
@@ -936,6 +990,7 @@ var retryTimeoutCallback = (function() {
         listenToBrowserForTransactionHistoryAfterRetry: __listenToBrowserForTransactionHistoryAfterRetry,
         listenToPlayground: listenToPlayground,
         listenToBrowserForRefresh: listenToBrowserForRefresh,
+        correctEditorError: __correctEditorError,
         populateURL: __populateURL,
         addRetryAnnotationButton: addRetryAnnotationButton,
         createPlayground: createPlayground

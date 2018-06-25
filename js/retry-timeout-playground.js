@@ -57,20 +57,6 @@ var retryTimeoutPlayground = function() {
                 params = this.getParamsFromEditor();
                 // Retry guide steps use seconds for maxDuration, so convert to ms
                 if (this.stepName !== 'Playground') {
-                    //TODO: use existing Retry step validation for strictness
-                    var content = this.editor.getEditorContent();
-                    var paramsToCheck = this.getParamsToCheck();
-                    if (this.__checkRetryAnnotationInContent(content, paramsToCheck)) {
-                        this.editor.closeEditorErrorBox(this.stepName);
-                        var index = contentManager.getCurrentInstructionIndex();
-                        if (index === 0) {
-                            contentManager.markCurrentInstructionComplete(stepName);
-                            contentManager.updateWithNewInstructionNoMarkComplete(stepName);
-                        } else {
-                            // display error and provide link to fix it
-                            this.editor.createErrorLinkForCallBack(true, __correctEditorError);
-                        }
-                    }
                     params.retryParms.maxDuration = params.retryParms.maxDuration*1000;
                     params = this.verifyAndCorrectParams(params);
                 }
@@ -88,28 +74,7 @@ var retryTimeoutPlayground = function() {
                 }
             } catch(e) {
                 this.editor.createCustomErrorMessage(e);
-            }
-            //     var content = this.editor.getEditorContent();
-            //     var paramsToCheck = [];
-
-            //     if (this.__checkRetryAnnotationInContent(content, paramsToCheck)) {
-            //         this.editor.closeEditorErrorBox(stepName);
-            //         var index = contentManager.getCurrentInstructionIndex();
-            //         if (index === 0) {
-            //             contentManager.markCurrentInstructionComplete(stepName);
-            //             contentManager.updateWithNewInstructionNoMarkComplete(stepName);
-            
-            //             // Display the pod with dashboard and web browser in it
-            //             var htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
-            //             contentManager.setPodContent(stepName, htmlFile);
-            //             contentManager.resizeTabbedEditor(this.stepName);
-            //             // var htmlFile = htmlRootDir + "playground-dashboard.html";
-            //             // contentManager.setPodContent(stepName, htmlFile);
-            //         }
-            //     } else {
-            //         // display error and provide link to fix it
-            //         this.editor.createErrorLinkForCallBack(true, __correctEditorError);
-            //     }            
+            }       
         },
 
         replayPlayground: function() {
@@ -607,147 +572,6 @@ var retryTimeoutPlayground = function() {
                 parms = [];
             }
             return parms;
-        },
-
-        getParamsToCheck: function() {
-            var paramsToCheck = [];
-            if (stepName === "AddLimitsRetry") {
-                paramsToCheck = ["retryOn=TimeoutException.class",
-                                "maxRetries=4",
-                                "maxDuration=10",
-                                "durationUnit=ChronoUnit.SECONDS"
-                                ];
-            } else if (stepName === "AddDelayRetry") {
-                paramsToCheck = ["retryOn=TimeoutException.class",
-                                "maxRetries=4",
-                                "maxDuration=10",
-                                "durationUnit=ChronoUnit.SECONDS",
-                                "delay=200",
-                                "delayUnit=ChronoUnit.MILLIS"
-                                ];
-            } else if (stepName === "AddJitterRetry") {
-                paramsToCheck = ["retryOn=TimeoutException.class",
-                                "maxRetries=4",
-                                "maxDuration=10",
-                                "durationUnit=ChronoUnit.SECONDS",
-                                "delay=200",
-                                "delayUnit=ChronoUnit.MILLIS",
-                                "jitter=100",
-                                "jitterDelayUnit=ChronoUnit.MILLIS"
-                                ];
-            }
-            return paramsToCheck;
-        },
-        __checkRetryAnnotationInContent: function(content, parmsToCheck) {
-            var annotationIsCorrect = true;
-            var editorContentParts = this.__getEditorParts(content);
-            if (editorContentParts.hasOwnProperty('retryParms')) {
-                var parmsInAnnotation = this.__isParmInRetryAnnotation(editorContentParts.retryParms, parmsToCheck);
-                if (parmsInAnnotation !== 1) {
-                    annotationIsCorrect = false;
-                }
-            } else {
-                annotationIsCorrect = false;  // None specified
-            }
-            return annotationIsCorrect;
-        },
-
-        __getEditorParts: function(content) {
-            var editorContents = {};
-            try {
-                // match:
-                //
-                // public class BankService {
-                //  < space or newline >
-                //     @Retry(...)
-                //     @Timeout(2000)
-                //     public Service showTransactions()....
-                //
-                // and capture groups to get content before the annotation,
-                // the @Retry annotation, the @Retry annotation params, and
-                // content after the annotation.
-                //
-                // Syntax:
-                //  \s to match all whitespace characters
-                //  \S to match non whitespace characters
-                //  \d to match digits
-                //  () capturing group
-                //  (?:) noncapturing group
-                //
-                // Result:
-                //   groups[0] - same as content
-                //   groups[1] - content before the @Retry annotation
-                //   groups[2] - the whole @Retry annotation
-                //   groups[3] - the @Retry parameters
-                //   groups[4] - content after the @Retry annotation
-                var codeToMatch = '([\\s\\S]*public class BankService {\\s*)' +     // Before the @Retry
-                                  '(@Retry' + '\\s*' + '\\(' + '\\s*' +
-                                  '((?:\\s*(?:retryOn|maxRetries|maxDuration|durationUnit|delay|delayUnit|jitter|jitterDelayUnit|abortOn)\\s*=\\s*[\\d\.,a-zA-Z]*)*)' +
-                                  '\\s*' + '\\))' +
-                                  '(\\s*@Timeout\\(2000\\)[\\s\\S]*)';              // After the @Retry
-                var regExpToMatch = new RegExp(codeToMatch, 'g');
-                var groups = regExpToMatch.exec(content);
-    
-                var parms = groups[3];   // String of just the @Retry paramters
-                parms = parms.replace('\n','');
-                parms = parms.replace(/\s/g, '');  // Remove white space
-                if (parms.trim() !== '') {
-                    parms = parms.split(',');
-                } else {
-                    parms = [];
-                }
-    
-                editorContents.retryParms = parms;
-                editorContents.afterAnnotationContent = groups[4];
-    
-            } catch (e) {
-    
-            }
-            return editorContents;
-        },
-        __isParmInRetryAnnotation: function(annotationParms, parmsToCheck) {
-            var parms = [];     // Array of parm objects { parm, value }
-            var allMatch = 1;   // Assume all match
-    
-            // For each parameter, pull apart parameter name and its value
-            $(annotationParms).each(function(index, element) {
-                if (element.indexOf('=') !== -1) {
-                    parms[index] = {};
-                    parms[index].name = element.trim().substring(0, element.indexOf('='));
-                    parms[index].value = element.trim().substring(element.indexOf('=') + 1);
-                }
-            });
-    
-            // Now check that each expected parm (parmsToCheck array) and its
-            // value exists in inputted parms.
-            $(parmsToCheck).each(function(index, element) {
-                var elementMatch = false;
-                if (element.indexOf('=') !== -1) {
-                    // For each expected parameter, pull apart parameter name and its value
-                    var expectedParm = element.trim().substring(0, element.indexOf('='));
-                    var expectedValue = element.trim().substring(element.indexOf('=') + 1);
-    
-                    // Loop through inputted parms to see if expected parm exists
-                    $(parms).each(function(parmsIndex, parmsElement) {
-                        if (parmsElement.name === expectedParm &&
-                            parmsElement.value === expectedValue) {
-                            elementMatch = true;
-                            return false;   // break out of loop
-                        }
-                    });
-                }
-    
-                if (elementMatch === false) {
-                    allMatch = 0;
-                    return false;   // break out of loop
-                }
-            });
-
-            if (allMatch === 1 && annotationParms.length > parmsToCheck.length) {
-                allMatch = 2; // extra Parameters
-            }
-    
-            return allMatch;
         }
     };
 
