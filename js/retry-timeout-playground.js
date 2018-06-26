@@ -515,8 +515,14 @@ var retryTimeoutPlayground = function() {
                         return false;
                     }
                 } else if (jitter === null) {
-                    jitter = 200;
-                    params.retryParms.jitter = 200;
+                    if (this.stepName === 'AddDelayRetry') {
+                        //remove jitter in delay step for demonstration purposes
+                        jitter = 0;
+                        params.retryParms.jitter = 0;
+                    } else {
+                        jitter = 200;
+                        params.retryParms.jitter = 200;    
+                    }
                 }
 
                 // jitter clamp

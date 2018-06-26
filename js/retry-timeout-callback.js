@@ -216,7 +216,7 @@ var retryTimeoutCallback = (function() {
     };
 
     var listenToPlayground = function(editor) {
-        editor.addSaveListener(updatePlayground);
+        editor.addSaveListener(__updatePlayground);
     };
 
     var __showStartingBrowser = function(editor) {
@@ -629,22 +629,22 @@ var retryTimeoutCallback = (function() {
     var addRetryAnnotationButton = function(event, stepName) {
         if (utils.isElementActivated(event)) {
             switch (stepName) {
-                    case 'AddRetryOnRetry':
-                        __addRetryOnRetryInEditor(stepName);
-                        break;
-                    case 'AddLimitsRetry':
-                        __addLimitsRetryInEditor(stepName);
-                        break;
-                    case 'AddDelayRetry':
-                        __addDelayRetryInEditor(stepName);
-                        break;
-                    case 'AddJitterRetry':
-                        __addJitterRetryInEditor(stepName);
-                        break;
-                    case 'AddAbortOnRetry':
-                        __addAbortOnRetryInEditor(stepName);
-                        break;
-               }
+                case 'AddRetryOnRetry':
+                    __addRetryOnRetryInEditor(stepName);
+                    break;
+                case 'AddLimitsRetry':
+                    __addLimitsRetryInEditor(stepName);
+                    break;
+                case 'AddDelayRetry':
+                    __addDelayRetryInEditor(stepName);
+                    break;
+                case 'AddJitterRetry':
+                    __addJitterRetryInEditor(stepName);
+                    break;
+                case 'AddAbortOnRetry':
+                    __addAbortOnRetryInEditor(stepName);
+                    break;
+            }
         }
     };
 
@@ -664,75 +664,18 @@ var retryTimeoutCallback = (function() {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 16, newContent, 5);
-    }
+    };
 
     var __addJitterRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS,\n           jitter = 100,\n           jitterDelayUnit = ChronoUnit.MILLIS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 17, newContent, 7);
-    }
+    };
 
     var __addAbortOnRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS,\n           jitter = 100,\n           jitterDelayUnit = ChronoUnit.MILLIS,\n           abortOn = FileNotFoundException.class)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 14, 20, newContent, 8);
-    }
-
-    var listenToEditorForRetryAnnotation = function(editor) {
-        editor.addSaveListener(__showPodWithDashboardAndBrowser);
-    };
-
-    var __showPodWithDashboardAndBrowser = function(editor) {
-        var stepName = editor.getStepName();
-        var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
-        var paramsToCheck = [];
-
-        if (stepName === "AddLimitsRetry") {
-            paramsToCheck = ["retryOn=TimeoutException.class",
-                             "maxRetries=4",
-                             "maxDuration=10",
-                             "durationUnit=ChronoUnit.SECONDS"
-                            ];
-        } else if (stepName === "AddDelayRetry") {
-            paramsToCheck = ["retryOn=TimeoutException.class",
-                             "maxRetries=4",
-                             "maxDuration=10",
-                             "durationUnit=ChronoUnit.SECONDS",
-                             "delay=200",
-                             "delayUnit=ChronoUnit.MILLIS"
-                            ];
-        } else if (stepName === "AddJitterRetry") {
-            paramsToCheck = ["retryOn=TimeoutException.class",
-                             "maxRetries=4",
-                             "maxDuration=10",
-                             "durationUnit=ChronoUnit.SECONDS",
-                             "delay=200",
-                             "delayUnit=ChronoUnit.MILLIS",
-                             "jitter=100",
-                             "jitterDelayUnit=ChronoUnit.MILLIS"
-                            ];
-        }
-
-        if (__checkRetryAnnotationInContent(content, paramsToCheck)) {
-            editor.closeEditorErrorBox(stepName);
-            var index = contentManager.getCurrentInstructionIndex();
-            if (index === 0) {
-                contentManager.markCurrentInstructionComplete(stepName);
-                contentManager.updateWithNewInstructionNoMarkComplete(stepName);
-    
-                // Display the pod with dashboard and web browser in it
-                // var htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
-                // contentManager.setPodContent(stepName, htmlFile);
-                // contentManager.resizeTabbedEditor(stepName);
-                var htmlFile = htmlRootDir + "playground-dashboard.html";
-                var pod = contentManager.getPod(stepName);
-                var playground = createPlayground(pod, stepName);
-                contentManager.setPodContent(stepName, htmlFile);
-            }
-        } else {
-            // display error and provide link to fix it
-            editor.createErrorLinkForCallBack(true, __correctEditorError);
-        }
     };
 
     var __checkRetryAnnotationInContent = function(content, parmsToCheck) {
@@ -884,7 +827,7 @@ var retryTimeoutCallback = (function() {
         contentManager.setPlayground(stepName, playground, 0);
     };
 
-    var updatePlayground = function(editor) {
+    var __updatePlayground = function(editor) {
         var stepName = editor.getStepName();
         var playground = contentManager.getPlayground(stepName);
         if (playground) {
@@ -977,7 +920,6 @@ var retryTimeoutCallback = (function() {
         listenToEditorForTimeoutAnnotation: listenToEditorForTimeoutAnnotation,
         listenToBrowserForTransactionHistory: __listenToBrowserForTransactionHistory,
         listenToEditorForInitialRetryAnnotation: listenToEditorForInitialRetryAnnotation,
-        listenToEditorForRetryAnnotation: listenToEditorForRetryAnnotation,
         listenToBrowserForTransactionHistoryAfterRetry: __listenToBrowserForTransactionHistoryAfterRetry,
         listenToPlayground: listenToPlayground,
         listenToBrowserForRefresh: listenToBrowserForRefresh,
