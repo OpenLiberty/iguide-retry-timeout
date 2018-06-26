@@ -22,8 +22,7 @@ var retryTimeoutCallback = (function() {
     };
 
     var addMicroProfileFaultToleranceFeatureButton = function(event) {
-        if (event.type === "click" ||
-           (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
+        if (utils.isElementActivated(event)) {
             // Click or 'Enter' or 'Space' key event...
             __addMicroProfileFaultToleranceFeature();
         }
@@ -191,8 +190,7 @@ var retryTimeoutCallback = (function() {
     };
 
     var saveServerXMLButton = function(event) {
-        if (event.type === "click" ||
-           (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
+        if (utils.isElementActivated(event)) {
             // Click or 'Enter' or 'Space' key event...
             contentManager.saveTabbedEditor(stepContent.getCurrentStepName(), "server.xml");
         }
@@ -203,8 +201,7 @@ var retryTimeoutCallback = (function() {
     };
 
     var saveButtonEditor = function(event, stepName) {
-        if (event.type === "click" ||
-           (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
+        if (utils.isElementActivated(event)) {
             // Click or 'Enter' or 'Space' key event...
             __saveButtonEditor(stepName);
         }
@@ -329,24 +326,16 @@ var retryTimeoutCallback = (function() {
     };
 
     var addTimeoutButton = function(event, stepName) {
-        if (event.type === "click" ||
-           (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
+        if (utils.isElementActivated(event)) {
             __addTimeoutInEditor(stepName);
         }
     };
 
     var clickTransaction = function(event, stepName, numOfRequest) {
-        if (event.type === "click" ||
-           (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
-            //    handleTransactionRequestInBrowser(stepName, numOfRequest);
-            startTimeline(stepName);
+        if (utils.isElementActivated(event)) {
+            handleTransactionRequestInBrowser(stepName, numOfRequest);
         }
     };
-
-    var startTimeline = function(stepName) {
-        var playground = contentManager.getPlayground(stepName);
-        playground.startTimeline();
-    }
 
     var handleTransactionRequestInBrowser = function(stepName, numOfRequest) {
         var browser = contentManager.getBrowser(stepName);
@@ -380,13 +369,16 @@ var retryTimeoutCallback = (function() {
                     showTransactionHistory(stepName, browser);
                     break;
                 case "AddLimitsRetry":
-                    showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 0 /* Not set */, 0 /* Not set */);
+                    var playground = contentManager.getPlayground(stepName);
+                    playground.startTimeline();
                     break;
                 case "AddDelayRetry":
-                    showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 200, 0 /* Not set */);
+                    var playground = contentManager.getPlayground(stepName);
+                    playground.startTimeline();
                     break;
                 case "AddJitterRetry":
-                    showTransactionHistoryWithDashboard(stepName, browser, 3, 10000 /* 10s */, 200, 100);
+                    var playground = contentManager.getPlayground(stepName);
+                    playground.startTimeline();
                     break;
             } 
         } else {
@@ -610,9 +602,8 @@ var retryTimeoutCallback = (function() {
     };
 
     var __populateURL = function(event, stepName) {
-        if (event.type === "click" ||
-           (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
-               // Click or 'Enter' or 'Space' key event...
+        if (utils.isElementActivated(event)) {
+            // Click or 'Enter' or 'Space' key event...
             contentManager.setBrowserURL(stepName, __browserTransactionBaseURL);
         }
     };
@@ -636,9 +627,8 @@ var retryTimeoutCallback = (function() {
     };
 
     var addRetryAnnotationButton = function(event, stepName) {
-        if (event.type === "click" ||
-           (event.type === "keypress" && (event.which === 13 || event.which === 32))) {
-               switch (stepName) {
+        if (utils.isElementActivated(event)) {
+            switch (stepName) {
                     case 'AddRetryOnRetry':
                         __addRetryOnRetryInEditor(stepName);
                         break;
@@ -904,7 +894,8 @@ var retryTimeoutCallback = (function() {
                 var contentValid = __validateContent(editor);
 
                 if (contentValid) {
-                    var htmlFile = htmlRootDir + "playground-dashboard.html";
+                    var htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
+                    // var htmlFile = htmlRootDir + "playground-dashboard.html";
                     contentManager.setPodContent(stepName, htmlFile);
     
                     var pod = contentManager.getPod(stepName);
