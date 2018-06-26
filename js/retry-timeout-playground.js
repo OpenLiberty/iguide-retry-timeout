@@ -2,7 +2,7 @@ var retryTimeoutPlayground = function() {
     var htmlRootDir = '/guides/iguide-retry-timeout/html/';
     var __browserTransactionBaseURL = 'https://global-ebank.openliberty.io/transactions';
 
-    var _playground = function(root, stepName, params) {
+    var _playground = function(root, stepName) {
         this.fileName = 'BankService.java';
         this.root = root;
         this.stepName = stepName;
@@ -149,15 +149,6 @@ var retryTimeoutPlayground = function() {
         setTicks: function() {
             this.timeoutCount++;
 
-
-            //TODO: for non-playground, set transaction page before last timeout
-            if ((this.stepName !== 'Playground') && (this.timeoutCount === this.timeoutsToSimulate)) {
-                this.stopProgressBar();
-                this.browser.setURL(__browserTransactionBaseURL);
-                this.browser.setBrowserContent(htmlRootDir + 'transaction-history.html');
-                return;
-            }
-
             // Show the timeout tick
             // Do the math...
             var timeoutTickPctPlacement = Math.round((this.elapsedRetryProgress/this.maxDuration) * 1000) / 10;  // Round to 1 decimal place
@@ -242,6 +233,14 @@ var retryTimeoutPlayground = function() {
                         $('<div/>').attr('class','timelineTick retryTick').attr('style','left:calc(' + retryTickPctPlacement + retryTickAdjustment).attr('title', retryLabel).appendTo(me.retryTickContainer);
                         if (me.stepName !== 'Playground') {
                             $('<div/>', {'class': 'timelineLabel retryLabel', text: retryLabel, style: 'left:calc(' + retryTickPctPlacement + '% - 29px);'}).appendTo(me.retryTickContainer);
+
+                            // Show transaction page after last retry
+                            if (me.timeoutCount === me.maxRetries) {
+                                me.stopProgressBar();
+                                me.browser.setURL(__browserTransactionBaseURL);
+                                me.browser.setBrowserContent(htmlRootDir + 'transaction-history.html');
+                                return;
+                            }
                         }
                 
                         // Advance the progress bar until the next timeout
@@ -581,8 +580,8 @@ var retryTimeoutPlayground = function() {
         }
     };
 
-    var create = function(root, stepName, params) {
-        return new _playground(root, stepName, params);
+    var create = function(root, stepName) {
+        return new _playground(root, stepName);
     };
 
     return {
