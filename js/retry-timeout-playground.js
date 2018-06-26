@@ -159,8 +159,6 @@ var retryTimeoutPlayground = function() {
                     this.currentPctProgress = timeoutTickPctPlacement;           
                 } else {
                     this.progressBar.attr('style', 'width: 100%');
-                    //console.log("set: 100 - 2");               browser.setURL(__browserTransactionBaseURL);
-                    // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
                     this.browser.setBrowserContent(htmlRootDir + 'playground-timeout-error.html');
                     return;
                 }
@@ -209,10 +207,7 @@ var retryTimeoutPlayground = function() {
                         // Exceeded maxDuration!
                         clearInterval(me.moveProgressBar);
                         me.progressBar.attr('style', 'width: 100%;');
-                        //console.log("set: 100% -4"); 
-                        //console.log("maxDuration exceeded....put up error");
                         this.browser.setURL(__browserTransactionBaseURL);
-                        // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
                         this.browser.setBrowserContent(htmlRootDir + 'playground-timeout-error.html');
                     }
                 } else {
@@ -248,9 +243,6 @@ var retryTimeoutPlayground = function() {
                     } else {
                         // Hit max duration time limit before initiating a Retry.  Error out.
                         me.progressBar.attr('style', 'width: 100%;');
-                        //console.log("set: 100% -6"); 
-                        //console.log("maxDuration exceeded....put up error");                    browser.setURL(__browserTransactionBaseURL);
-                        // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
                         me.browser.setBrowserContent(htmlRootDir + 'playground-timeout-error.html');
                     }
                 }
@@ -268,43 +260,24 @@ var retryTimeoutPlayground = function() {
             this.moveProgressBar = setInterval( function() {
                 // Moves the timeline forward 1% at a time.  If no more timeouts should
                 // be processed it stops and shows the transaction history.
-                if (me.timeoutCount === me.timeoutsToSimulate) {
-                    //TODO: this should finish one more timeout and show failure page
-                    clearInterval(me.moveProgressBar);
-                    me.currentPctProgress += 1; // Advance the progress bar to simulate processing
-                    if (me.currentPctProgress <= 100) {
+
+                // Determine how far (% of timeline) we would travel in <timeout> milliseconds.
+                var forwardPctProgress = Math.round(((me.elapsedRetryProgress + me.timeout)/me.maxDuration) * 1000) / 10;  // Round to 1 decimal place
+                if ((me.currentPctProgress + 1) < forwardPctProgress) {
+                    me.currentPctProgress++;
+                    if (me.currentPctProgress < 100) {
                         me.progressBar.attr('style', 'width:' + me.currentPctProgress + '%;');
-                        //console.log("set: " + currentPctProgress + " -7"); 
                     } else {
-                        me.progressBar.attr('style', 'width:100%;');
-                        //console.log("set: 100% -8"); 
-                    }
-                    me.browser.setURL(__browserTransactionBaseURL);
-                    me.browser.setBrowserContent(htmlRootDir + 'playground-timeout-error.html');
-                } else {
-                    // Determine how far (% of timeline) we would travel in <timeout> milliseconds.
-                    var forwardPctProgress = Math.round(((me.elapsedRetryProgress + me.timeout)/me.maxDuration) * 1000) / 10;  // Round to 1 decimal place
-                    if ((me.currentPctProgress + 1) < forwardPctProgress) {
-                        me.currentPctProgress++;
-                        if (me.currentPctProgress < 100) {
-                            me.progressBar.attr('style', 'width:' + me.currentPctProgress + '%;');
-                            //console.log("set: " + currentPctProgress + " -9"); 
-                        } else {
-                            // Exceeded maxDuration!
-                            // console.log("maxDuration exceeded....put up message");
-                            clearInterval(me.moveProgressBar);
-                            me.progressBar.attr('style', 'width: 100%;');
-                            //console.log("set: " + 100 + " -10");                        
-                            me.browser.setURL(__browserTransactionBaseURL);
-                            // NOTE THAT THAT THIS HTML HAS A DELAY IN IT.  MAY NEED NEW ONE FOR PLAYGROUND.
-                            me.browser.setBrowserContent(htmlRootDir + 'playground-timeout-error.html');
-                        }
-                    }  else {
+                        // Exceeded maxDuration!
                         clearInterval(me.moveProgressBar);
-                        me.elapsedRetryProgress += me.timeout;
-                        // console.log("set elapsedRetryProgress up " + timeout + ":" + elapsedRetryProgress);
-                        me.setTicks();
+                        me.progressBar.attr('style', 'width: 100%;');
+                        me.browser.setURL(__browserTransactionBaseURL);
+                        me.browser.setBrowserContent(htmlRootDir + 'playground-timeout-error.html');
                     }
+                }  else {
+                    clearInterval(me.moveProgressBar);
+                    me.elapsedRetryProgress += me.timeout;
+                    me.setTicks();
                 }
             }, progress1pct);  // Repeat -- moving the timeline 1% at a time
         },
