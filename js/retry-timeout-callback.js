@@ -623,7 +623,6 @@ var retryTimeoutCallback = (function() {
 
                 if (contentValid) {
                     var htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
-                    // var htmlFile = htmlRootDir + "playground-dashboard.html";
                     contentManager.setPodContent(stepName, htmlFile);
                     window.setTimeout(function(){
                         var pod = contentManager.getPod(stepName);
@@ -631,6 +630,7 @@ var retryTimeoutCallback = (function() {
                         playground = contentManager.getPlayground(stepName);
                         playground.updatePlayground();
                     }, 500);
+                    contentManager.resizeTabbedEditor(stepName);
                 }
             }
         }

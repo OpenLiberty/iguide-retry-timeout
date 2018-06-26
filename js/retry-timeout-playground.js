@@ -30,6 +30,7 @@ var retryTimeoutPlayground = function() {
 
             // maxRetries+1 is for timeoutsToSimulate. workaround to simulate the last timeout
             this.timeoutsToSimulate = this.maxRetries + 1;
+            this.progress1pct = this.maxDuration * 0.01; // Number Milliseconds in 1% of timeline.
         },
         startTimeline: function() {
             this.resetPlayground();
@@ -185,36 +186,23 @@ var retryTimeoutPlayground = function() {
             //console.log("retryTickSpot: " + retryTickSpot);
             if (this.jitter > 0 && this.delay > 0) {
                 // Have a jitter that determines the next delay time.
-                var positiveOrNegative = Math.floor(Math.random() * 10) < 5 ? -1: 1;
+                var positiveOrNegative = Math.random() < 0.5 ? -1: 1;
                 var jitterDelay = Math.floor((Math.random() * this.jitter) + 1) * positiveOrNegative;
                 //console.log("jitterDelay: " + jitterDelay);
                 retryTickSpot += jitterDelay;
                 //console.log("retryTickSpot adjusted for jitter: " + retryTickSpot);
             }
             var retryTickPctPlacement = Math.round((retryTickSpot/this.maxDuration) * 1000) / 10;  // Round to 1 decimal place
-            var progress1pct = this.maxDuration * .01;  // Number Milliseconds in 1% of timeline.
             var me = this;
             this.moveProgressBar = setInterval( function() {
                 // Advance the blue progress bar 1% at a time until we reach the spot
                 // for the retry tick.
-                me.currentPctProgress++;
-                if (retryTickPctPlacement < 100  &&  (me.currentPctProgress+1) < retryTickPctPlacement) { 
-                    me.currentPctProgress++;               
-                    if (me.currentPctProgress <= 100) {
-                        me.progressBar.attr('style', 'width:' + me.currentPctProgress + '%;');
-                        //console.log("set: " + currentPctProgress + " -3"); 
-                    } else {
-                        // Exceeded maxDuration!
-                        clearInterval(me.moveProgressBar);
-                        me.progressBar.attr('style', 'width: 100%;');
-                        this.browser.setURL(__browserTransactionBaseURL);
-                        this.browser.setBrowserContent(htmlRootDir + 'playground-timeout-error.html');
-                    }
+                // me.currentPctProgress++;
+                if (me.currentPctProgress+1 < retryTickPctPlacement) { 
+                    me.advanceProgressBar();
                 } else {
                     clearInterval(me.moveProgressBar);
                     if (retryTickPctPlacement <= 100) {
-                        me.currentPctProgress = retryTickPctPlacement;
-        
                         // Move the blue progress bar exactly to the retry tick spot
                         me.progressBar.attr('style', 'width:' + retryTickPctPlacement + '%;');
                         //console.log("set: " + retryTickPctPlacement + " -5"); 
@@ -246,7 +234,7 @@ var retryTimeoutPlayground = function() {
                         me.browser.setBrowserContent(htmlRootDir + 'playground-timeout-error.html');
                     }
                 }
-            }, progress1pct);
+            }, this.progress1pct);
         },
 
         /**
@@ -255,7 +243,6 @@ var retryTimeoutPlayground = function() {
          * 
          */
         setProgressBar: function() {
-            var progress1pct = this.maxDuration * .01;  // Number Milliseconds in 1% of timeline.
             var me = this;
             this.moveProgressBar = setInterval( function() {
                 // Moves the timeline forward 1% at a time.  If no more timeouts should
@@ -263,29 +250,32 @@ var retryTimeoutPlayground = function() {
 
                 // Determine how far (% of timeline) we would travel in <timeout> milliseconds.
                 var forwardPctProgress = Math.round(((me.elapsedRetryProgress + me.timeout)/me.maxDuration) * 1000) / 10;  // Round to 1 decimal place
-                if ((me.currentPctProgress + 1) < forwardPctProgress) {
-                    me.currentPctProgress++;
-                    if (me.currentPctProgress < 100) {
-                        me.progressBar.attr('style', 'width:' + me.currentPctProgress + '%;');
-                    } else {
-                        // Exceeded maxDuration!
-                        clearInterval(me.moveProgressBar);
-                        me.progressBar.attr('style', 'width: 100%;');
-                        me.browser.setURL(__browserTransactionBaseURL);
-                        me.browser.setBrowserContent(htmlRootDir + 'playground-timeout-error.html');
-                    }
+                if (me.currentPctProgress + 1 < forwardPctProgress) {
+                    me.advanceProgressBar();
                 }  else {
                     clearInterval(me.moveProgressBar);
                     me.elapsedRetryProgress += me.timeout;
                     me.setTicks();
                 }
-            }, progress1pct);  // Repeat -- moving the timeline 1% at a time
+            }, this.progress1pct);  // Repeat -- moving the timeline 1% at a time
+        },
+
+        advanceProgressBar: function() {
+            this.currentPctProgress++;
+            if (this.currentPctProgress < 100) {
+                this.progressBar.attr('style', 'width:' + this.currentPctProgress + '%;');
+            } else {
+                // Exceeded maxDuration!
+                this.stopProgressBar();
+                this.browser.setURL(__browserTransactionBaseURL);
+                this.browser.setBrowserContent(htmlRootDir + 'playground-timeout-error.html');
+            }
         },
 
         stopProgressBar: function() {
             clearInterval(this.moveProgressBar);
-            this.currentPctProgress += 1; // Advance the progress bar to simulate processing
-            if (this.currentPctProgress <= 100) {
+            this.currentPctProgress++; // Advance the progress bar to simulate processing
+            if (this.currentPctProgress < 100) {
                 this.progressBar.attr('style', 'width:' + this.currentPctProgress + '%;');
             } else {
                 this.progressBar.attr('style', 'width:100%;');
