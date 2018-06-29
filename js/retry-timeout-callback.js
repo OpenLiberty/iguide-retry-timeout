@@ -616,7 +616,10 @@ var retryTimeoutCallback = (function() {
         var stepName = editor.getStepName();
         var playground = contentManager.getPlayground(stepName);
         if (playground) {
-            playground.updatePlayground();
+            //prevent the Retry steps from using the editor Run button after its playground is successfully created
+            if (stepName === 'Playground') { 
+                playground.updatePlayground();
+            }
         } else { //usually should be all non-playground steps because not initialized
             if (stepName !== 'Playground') {
                 var contentValid = __validateContent(editor);
