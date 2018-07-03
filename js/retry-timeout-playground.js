@@ -197,7 +197,7 @@ var retryTimeoutPlayground = function() {
             this.moveProgressBar = setInterval( function() {
                 // Advance the blue progress bar 1% at a time until we reach the spot
                 // for the retry tick.
-                if (me.currentPctProgress+1 < retryTickPctPlacement) { 
+                if (me.currentPctProgress < retryTickPctPlacement) { 
                     me.advanceProgressBar();
                 } else {
                     clearInterval(me.moveProgressBar);
@@ -224,7 +224,7 @@ var retryTimeoutPlayground = function() {
                                 return;
                             }
                         }
-                        
+
                         // Advance the progress bar until the next timeout
                         me.setProgressBar();    
                     } else {
