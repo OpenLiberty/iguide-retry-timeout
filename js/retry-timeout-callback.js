@@ -615,28 +615,21 @@ var retryTimeoutCallback = (function() {
     var __updatePlayground = function(editor) {
         var stepName = editor.getStepName();
         var playground = contentManager.getPlayground(stepName);
-        if (playground) {
-            //prevent the Retry steps from using the editor Run button after its playground is successfully created
-            if (stepName === 'Playground') { 
-                playground.updatePlayground();
-            } else {
-                __validateContent(editor);
-            }
-        } else { //usually should be all non-playground steps because not initialized
-            if (stepName !== 'Playground') {
-                var contentValid = __validateContent(editor);
+        if (stepName === 'Playground') {
+            playground.updatePlayground();
+        } else {
+            var contentValid = __validateContent(editor);
 
-                if (contentValid) {
-                    var htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
-                    contentManager.setPodContent(stepName, htmlFile);
-                    window.setTimeout(function(){
-                        var pod = contentManager.getPod(stepName);
-                        createPlayground(pod, stepName);
-                        playground = contentManager.getPlayground(stepName);
-                        playground.updatePlayground();
-                    }, 500);
-                    contentManager.resizeTabbedEditor(stepName);
-                }
+            if (!playground && contentValid) { // only load right-side browser if not previously loaded
+                var htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
+                contentManager.setPodContent(stepName, htmlFile);
+                window.setTimeout(function(){
+                    var pod = contentManager.getPod(stepName);
+                    createPlayground(pod, stepName);
+                    playground = contentManager.getPlayground(stepName);
+                    playground.updatePlayground();
+                }, 500);
+                contentManager.resizeTabbedEditor(stepName);
             }
         }
     };
