@@ -619,6 +619,8 @@ var retryTimeoutCallback = (function() {
             //prevent the Retry steps from using the editor Run button after its playground is successfully created
             if (stepName === 'Playground') { 
                 playground.updatePlayground();
+            } else {
+                __validateContent(editor);
             }
         } else { //usually should be all non-playground steps because not initialized
             if (stepName !== 'Playground') {
