@@ -68,6 +68,10 @@ var retryTimeoutPlayground = function() {
                 if (this.stepName === 'Playground') {
                     paramsValid = this.verifyAndCorrectParams(params);
                     if (paramsValid) {
+                        // Put the browser into focus.
+                        var webBrowser = contentManager.getBrowser(this.stepName);
+                        webBrowser.contentRootElement.trigger("click");
+                        
                         this.startTimeline(params);
                     } else {
                         this.editor.createCustomErrorMessage(retryTimeoutMessages.INVALID_PARAMETER_VALUE);
@@ -90,8 +94,6 @@ var retryTimeoutPlayground = function() {
             if (!this.browser) {
                 this.browser = contentManager.getBrowser(this.stepName);
             }
-            this.browser.setBrowserContent(null);
-
             if (!this.editor) {
                 this.editor = contentManager.getEditorInstanceFromTabbedEditor(this.stepName, this.fileName);
             }
