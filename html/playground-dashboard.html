@@ -20,12 +20,6 @@
         script.src = '/guides/iguides-common/js/interactive-guides/externalized-string.js';
         document.getElementsByTagName('head')[0].appendChild(script);
     </script>
-    <style>
-        .browserHolder {
-            position: relative;
-            width: 100%;           
-        }
-    </style>
 </head>
 <body>    
     <div id="playgroundDashboard" tabindex="0">
@@ -48,21 +42,5 @@
                 <div class="legendText legendTextBottom" data-externalizedString="RETRY"></div>
             </div>
         </div>
-
-        <div class='browserHolder'></div>
     </div>
 </body>
-
-<script>
-    var stepName = stepContent.getCurrentStepName();
-
-    var content = {
-        enableStatusBar: false,
-        url: "https://global-ebank.openliberty.io/transactions",
-        callback: function test(webBrowser) {retryTimeoutCallback.listenToBrowserForRefresh(webBrowser); }
-        
-    };
-    webBrowser.create($("[data-step='" + stepName + "']").find('.browserHolder'), stepName, content).done(function(newWebBrowser){
-        contentManager.setWebBrowser(stepName, newWebBrowser, 0);
-    });
-</script>

@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 var messages = {
-    YOUR_ACCOUNT: "Your Account",
     TRANSACTION_UNABLE_TO_LOAD: "Your recent transactions are unavailable at this time.",
     RECENT_TRANSACTIONS: "Recent Transactions",
     DESCRIPTION: "DESCRIPTION",
@@ -27,5 +26,9 @@ var messages = {
     PLEASE_TRY_AGAIN: "Please try again later.",
     TIMEOUT: "Timeout",
     RETRY: "Retry",
-    PAGENOTFOUND: "404 Page not found error"
+    PAGENOTFOUND: "404 Page not found error",
+    ABOUT: "About",
+    USER: "User",
+    YOUR_ACCOUNT: "Global eBank - Your Account",
+    WARNING: "Warning"
 };
