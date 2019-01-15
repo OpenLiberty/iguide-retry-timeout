@@ -20,15 +20,14 @@
                 "displayType": "fileEditor",
                 "fileName": "server.xml",
                 "preload": [
-                "<?xml version=\"1.0\"?>",
-                "<server description=\"Sample Liberty server\">",
-                "   <featureManager>",
-                "      <feature>cdi-1.2</feature>",
-                "   </featureManager>",
-                "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpsPort=\"${default.https.port}\" httpPort=\"{default.http.port}\"/>",
-                "</server>"
-                ],
-                "save": false
+                    "<?xml version=\"1.0\"?>",
+                    "<server description=\"Sample Liberty server\">",
+                    "   <featureManager>",
+                    "      <feature>cdi-1.2</feature>",
+                    "   </featureManager>",
+                    "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpsPort=\"${default.https.port}\" httpPort=\"{default.http.port}\"/>",
+                    "</server>"
+                ]
              }
             ]
         }
@@ -106,8 +105,7 @@
                                 "   </featureManager>",
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
-                            ],
-                            "save": false
+                            ]
                         }
                     ]
                 }        
@@ -147,7 +145,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": [
                                 {
                                     "from": "1",
@@ -229,8 +226,7 @@
                                     "from": "7",
                                     "to": "7"
                                 }
-                            ],    
-                            "save": false,
+                            ],
                             "callback": "(function test(tabbedEditor) {retryTimeoutCallback.listenToEditorForTimeoutAnnotation(tabbedEditor); })"
                         },
                         {
@@ -248,7 +244,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": true
                         }
                     ]
@@ -320,7 +315,6 @@
                                     "to": "12"
                                 }
                             ],
-                            "save": false,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForInitialRetryAnnotation(editor); })"
                         },
                         {
@@ -338,7 +332,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": true
                         }    
                     ]
@@ -418,7 +411,6 @@
                                     "to": "13"
                                 }
                             ],
-                            "save": false,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToPlayground(editor); })"
                         },
                         {
@@ -436,7 +428,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": true
                         }   
                     ]
@@ -519,7 +510,6 @@
                                     "to": "16"
                                 }
                             ],
-                            "save": false,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToPlayground(editor); })"
                         },
                         {
@@ -537,7 +527,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": true
                         }
                     ]
@@ -621,7 +610,6 @@
                                     "to": "17"
                                 }
                             ],
-                            "save": false,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToPlayground(editor); })" 
                         },
                         {
@@ -639,7 +627,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": true
                         }
                     ]
@@ -718,7 +705,6 @@
                                     "to": "20"
                                 }
                             ],
-                            "save": false,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForInitialRetryAnnotation(editor); })"
                         },
                         {
@@ -736,7 +722,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": true
                         }
                     ]
@@ -827,7 +812,6 @@
                                 }
                             ],
                             "height": "468px",
-                            "save": false,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToPlayground(editor); })"
                         }
                     ]
