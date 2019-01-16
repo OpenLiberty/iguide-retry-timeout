@@ -346,7 +346,7 @@ var retryTimeoutCallback = (function() {
     var showBrowserOverlay = function(browser, numOfRequest, stepName) {
         if (numOfRequest === 1) {
             setTimeout(function () {
-                var overlayText = retryTimeoutMessages["OVERLAY_TEXT"];
+                var overlayText = retryTimeout_messages["OVERLAY_TEXT"];
                 browser.enableBrowserOverlay(overlayText);
             }, 5000);
         }

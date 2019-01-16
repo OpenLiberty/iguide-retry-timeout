@@ -74,7 +74,7 @@ var retryTimeoutPlayground = function() {
                         
                         this.startTimeline(params);
                     } else {
-                        this.editor.createCustomErrorMessage(retryTimeoutMessages.INVALID_PARAMETER_VALUE);
+                        this.editor.createCustomErrorMessage(retryTimeout_messages.INVALID_PARAMETER_VALUE);
                     }
                 }
             } catch(e) {
@@ -306,7 +306,7 @@ var retryTimeoutPlayground = function() {
             var retryMatch = retryRegex.exec(content);
 
             if (!retryMatch) {
-                throw retryTimeoutMessages.RETRY_REQUIRED;
+                throw retryTimeout_messages.RETRY_REQUIRED;
             } else if (!retryMatch[2]) {
                 // This just means the input didn't match the expected format.
                 // Any non-empty code inside the parentheses should be invalid.
@@ -314,7 +314,7 @@ var retryTimeoutPlayground = function() {
                 var paramMatch = retryParamRegex.exec(content);
                 // ensure empty parentheses match if they exist. else input is invalid
                 if (paramMatch && paramMatch[1] && paramMatch[1].replace(/\s*/g, '') !== '()') {
-                    throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                    throw retryTimeout_messages.INVALID_PARAMETER_VALUE;
                 }
                 return retryParms;
             }
@@ -327,13 +327,13 @@ var retryTimeoutPlayground = function() {
             $.each(retryParams, function(i, param) {
                 match = keyValueRegex.exec(param);
                 if (!match) { // invalid param format for @Retry
-                    throw retryTimeoutMessages.SYNTAX_ERROR; 
+                    throw retryTimeout_messages.SYNTAX_ERROR; 
                 }
                 switch (match[1]) {
                 case 'retryOn':
                 case 'abortOn':
                     if (this.stepName === 'Playground') {
-                        throw retryTimeoutMessages.RETRY_ABORT_UNSUPPORTED;
+                        throw retryTimeout_messages.RETRY_ABORT_UNSUPPORTED;
                     }
                     break;
                 case 'maxRetries':
@@ -341,7 +341,7 @@ var retryTimeoutPlayground = function() {
                 case 'delay':
                 case 'jitter':
                     if (!match[2]) {
-                        throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                        throw retryTimeout_messages.INVALID_PARAMETER_VALUE;
                     }
                     retryParms[match[1]] = match[2];
                     break;
@@ -349,11 +349,11 @@ var retryTimeoutPlayground = function() {
                 case 'delayUnit':
                 case 'jitterDelayUnit':
                     if (this.stepName === 'Playground') {
-                        throw retryTimeoutMessages.UNIT_PARAMS_DISABLED;
+                        throw retryTimeout_messages.UNIT_PARAMS_DISABLED;
                     }
                     break;
                 default:
-                    throw retryTimeoutMessages.UNSUPPORTED_RETRY_PARAM;
+                    throw retryTimeout_messages.UNSUPPORTED_RETRY_PARAM;
                 }
             });
             return retryParms;
@@ -374,10 +374,10 @@ var retryTimeoutPlayground = function() {
             var timeoutMatch = timeoutRegex.exec(content);
 
             if (!timeoutMatch) {
-                throw retryTimeoutMessages.TIMEOUT_REQUIRED;
+                throw retryTimeout_messages.TIMEOUT_REQUIRED;
             }
             if (timeoutMatch[3] == '') {
-                throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                throw retryTimeout_messages.INVALID_PARAMETER_VALUE;
             }
 
             if (timeoutMatch[2]) { // valid parameter format
@@ -389,19 +389,19 @@ var retryTimeoutPlayground = function() {
                 $.each(timeoutParams, function(i, param) {
                     match = keyValueRegex.exec(param);
                     if (!match) { // invalid param format for @Retry
-                        throw retryTimeoutMessages.SYNTAX_ERROR; 
+                        throw retryTimeout_messages.SYNTAX_ERROR; 
                     }
                     switch (match[1]) {
                     case 'value':
                         if (!match[2]) {
-                            throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                            throw retryTimeout_messages.INVALID_PARAMETER_VALUE;
                         }
                         timeoutParms[match[1]] = match[2];
                         break;
                     case 'unit':
-                        throw retryTimeoutMessages.UNIT_PARAMS_DISABLED;
+                        throw retryTimeout_messages.UNIT_PARAMS_DISABLED;
                     default:
-                        throw retryTimeoutMessages.UNSUPPORTED_TIMEOUT_PARAM;
+                        throw retryTimeout_messages.UNSUPPORTED_TIMEOUT_PARAM;
                     }
                 });
             } else if (timeoutMatch[4]) { // else, standalone value (to be validated later)
@@ -411,7 +411,7 @@ var retryTimeoutPlayground = function() {
                 var paramMatch = timeoutParamRegex.exec(content);
                 // ensure empty parentheses match if they exist. else input is invalid
                 if (paramMatch && paramMatch[1] && paramMatch[1].replace(/\s*/g, '') !== '()') {
-                    throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                    throw retryTimeout_messages.INVALID_PARAMETER_VALUE;
                 }
             }
             return timeoutParms;
@@ -437,7 +437,7 @@ var retryTimeoutPlayground = function() {
                 }
 
                 if (maxRetries === -1 && maxDuration === 0) {
-                    throw retryTimeoutMessages.UNLIMITED_RETRIES;
+                    throw retryTimeout_messages.UNLIMITED_RETRIES;
                 }
 
                 if (maxRetries) {
@@ -466,7 +466,7 @@ var retryTimeoutPlayground = function() {
                         return false;
                     }
                     if (delay > maxDuration) {
-                        throw retryTimeoutMessages.DURATION_LESS_THAN_DELAY;
+                        throw retryTimeout_messages.DURATION_LESS_THAN_DELAY;
                     }
                 } else if (delay === null) {
                     delay = 0;
@@ -532,7 +532,7 @@ var retryTimeoutPlayground = function() {
         // converts the string of parameters into an array
         __parmsToArray: function(parms) {
             if (!parms) {
-                throw retryTimeoutMessages.INVALID_PARAMETER_VALUE;
+                throw retryTimeout_messages.INVALID_PARAMETER_VALUE;
             }
             parms = parms.replace(/\s/g, '');  // Remove white space
             if (parms.trim() !== '') {

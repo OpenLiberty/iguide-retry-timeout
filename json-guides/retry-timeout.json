@@ -20,15 +20,14 @@
                 "displayType": "fileEditor",
                 "fileName": "server.xml",
                 "preload": [
-                "<?xml version=\"1.0\"?>",
-                "<server description=\"Sample Liberty server\">",
-                "   <featureManager>",
-                "      <feature>cdi-1.2</feature>",
-                "   </featureManager>",
-                "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpsPort=\"${default.https.port}\" httpPort=\"{default.http.port}\"/>",
-                "</server>"
-                ],
-                "save": false
+                    "<?xml version=\"1.0\"?>",
+                    "<server description=\"Sample Liberty server\">",
+                    "   <featureManager>",
+                    "      <feature>cdi-1.2</feature>",
+                    "   </featureManager>",
+                    "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpsPort=\"${default.https.port}\" httpPort=\"{default.http.port}\"/>",
+                    "</server>"
+                ]
              }
             ]
         }
@@ -106,8 +105,7 @@
                                 "   </featureManager>",
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
-                            ],
-                            "save": false
+                            ]
                         }
                     ]
                 }        
@@ -147,7 +145,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": [
                                 {
                                     "from": "1",
@@ -229,8 +226,7 @@
                                     "from": "7",
                                     "to": "7"
                                 }
-                            ],    
-                            "save": false,
+                            ],
                             "callback": "(function test(tabbedEditor) {retryTimeoutCallback.listenToEditorForTimeoutAnnotation(tabbedEditor); })"
                         },
                         {
@@ -248,7 +244,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": true
                         }
                     ]
@@ -320,7 +315,6 @@
                                     "to": "12"
                                 }
                             ],
-                            "save": false,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForInitialRetryAnnotation(editor); })"
                         },
                         {
@@ -338,7 +332,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": true
                         }    
                     ]
@@ -357,7 +350,7 @@
                 "</ul>"
             ],
             "instruction": [
-                "Update the <code>@Retry</code> annotation on line 13 to limit the number of retry attempts to 4 and the retry duration to 10 seconds, or click<br> <action title='Add @Retry with maxRetries and maxDuration' onclick=\"retryTimeoutCallback.addRetryAnnotationButton(event, 'AddLimitsRetry')\">@Retry(retryOn = TimeoutException.class,\n       maxRetries = 4,\n       maxDuration = 10,\n       durationUnit = ChronoUnit.SECONDS)</action>.<br>This Retry policy initiates a retry request for each <code>TimeoutException</code> that occurs but limits retry attempts to no more than 4 retries. The operation aborts if the total duration of all retries lasts more than 10 seconds.<br> Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'AddLimitsRetry')\">Run</action> on the editor menu pane.",
+                "Update the <code>@Retry</code> annotation on line 13 to limit the number of retry attempts to 4 and the retry duration to 10 seconds, or click<br> <action title='Add @Retry with maxRetries and maxDuration' onclick=\"retryTimeoutCallback.addRetryAnnotationButton(event, 'AddLimitsRetry')\">@Retry(retryOn = TimeoutException.class,\n       <span class='actionAddedText'>maxRetries = 4,\n       maxDuration = 10,\n       durationUnit = ChronoUnit.SECONDS</span>)</action>.<br>This Retry policy initiates a retry request for each <code>TimeoutException</code> that occurs but limits retry attempts to no more than 4 retries. The operation aborts if the total duration of all retries lasts more than 10 seconds.<br> Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'AddLimitsRetry')\">Run</action> on the editor menu pane.",
                 "Enter the following URL into the browser, or click <action title='URL to retrieve transaction history' onclick=\"retryTimeoutCallback.populateURL(event, 'AddLimitsRetry')\">https://global-ebank.openliberty.io/transactions</action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'AddLimitsRetry')\">Enter</action> to retrieve the account transaction history. The timeline shows that the initial request times out after 2 seconds.  The Retry policy attempts the request to the transaction history microservice up to 4 times. Watch as the timeline shows these automatic retry attempts that immediately follow any timeouts that occur within 10 seconds or until the transaction history appears."
             ],
             "content": [
@@ -418,7 +411,6 @@
                                     "to": "13"
                                 }
                             ],
-                            "save": false,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToPlayground(editor); })"
                         },
                         {
@@ -436,7 +428,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": true
                         }   
                     ]
@@ -454,7 +445,7 @@
                 "<ul>"
             ],
             "instruction": [
-                "Update the <code>@Retry</code> annotation on lines 13 - 16 to include a delay of 200 ms, or click<br><action title='Add @Retry with delay' onclick=\"retryTimeoutCallback.addRetryAnnotationButton(event, 'AddDelayRetry')\">@Retry(retryOn = TimeoutException.class,\n       maxRetries = 4,\n       maxDuration = 10,\n       durationUnit = ChronoUnit.SECONDS,\n       delay = 200, delayUnit = ChronoUnit.MILLIS)</action>.<br> This Retry policy indicates that a delay of 200 ms follows each <code>TimeoutException</code> before the application retries another request. However, no more than 4 retries occur, and retry attempts stop after 10 seconds.<br> Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'AddDelayRetry')\">Run</action> on the editor menu pane.",
+                "Update the <code>@Retry</code> annotation on lines 13 - 16 to include a delay of 200 ms, or click<br><action title='Add @Retry with delay' onclick=\"retryTimeoutCallback.addRetryAnnotationButton(event, 'AddDelayRetry')\">@Retry(retryOn = TimeoutException.class,\n       maxRetries = 4,\n       maxDuration = 10,\n       durationUnit = ChronoUnit.SECONDS,\n       <span class='actionAddedText'>delay = 200, delayUnit = ChronoUnit.MILLIS</span>)</action>.<br> This Retry policy indicates that a delay of 200 ms follows each <code>TimeoutException</code> before the application retries another request. However, no more than 4 retries occur, and retry attempts stop after 10 seconds.<br> Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'AddDelayRetry')\">Run</action> on the editor menu pane.",
                 "Enter the following URL into the browser, or click <action title='URL to retrieve transaction history' onclick=\"retryTimeoutCallback.populateURL(event, 'AddDelayRetry')\">https://global-ebank.openliberty.io/transactions</action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'AddDelayRetry')\">Enter</action> to retrieve the account transaction history. The timeline shows how the Retry policy automatically initiates another request with a delay of 200 ms after each timeout of 2000 ms that occurs until the transaction history is displayed."
             ],
             "content": [
@@ -519,7 +510,6 @@
                                     "to": "16"
                                 }
                             ],
-                            "save": false,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToPlayground(editor); })"
                         },
                         {
@@ -537,7 +527,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": true
                         }
                     ]
@@ -555,7 +544,7 @@
                 "</ul>",
                 "Why would you want to add a jitter?  Suppose, for example, that multiple applications are making requests to your microservice and causing it to become overloaded.  By adding a jitter to the delay time, you allow the retry times of these requests to vary.  Therefore, the cluster of retry requests are spread out over time, reducing the chance that the busy service continues to be overloaded."            ],
             "instruction": [
-                "Add a jitter of 100 ms to the delay in the <code>@Retry</code> annotation on lines 13 - 17, or click<br><action title='Add @Retry with jitter' onclick=\"retryTimeoutCallback.addRetryAnnotationButton(event, 'AddJitterRetry')\">@Retry(retryOn = TimeoutException.class,\n       maxRetries = 4,\n       maxDuration = 10,\n       durationUnit = ChronoUnit.SECONDS,\n       delay = 200, delayUnit = ChronoUnit.MILLIS,\n       jitter = 100,\n       jitterDelayUnit = ChronoUnit.MILLIS)</action>.<br> The delay between retries is now spread out between 100 and 300 ms.<br> Click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'AddJitterRetry')\">Run</action> on the editor menu pane.",
+                "Add a jitter of 100 ms to the delay in the <code>@Retry</code> annotation on lines 13 - 17, or click<br><action title='Add @Retry with jitter' onclick=\"retryTimeoutCallback.addRetryAnnotationButton(event, 'AddJitterRetry')\">@Retry(retryOn = TimeoutException.class,\n       maxRetries = 4,\n       maxDuration = 10,\n       durationUnit = ChronoUnit.SECONDS,\n       delay = 200, delayUnit = ChronoUnit.MILLIS,\n       <span class='actionAddedText'>jitter = 100,\n       jitterDelayUnit = ChronoUnit.MILLIS</span>)</action>.<br> The delay between retries is now spread out between 100 and 300 ms.<br> Click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'AddJitterRetry')\">Run</action> on the editor menu pane.",
                 "Enter the following URL into the browser, or click <action title='URL to retrieve transaction history' onclick=\"retryTimeoutCallback.populateURL(event, 'AddJitterRetry')\">https://global-ebank.openliberty.io/transactions</action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'AddJitterRetry')\">Enter</action> to retrieve the account transaction history. The Retry policy now includes a jitter of 100 ms. The timeline shows that the retry attempts occur somewhere between 100 and 300 ms (200 ms delay &#177; 100 ms jitter) after any timeout of 2000 ms that occurs within 10 seconds. To see the randomness of the jitter values, click the <b>Refresh</b> button in the sample browser."            
             ],
             "content": [
@@ -621,7 +610,6 @@
                                     "to": "17"
                                 }
                             ],
-                            "save": false,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToPlayground(editor); })" 
                         },
                         {
@@ -639,7 +627,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": true
                         }
                     ]
@@ -656,7 +643,7 @@
                 "</ul>"
             ],
             "instruction": [
-                "To stop all retry attempts when a <code>FileNotFoundException</code> occurs, add a condition to the <code>@Retry</code> annotation beginning on line 14, or click<br> <action title='Add @Retry with the abortOn parameter' onclick=\"retryTimeoutCallback.addRetryAnnotationButton(event, 'AddAbortOnRetry')\">@Retry(retryOn = TimeoutException.class,\n       maxRetries = 4,\n       maxDuration = 10,\n       durationUnit = ChronoUnit.SECONDS,\n       delay = 200, delayUnit = ChronoUnit.MILLIS,\n       jitter = 100,\n       jitterDelayUnit = ChronoUnit.MILLIS,\n       abortOn = FileNotFoundException.class)</action>.<br> This Retry policy allows all timeouts from the service to be retried up to 4 times within 10 seconds of the original timeout failure with a delay of 100 to 300 ms between retry attempts. However, it halts all retry attempts and immediately returns if a <code>FileNotFoundException</code> occurs.<br>Click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'AddAbortOnRetry')\">Run</action> on the editor menu pane.",
+                "To stop all retry attempts when a <code>FileNotFoundException</code> occurs, add a condition to the <code>@Retry</code> annotation beginning on line 14, or click<br> <action title='Add @Retry with the abortOn parameter' onclick=\"retryTimeoutCallback.addRetryAnnotationButton(event, 'AddAbortOnRetry')\">@Retry(retryOn = TimeoutException.class,\n       maxRetries = 4,\n       maxDuration = 10,\n       durationUnit = ChronoUnit.SECONDS,\n       delay = 200, delayUnit = ChronoUnit.MILLIS,\n       jitter = 100,\n       jitterDelayUnit = ChronoUnit.MILLIS,\n       <span class='actionAddedText'>abortOn = FileNotFoundException.class</span>)</action>.<br> This Retry policy allows all timeouts from the service to be retried up to 4 times within 10 seconds of the original timeout failure with a delay of 100 to 300 ms between retry attempts. However, it halts all retry attempts and immediately returns if a <code>FileNotFoundException</code> occurs.<br>Click <action title='Run' onclick=\"retryTimeoutCallback.saveButtonEditor(event, 'AddAbortOnRetry')\">Run</action> on the editor menu pane.",
                 "Enter the following URL into the browser, or click <action title='URL to retrieve transaction history' onclick=\"retryTimeoutCallback.populateURL(event, 'AddAbortOnRetry')\">https://global-ebank.openliberty.io/transactions</action> and then press <action title='Enter' onclick=\"retryTimeoutCallback.clickTransaction(event, 'AddAbortOnRetry')\">Enter</action> to retrieve the account transaction history.  This time the example simulates a <code>FileNotFoundException</code>, and the request to the transaction history microservice fails and displays an error message without any timeouts or retries."
             ],
             "content": [
@@ -718,7 +705,6 @@
                                     "to": "20"
                                 }
                             ],
-                            "save": false,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToEditorForInitialRetryAnnotation(editor); })"
                         },
                         {
@@ -736,7 +722,6 @@
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
                             ],
-                            "save": false,
                             "readonly": true
                         }
                     ]
@@ -827,7 +812,6 @@
                                 }
                             ],
                             "height": "468px",
-                            "save": false,
                             "callback": "(function test(editor) {retryTimeoutCallback.listenToPlayground(editor); })"
                         }
                     ]
