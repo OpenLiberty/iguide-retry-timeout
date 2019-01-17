@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-.transactionsWrapper {
+ .transactionsWrapper {
     max-height: 150px;
     display: block;
     overflow-y: scroll;
