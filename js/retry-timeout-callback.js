@@ -417,30 +417,24 @@ var retryTimeoutCallback = (function() {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 13, newContent, 4);
-        // line number to scroll to = insert line + the number of lines to be insert 
-        // for this example 13 + 4 = 17
-        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, 0, 17);
     };
 
     var __addDelayRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 16, newContent, 5);
-        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, 0, 18);
     };
 
     var __addJitterRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS,\n           jitter = 100,\n           jitterDelayUnit = ChronoUnit.MILLIS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 17, newContent, 7);
-        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, 0, 20);
     };
 
     var __addAbortOnRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS,\n           jitter = 100,\n           jitterDelayUnit = ChronoUnit.MILLIS,\n           abortOn = FileNotFoundException.class)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 14, 20, newContent, 8);
-        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, 0, 22);
     };
 
     var __checkRetryAnnotationInContent = function(content, parmsToCheck) {
