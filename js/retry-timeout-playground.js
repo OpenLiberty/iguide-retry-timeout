@@ -68,6 +68,7 @@ var retryTimeoutPlayground = function() {
                 if (this.stepName === 'Playground') {
                     paramsValid = this.verifyAndCorrectParams(params);
                     if (paramsValid) {
+                        this.editor.addCodeUpdated();
                         // Put the browser into focus.
                         var webBrowser = contentManager.getBrowser(this.stepName);
                         webBrowser.contentRootElement.trigger("click");
