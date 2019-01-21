@@ -53,7 +53,8 @@
             "guide_duration" : "20 minutes",
             "description": [
                 "Explore how to use <a href='https://microprofile.io/' target='_blank'>MicroProfile</a> Timeout and Retry policies from the <a href='https://github.com/eclipse/microprofile-fault-tolerance' target='_blank'>Fault Tolerance feature</a> to make your microservice more resilient to common failures like network problems or an <code>IOException</code>.",
-                "You'll start with a sample bank scenario and experience a network glitch. You'll then enable MicroProfile Fault Tolerance and use the Timeout policy to quickly fail requests that are hanging for too long. Finally, you'll explore the Retry policy and how it can help overcome temporary intermittent failures your application might experience."
+                "You'll start with a sample bank scenario and experience a network glitch. You'll then enable MicroProfile Fault Tolerance and use the Timeout policy to quickly fail requests that are hanging for too long. Finally, you'll explore the Retry policy and how it can help overcome temporary intermittent failures your application might experience.",
+                "When you arrive at the section about the Interactive timeout retry playground, you can modify the parameters of the MicroProfile Timeout and Retry policies in any combination. You can then run a sample scenario to see how the parameter values affect the results."
             ],
             "sections" : [
                 {
