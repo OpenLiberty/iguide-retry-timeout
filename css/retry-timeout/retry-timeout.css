@@ -8,27 +8,21 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-#guide_content .codeeditor .CodeMirror {
-    height: 100%;
-}
-
 /** CSS for the dashboard **/
 .dashboardHolder {
     position: relative;
     width: 100%;
-    height: 75px;
+    height: 87px;
     left: 0;
     top: 0;
 }
 
 .timeline {
     display: flex;
-/*    justify-content: space-between; */
     align-items: center;
     flex-direction: column;
     position: relative;
-    height: 75px;
-    padding-bottom: 10px;
+    height: 85px;
 }
 
 .progressBar {
@@ -52,14 +46,17 @@
     width: 100%;
     line-height: 12px;
     font-weight: 500;
+    margin-left: 32px;
 }
 
 .legendTextTop {
+    margin-top: 8px;
     margin-bottom: 5px;
 }
 
 .legendTextBottom {
     margin-top: 5px;
+    margin-bottom: 8px;
 }
 
 .timelineContainer {

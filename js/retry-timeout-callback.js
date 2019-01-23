@@ -10,8 +10,10 @@
 *******************************************************************************/
 var retryTimeoutCallback = (function() {
 
+    var serverFileName = "server.xml";
     var bankServiceFileName = "BankService.java";
     var htmlRootDir = "/guides/iguide-retry-timeout/html/";
+    var __welcomePageURL = "https://global-ebank.openliberty.io/welcome";
     var __browserTransactionBaseURL = "https://global-ebank.openliberty.io/transactions";
 
     var listenToEditorForFeatureInServerXML = function(editor) {
@@ -23,6 +25,10 @@ var retryTimeoutCallback = (function() {
 
     var addMicroProfileFaultToleranceFeatureButton = function(event) {
         if (utils.isElementActivated(event)) {
+            // Put the server.xml editor into focus.
+            var stepName = stepContent.getCurrentStepName();
+            contentManager.focusTabbedEditorByName(stepName, serverFileName);
+
             // Click or 'Enter' or 'Space' key event...
             __addMicroProfileFaultToleranceFeature();
         }
@@ -31,7 +37,6 @@ var retryTimeoutCallback = (function() {
     var __addMicroProfileFaultToleranceFeature = function() {
         var FTFeature = "      <feature>mpFaultTolerance-1.0</feature>";
         var stepName = stepContent.getCurrentStepName();
-        var serverFileName = "server.xml";
 
         // reset content every time annotation is added through the button so as to clear out any
         // manual editing
@@ -155,22 +160,14 @@ var retryTimeoutCallback = (function() {
 
     var __saveServerXML = function(editor) {
         var stepName = stepContent.getCurrentStepName();
-        var serverFileName = "server.xml";
-
-        var content = contentManager.getTabbedEditorContents(stepName, serverFileName);
-        if (__checkMicroProfileFaultToleranceFeatureContent(content)) {
-            editor.closeEditorErrorBox(stepName);
-            contentManager.markCurrentInstructionComplete(stepName);
-        } else {
-            // display error to fix it
-            editor.createErrorLinkForCallBack(true, __correctEditorError);
-        }
+        var content = contentManager.getTabbedEditorContents(stepName, serverFileName);        
+        utils.validateContentAndSave(stepName, editor, content, __checkMicroProfileFaultToleranceFeatureContent, __correctEditorError);
     };
 
     var saveServerXMLButton = function(event) {
         if (utils.isElementActivated(event)) {
             // Click or 'Enter' or 'Space' key event...
-            contentManager.saveTabbedEditor(stepContent.getCurrentStepName(), "server.xml");
+            contentManager.saveTabbedEditor(stepContent.getCurrentStepName(), serverFileName);
         }
     };
 
@@ -186,65 +183,21 @@ var retryTimeoutCallback = (function() {
     };
 
     var listenToEditorForTimeoutAnnotation = function(editor) {
-        editor.addSaveListener(__showStartingBrowser)
+        editor.addSaveListener(__checkEditorContent)
     };
 
     var listenToEditorForInitialRetryAnnotation = function(editor) {
-        editor.addSaveListener(__showStartingBrowser);
+        editor.addSaveListener(__checkEditorContent);
     };
 
     var listenToPlayground = function(editor) {
         editor.addSaveListener(__updatePlayground);
     };
 
-    var __showStartingBrowser = function(editor) {
+    var __checkEditorContent = function(editor) {
         var stepName = editor.getStepName();
         var content = contentManager.getTabbedEditorContents(stepName, bankServiceFileName);
 
-        var htmlFile;
-        if (stepName === "TimeoutAnnotation") {
-            htmlFile = htmlRootDir + "transaction-history-timeout.html";
-        } else if (stepName === "AddRetryOnRetry"  || stepName === "AddAbortOnRetry") {
-            htmlFile = htmlRootDir + "transaction-history-retry-start.html";
-        }
-
-        if (__checkEditorContent(stepName, content)) {
-            editor.closeEditorErrorBox(stepName);
-            var index = contentManager.getCurrentInstructionIndex();
-            if (index === 0) {
-                contentManager.markCurrentInstructionComplete(stepName);
-                contentManager.updateWithNewInstructionNoMarkComplete(stepName);
-                // display empty web browser
-                contentManager.setPodContent(stepName, htmlFile);
-
-                if (stepName === "AddAbortOnRetry") {
-                    setTimeout(function () {
-                        // Use a interval timer to make sure the pod content is rendered 
-                        // before accessing the browser within.
-                        var waitingForPodContentTimeInterval = setInterval(function () {
-                            if (contentManager.getPod(stepName).contentRootElement.length === 1) {
-                                clearInterval(waitingForPodContentTimeInterval);
-                                var podContents = contentManager.getPod(stepName).contentRootElement;
-                                // resizeTabbedEditor resizes a small editor to be the same size
-                                // as the pod created.  But, on this page we have an editor that
-                                // is larger than the browser in the pod ... and we need to extend
-                                // the pod size to match the editor.
-                                podContents.find('.wbContent').attr("style", "height: 518px;");
-                            } 
-                        }, 10);
-                    }, 300);
-                }
-                
-                // resize the height of the tabbed editor
-                contentManager.resizeTabbedEditor(stepName);
-            }
-        } else {
-            // display error and provide link to fix it
-            editor.createErrorLinkForCallBack(true, __correctEditorError);
-        }
-    };
-
-    var __checkEditorContent = function(stepName, content) {
         var contentIsCorrect = true;
         if (stepName === "TimeoutAnnotation") {
             contentIsCorrect = __validateEditorTimeoutAnnotationStep(content);
@@ -263,8 +216,7 @@ var retryTimeoutCallback = (function() {
                                 ]
             contentIsCorrect = __checkRetryAnnotationInContent(content, paramsToCheck);
         }
-
-        return contentIsCorrect;
+        utils.handleEditorSave(stepName, editor, contentIsCorrect, __correctEditorError);
     };
 
     var __validateEditorTimeoutAnnotationStep = function(content) {
@@ -298,6 +250,9 @@ var retryTimeoutCallback = (function() {
     };
 
     var __addTimeoutInEditor = function(stepName) {
+        // Put the BankService.java editor into focus.
+        contentManager.focusTabbedEditorByName(stepName, bankServiceFileName);
+
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Timeout(2000)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 7, 7, newContent, 1);
@@ -309,25 +264,24 @@ var retryTimeoutCallback = (function() {
         }
     };
 
-    var clickTransaction = function(event, stepName, numOfRequest) {
+    var clickTransaction = function(event, stepName) {
         if (utils.isElementActivated(event)) {
-            handleTransactionRequestInBrowser(stepName, numOfRequest);
+            // Click or 'Enter' or 'Space' key event...
+            contentManager.refreshBrowser(stepName);
         }
     };
 
-    var handleTransactionRequestInBrowser = function(stepName, numOfRequest) {
-        var browser = contentManager.getBrowser(stepName);
-        var browserContentHTML = htmlRootDir + "global-eBank.html";
+    var handleTransactionRequestInBrowser = function(browser, stepName, numOfRequest) {
+        var browserContentHTML= "/guides/iguides-common/html/interactive-guides/bankApp-welcome.html"
 
         var checkURL = browser.getURL().trim();
         if (checkURL === __browserTransactionBaseURL) {
             if (numOfRequest !== -1) {
                 contentManager.markCurrentInstructionComplete(stepName);
             }
-            if (stepName === "TransactionHistory") {
+            if (stepName === "BankScenario") {
                 if (numOfRequest === 0) {
                     browserContentHTML = htmlRootDir + "transaction-history.html";
-                    contentManager.updateWithNewInstructionNoMarkComplete(stepName);
                 } else if (numOfRequest === 1) {
                     browserContentHTML = htmlRootDir + "transaction-history-loading.html";
                 }
@@ -340,7 +294,7 @@ var retryTimeoutCallback = (function() {
             browser.setBrowserContent(browserContentHTML);
     
             switch(stepName) {
-                case "TransactionHistory":
+                case "BankScenario":
                     showBrowserOverlay(browser, numOfRequest, stepName);
                     break;
                 case "AddRetryOnRetry":
@@ -360,7 +314,9 @@ var retryTimeoutCallback = (function() {
                     break;
             } 
         } else {
-            if (checkURL !== ""){
+            if (checkURL === __welcomePageURL){
+                browser.setBrowserContent(browserContentHTML);
+            } else if (checkURL !== "") {
                 browser.setBrowserContent("/guides/iguide-retry-timeout/html/page-not-found.html");
             } else {
                 browser.setBrowserContent("");
@@ -371,7 +327,7 @@ var retryTimeoutCallback = (function() {
     var showBrowserOverlay = function(browser, numOfRequest, stepName) {
         if (numOfRequest === 1) {
             setTimeout(function () {
-                var overlayText = retryTimeoutMessages["OVERLAY_TEXT"];
+                var overlayText = retryTimeout_messages["OVERLAY_TEXT"];
                 browser.enableBrowserOverlay(overlayText);
             }, 5000);
         }
@@ -389,6 +345,11 @@ var retryTimeoutCallback = (function() {
     var __populateURL = function(event, stepName) {
         if (utils.isElementActivated(event)) {
             // Click or 'Enter' or 'Space' key event...
+
+            // Put the browser into focus if here from clicking an action button.
+            var webBrowser = contentManager.getBrowser(stepName);
+            webBrowser.contentRootElement.trigger("click");
+            
             contentManager.setBrowserURL(stepName, __browserTransactionBaseURL);
         }
     };
@@ -397,22 +358,16 @@ var retryTimeoutCallback = (function() {
         var setBrowserContent = function(currentURL) {
             var stepName = webBrowser.getStepName();
             var currentInstructionIndex = contentManager.getCurrentInstructionIndex(stepName);
-            handleTransactionRequestInBrowser(stepName, currentInstructionIndex);
-        }
-        webBrowser.addUpdatedURLListener(setBrowserContent);
-    };
-
-    var __listenToBrowserForTransactionHistoryAfterRetry = function(webBrowser) {
-        var setBrowserContent = function(currentURL) {
-            var stepName = webBrowser.getStepName();
-            var numOfRequest = contentManager.getCurrentInstructionIndex(stepName);
-            handleTransactionRequestInBrowser(stepName, numOfRequest);
+            handleTransactionRequestInBrowser(webBrowser, stepName, currentInstructionIndex);
         }
         webBrowser.addUpdatedURLListener(setBrowserContent);
     };
 
     var addRetryAnnotationButton = function(event, stepName) {
         if (utils.isElementActivated(event)) {
+            // Put the BankService.java editor into focus.
+            contentManager.focusTabbedEditorByName(stepName, bankServiceFileName);
+
             switch (stepName) {
                 case 'AddRetryOnRetry':
                     __addRetryOnRetryInEditor(stepName);
@@ -443,24 +398,30 @@ var retryTimeoutCallback = (function() {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 13, newContent, 4);
+        // line number to scroll to = insert line + the number of lines to be insert 
+        // for this example 13 + 4 = 17
+        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, 17);
     };
 
     var __addDelayRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 16, newContent, 5);
+        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, 18);
     };
 
     var __addJitterRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS,\n           jitter = 100,\n           jitterDelayUnit = ChronoUnit.MILLIS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 17, newContent, 7);
+        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, 20);
     };
 
     var __addAbortOnRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS,\n           jitter = 100,\n           jitterDelayUnit = ChronoUnit.MILLIS,\n           abortOn = FileNotFoundException.class)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 14, 20, newContent, 8);
+        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, 22);
     };
 
     var __checkRetryAnnotationInContent = function(content, parmsToCheck) {
@@ -618,19 +579,22 @@ var retryTimeoutCallback = (function() {
         if (stepName === 'Playground') {
             playground.updatePlayground();
         } else {
-            var contentValid = __validateContent(editor);
-
-            if (!playground && contentValid) { // only load right-side browser if not previously loaded
-                var htmlFile = htmlRootDir + "transaction-history-retry-dashboard.html";
-                contentManager.setPodContent(stepName, htmlFile);
-                window.setTimeout(function(){
-                    var pod = contentManager.getPod(stepName);
-                    createPlayground(pod, stepName);
-                    playground = contentManager.getPlayground(stepName);
-                    playground.updatePlayground();
-                }, 500);
-                contentManager.resizeTabbedEditor(stepName);
+            if (!playground) {
+                // If the step's playground has not yet been created, create it.
+                var pod = contentManager.getPod(stepName);
+                createPlayground(pod, stepName);
+                playground = contentManager.getPlayground(stepName);
             }
+
+            var contentValid = __validateContent(editor);
+            if (contentValid) {
+                // Put the browser into focus.
+                var webBrowser = contentManager.getBrowser(stepName);
+                webBrowser.contentRootElement.trigger("click");
+
+                playground.updatePlayground();
+            }
+
         }
     };
 
@@ -638,19 +602,12 @@ var retryTimeoutCallback = (function() {
         var stepName = editor.getStepName();
         var content = editor.getEditorContent();
         var paramsToCheck = getParamsToCheck(stepName);
+        var contentIsCorrect = false;
         if (__checkRetryAnnotationInContent(content, paramsToCheck)) {
-            editor.closeEditorErrorBox(stepName);
-            var index = contentManager.getCurrentInstructionIndex();
-            if (index === 0) {
-                contentManager.markCurrentInstructionComplete(stepName);
-                contentManager.updateWithNewInstructionNoMarkComplete(stepName);
-            }
-            return true;
-        } else {
-            // display error and provide link to fix it
-            editor.createErrorLinkForCallBack(true, __correctEditorError);
-            return false;
+            contentIsCorrect = true;
         }
+        utils.handleEditorSave(stepName, editor, contentIsCorrect, __correctEditorError);
+        return contentIsCorrect;
     };
 
     var getParamsToCheck = function(stepName) {
@@ -704,7 +661,6 @@ var retryTimeoutCallback = (function() {
         listenToEditorForTimeoutAnnotation: listenToEditorForTimeoutAnnotation,
         listenToBrowserForTransactionHistory: __listenToBrowserForTransactionHistory,
         listenToEditorForInitialRetryAnnotation: listenToEditorForInitialRetryAnnotation,
-        listenToBrowserForTransactionHistoryAfterRetry: __listenToBrowserForTransactionHistoryAfterRetry,
         listenToPlayground: listenToPlayground,
         listenToBrowserForRefresh: listenToBrowserForRefresh,
         correctEditorError: __correctEditorError,
