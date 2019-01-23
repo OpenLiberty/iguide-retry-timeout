@@ -160,16 +160,8 @@ var retryTimeoutCallback = (function() {
 
     var __saveServerXML = function(editor) {
         var stepName = stepContent.getCurrentStepName();
-
-        var content = contentManager.getTabbedEditorContents(stepName, serverFileName);
-        if (__checkMicroProfileFaultToleranceFeatureContent(content)) {
-            editor.closeEditorErrorBox(stepName);
-            editor.addCodeUpdated();
-            contentManager.markCurrentInstructionComplete(stepName);
-        } else {
-            // display error to fix it
-            editor.createErrorLinkForCallBack(true, __correctEditorError);
-        }
+        var content = contentManager.getTabbedEditorContents(stepName, serverFileName);        
+        utils.validateContentAndSave(stepName, editor, content, __checkMicroProfileFaultToleranceFeatureContent, __correctEditorError);
     };
 
     var saveServerXMLButton = function(event) {
@@ -224,18 +216,7 @@ var retryTimeoutCallback = (function() {
                                 ]
             contentIsCorrect = __checkRetryAnnotationInContent(content, paramsToCheck);
         }
-
-        if (contentIsCorrect) {
-            editor.closeEditorErrorBox(stepName);
-            editor.addCodeUpdated();
-            var index = contentManager.getCurrentInstructionIndex();
-            if (index === 0) {
-                contentManager.markCurrentInstructionComplete(stepName);
-            }
-        } else {
-            // Display error and provide link to fix it
-            editor.createErrorLinkForCallBack(true, __correctEditorError);
-        }
+        utils.handleEditorSave(stepName, editor, contentIsCorrect, __correctEditorError);
     };
 
     var __validateEditorTimeoutAnnotationStep = function(content) {
@@ -621,19 +602,12 @@ var retryTimeoutCallback = (function() {
         var stepName = editor.getStepName();
         var content = editor.getEditorContent();
         var paramsToCheck = getParamsToCheck(stepName);
+        var contentIsCorrect = false;
         if (__checkRetryAnnotationInContent(content, paramsToCheck)) {
-            editor.closeEditorErrorBox(stepName);
-            editor.addCodeUpdated();
-            var index = contentManager.getCurrentInstructionIndex();
-            if (index === 0) {
-                contentManager.markCurrentInstructionComplete(stepName);
-            }
-            return true;
-        } else {
-            // display error and provide link to fix it
-            editor.createErrorLinkForCallBack(true, __correctEditorError);
-            return false;
+            contentIsCorrect = true;
         }
+        utils.handleEditorSave(stepName, editor, contentIsCorrect, __correctEditorError);
+        return contentIsCorrect;
     };
 
     var getParamsToCheck = function(stepName) {
