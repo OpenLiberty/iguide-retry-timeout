@@ -59,15 +59,14 @@ var retryTimeoutPlayground = function() {
                 // Retry guide steps use seconds for maxDuration, so convert to ms
                 if (this.stepName !== 'Playground') {
                     params.retryParms.maxDuration = params.retryParms.maxDuration*1000;
-                    params = this.verifyAndCorrectParams(params);
-                }
-
-                this.setParams(params);
-
-                //Below should be playground-only code
-                if (this.stepName === 'Playground') {
                     paramsValid = this.verifyAndCorrectParams(params);
                     if (paramsValid) {
+                        this.setParams(paramsValid);
+                    }
+                } else {
+                    paramsValid = this.verifyAndCorrectParams(params);
+                    if (paramsValid) {
+                        this.setParams(paramsValid);
                         this.editor.addCodeUpdated();
                         // Put the browser into focus.
                         var webBrowser = contentManager.getBrowser(this.stepName);
