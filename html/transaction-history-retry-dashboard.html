@@ -14,54 +14,31 @@
         var script = document.createElement('script');
         
         script.onload = function() {
-            var guideRootDir = "/guides/iguide-retry-timeout/nls/"
+            var guideRootDir = "/guides/iguide-retry-timeout/js/nls/retry-timeout/"
             retrieveExternalizedStrings(guideRootDir);
         };
         script.src = '/guides/iguides-common/js/interactive-guides/externalized-string.js';
         document.getElementsByTagName('head')[0].appendChild(script);
     </script>
-    <style>
-        .browserHolder {
-            position: relative;
-            width: 100%;           
-        }
-    </style>
 </head>
-<body>    
-    <div class="pod-animation-slide-from-right" tabindex="0" aria-label="Timeout and Retry timeline and transaction history sample browser window">
-
-        <div class='dashboardHolder' tabindex="0" aria-label="Timeout and Retry timeline">
-            <div class="timeline">
-                <div class="legendText legendTextTop" data-externalizedString="TIMEOUT"></div>
-                <div class="timelineContainer">
-                    <div class="tickContainer">
-                    </div>
+<body>
+    <div class='dashboardHolder' tabindex="0" aria-label="Timeout and Retry timeline">
+        <div class="timeline">
+            <div class="legendText legendTextTop" data-externalizedString="TIMEOUT"></div>
+            <div class="timelineContainer">
+                <div class="tickContainer">
                 </div>
-                <div class="progressBar">
-                    <div></div>
-                </div>
-                <div class="timelineContainer">
-                    <div class="tickContainer">
-                    </div>                    
-                    <div class="timelineLegend timelineLegendStart">0</div>
-                    <div class="timelineLegend timelineLegendEnd">10s</div>
-                </div>    
-                <div class="legendText legendTextBottom" data-externalizedString="RETRY"></div>
             </div>
+            <div class="progressBar">
+                <div></div>
+            </div>
+            <div class="timelineContainer">
+                <div class="tickContainer">
+                </div>                    
+                <div class="timelineLegend timelineLegendStart">0</div>
+                <div class="timelineLegend timelineLegendEnd">10s</div>
+            </div>    
+            <div class="legendText legendTextBottom" data-externalizedString="RETRY"></div>
         </div>
-
-        <div class='browserHolder'></div>
     </div>
 </body>
-
-<script>
-    var stepName = stepContent.getCurrentStepName();
-
-    var content = {
-        enableStatusBar: false,
-        callback: function test(webBrowser) {retryTimeoutCallback.listenToBrowserForTransactionHistoryAfterRetry(webBrowser); }
-    };
-    webBrowser.create($("[data-step='" + stepName + "']").find('.browserHolder'), stepName, content).done(function(newWebBrowser){
-        contentManager.setWebBrowser(stepName, newWebBrowser, 0);
-    });
-</script>

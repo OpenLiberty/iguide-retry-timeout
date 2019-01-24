@@ -14,30 +14,34 @@ body {
     font-family: Asap;
     margin: 0 1px;
     overflow: hidden;
+    height: 100%;
 }
 
-.bankHeadingBlock {
+.bankHeadingBlockFlexContainer {
     height: 36px;
     background-color: #deedf7;
+    display: flex;
+    justify-content: space-between;
 }
 
 .bankHeading {
     font-weight: 500;
     font-size: 16px;
-    color: #343334;
+    color: #5E6B8D;
     letter-spacing: 0;
     text-align: left;
     padding: 9px 0px 9px 18px;
-    border-bottom: 1px solid #95c4f3;
 }
 
-.bankSeparatorLine {
-    border:1px solid #95c4f3;
+.bankHeadingBlockFlexContainer > span {
+    margin: auto 10px auto auto;
 }
 
-.stepIntro {
-    background-color: rgba(222,237,247,0.44);
-    height: 50px;
+.bankHeadingBlockFlexContainer > span > img {
+    height: 24px;
+    width: 24px;
+    opacity: 0.41;
+    padding-left: 10px;
 }
 
 .stepIntroText {
@@ -71,7 +75,6 @@ body {
 
 #fail {
     display: flex;  /** Initially the spinner is showing so hide this div **/
-    /*height: calc(100% - 85px);  */ /** 85px is height of check balance + global ebank headers **/
     height: 90%;
 }
 
@@ -79,19 +82,24 @@ body {
     display: flex;
     flex-wrap: nowrap;
     flex-direction: column;
-    background:rgba(231,29,50,0.07);
     justify-content: center;
     margin: 24px; 
     flex-grow: 1;
+    overflow: hidden;
 }
 
 .flexWarningContainer > div {
     text-align: center;
-    line-height: 26px;
-    font-size: 16px;
+    line-height: 24px;
+    font-size: 14px;
+    font-weight: 500;
     align-self: center;
-    color: #272727;
+    color: #1B1C34;
     letter-spacing: 0;
+}
+
+#errorImg {
+    vertical-align: middle;
 }
 
 @-webkit-keyframes spin {
