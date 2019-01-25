@@ -58,6 +58,10 @@ var retryTimeoutPlayground = function() {
             var params, paramsValid;
             try {
                 params = this.getParamsFromEditor();
+                // NOTE:  any errors found with the inputted parameter values will cause
+                //        an appropriate error message to be thrown which will be caught
+                //        below and shown to the user.
+
                 // Retry guide steps use seconds for maxDuration, so convert to ms
                 if (this.stepName !== 'Playground') {
                     params.retryParms.maxDuration = params.retryParms.maxDuration*1000;
@@ -421,7 +425,9 @@ var retryTimeoutPlayground = function() {
         },
         
         // Checks if parameters are valid (all in milliseconds)
-        // returns false if something is not valid
+        // returns false if something is not valid and a generic message will be shown.  Else,
+        //         throws an exception with appropriate message citing the parameter violation
+        //         when the error is detected.
         // returns corrected parameters otherwise
         verifyAndCorrectParams: function(params) {
             var retryParms = params.retryParms;
