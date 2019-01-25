@@ -23,14 +23,16 @@ var retryTimeoutPlayground = function() {
 
             this.timeout = parseInt(params.timeoutParms.value);
 
+            // maxRetries+1 is for timeoutsToSimulate. workaround to simulate the last timeout
+            this.timeoutsToSimulate = this.maxRetries + 1;
+
             // If unlimited max duration, calculate theoretical using other params
             if (this.maxDuration === Number.MAX_SAFE_INTEGER && this.maxRetries !== -1) {
                 this.maxDuration = this.calcMaxDuration();
             }
 
-            // maxRetries+1 is for timeoutsToSimulate. workaround to simulate the last timeout
-            this.timeoutsToSimulate = this.maxRetries + 1;
             this.progress1pct = this.maxDuration * 0.01; // Number Milliseconds in 1% of timeline.
+            
         },
         startTimeline: function() {
             this.resetPlayground();
@@ -72,7 +74,7 @@ var retryTimeoutPlayground = function() {
                         var webBrowser = contentManager.getBrowser(this.stepName);
                         webBrowser.contentRootElement.trigger("click");
                         
-                        this.startTimeline(params);
+                        this.startTimeline(params);    
                     } else {
                         this.editor.createCustomErrorMessage(retryTimeout_messages.INVALID_PARAMETER_VALUE);
                     }
@@ -324,6 +326,7 @@ var retryTimeoutPlayground = function() {
 
             var keyValueRegex = /(.*)=(.*)/;
             var match = null;
+            var thisStepName = this.stepName;
             $.each(retryParams, function(i, param) {
                 match = keyValueRegex.exec(param);
                 if (!match) { // invalid param format for @Retry
@@ -332,7 +335,7 @@ var retryTimeoutPlayground = function() {
                 switch (match[1]) {
                 case 'retryOn':
                 case 'abortOn':
-                    if (this.stepName === 'Playground') {
+                    if (thisStepName === 'Playground') {
                         throw retryTimeout_messages.RETRY_ABORT_UNSUPPORTED;
                     }
                     break;
@@ -348,7 +351,7 @@ var retryTimeoutPlayground = function() {
                 case 'durationUnit':
                 case 'delayUnit':
                 case 'jitterDelayUnit':
-                    if (this.stepName === 'Playground') {
+                    if (thisStepName === 'Playground') {
                         throw retryTimeout_messages.UNIT_PARAMS_DISABLED;
                     }
                     break;
@@ -418,7 +421,7 @@ var retryTimeoutPlayground = function() {
         },
         
         // Checks if parameters are valid (all in milliseconds)
-        // returns false if something is invalid
+        // returns false if something is not valid
         // returns corrected parameters otherwise
         verifyAndCorrectParams: function(params) {
             var retryParms = params.retryParms;
@@ -428,7 +431,7 @@ var retryTimeoutPlayground = function() {
                 var delay = this.__getValueIfInteger(retryParms.delay);
                 var jitter = this.__getValueIfInteger(retryParms.jitter);
         
-                // If any variable is invalid, return false
+                // If any variable is not valid, return false
                 if (maxRetries === false ||
                     maxDuration === false ||
                     delay === false ||
@@ -500,10 +503,14 @@ var retryTimeoutPlayground = function() {
                 if (value) {
                     if (value < 0) {
                         return false;
-                    }
+                    } 
                 } else if (value === null) {
-                    value = 1000;
+                    // Timeout was not specified. Default to 1000ms.
                     params.timeoutParms.value = 1000;
+                } else if (value === 0) {
+                    // Timeout = 0 is valid, but for our simulation we need
+                    // to get a TimeoutException so Timeout has to be > 0.
+                    throw retryTimeout_messages.ZERO_NOT_ALLOWED;
                 } else {
                     return false;
                 }
