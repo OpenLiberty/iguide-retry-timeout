@@ -15,6 +15,12 @@ var retryTimeoutCallback = (function() {
     var htmlRootDir = "/guides/iguide-retry-timeout/html/";
     var __welcomePageURL = "https://global-ebank.openliberty.io/welcome";
     var __browserTransactionBaseURL = "https://global-ebank.openliberty.io/transactions";
+    var mapStepNameToScollLine = { 'TimeoutAnnotation': 8,
+                                   'AddRetryOnRetry': 13,
+                                   'AddLimitsRetry': 17, 
+                                   'AddDelayRetry': 18,
+                                   'AddJitterRetry': 20,
+                                   'AddAbortOnRetry': 22};
 
     var listenToEditorForFeatureInServerXML = function(editor) {
         var saveServerXML = function(editor) {
@@ -216,7 +222,7 @@ var retryTimeoutCallback = (function() {
                                 ]
             contentIsCorrect = __checkRetryAnnotationInContent(content, paramsToCheck);
         }
-        utils.handleEditorSave(stepName, editor, contentIsCorrect, __correctEditorError);
+        utils.handleEditorSave(stepName, editor, contentIsCorrect, __correctEditorError, mapStepNameToScollLine[stepName], bankServiceFileName);
     };
 
     var __validateEditorTimeoutAnnotationStep = function(content) {
@@ -400,28 +406,28 @@ var retryTimeoutCallback = (function() {
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 13, newContent, 4);
         // line number to scroll to = insert line + the number of lines to be insert 
         // for this example 13 + 4 = 17
-        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, 17);
+        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, mapStepNameToScollLine[stepName]);
     };
 
     var __addDelayRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 16, newContent, 5);
-        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, 18);
+        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, mapStepNameToScollLine[stepName]);
     };
 
     var __addJitterRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS,\n           jitter = 100,\n           jitterDelayUnit = ChronoUnit.MILLIS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 17, newContent, 7);
-        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, 20);
+        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, mapStepNameToScollLine[stepName]);
     };
 
     var __addAbortOnRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS,\n           jitter = 100,\n           jitterDelayUnit = ChronoUnit.MILLIS,\n           abortOn = FileNotFoundException.class)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 14, 20, newContent, 8);
-        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, 22);
+        contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, mapStepNameToScollLine[stepName]);
     };
 
     var __checkRetryAnnotationInContent = function(content, parmsToCheck) {
@@ -606,7 +612,7 @@ var retryTimeoutCallback = (function() {
         if (__checkRetryAnnotationInContent(content, paramsToCheck)) {
             contentIsCorrect = true;
         }
-        utils.handleEditorSave(stepName, editor, contentIsCorrect, __correctEditorError);
+        utils.handleEditorSave(stepName, editor, contentIsCorrect, __correctEditorError, mapStepNameToScollLine[stepName], bankServiceFileName);
         return contentIsCorrect;
     };
 
