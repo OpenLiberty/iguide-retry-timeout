@@ -273,6 +273,7 @@ var retryTimeoutCallback = (function() {
     var clickTransaction = function(event, stepName) {
         if (utils.isElementActivated(event)) {
             // Click or 'Enter' or 'Space' key event...
+            contentManager.setBrowserURL(stepName, __browserTransactionBaseURL);
             contentManager.refreshBrowser(stepName);
         }
     };
