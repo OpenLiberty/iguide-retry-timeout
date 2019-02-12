@@ -273,6 +273,10 @@ var retryTimeoutCallback = (function() {
     var clickTransaction = function(event, stepName) {
         if (utils.isElementActivated(event)) {
             // Click or 'Enter' or 'Space' key event...
+            // Focus the webBrowser for the step
+            var webBrowser = contentManager.getBrowser(stepName);
+            webBrowser.contentRootElement.trigger("click");
+            // Set the browser content
             contentManager.setBrowserURL(stepName, __browserTransactionBaseURL);
             contentManager.refreshBrowser(stepName);
         }
