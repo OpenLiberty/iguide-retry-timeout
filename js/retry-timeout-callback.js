@@ -129,6 +129,12 @@ var retryTimeoutCallback = (function() {
                 features = features.replace(/\s/g, '');
                 if (features.length !== "<feature>mpFaultTolerance-1.0</feature><feature>servlet-3.1</feature><feature>cdi-1.2</feature><feature>jaxrs-2.0</feature>".length) {
                     isFTFeatureThere = false; // contains extra text
+<<<<<<< Updated upstream
+=======
+                } else {
+                    // Syntax is good.  Save off this version of server.xml.
+                    utils.saveFeatureInContent(editor, content, "mpFaultTolerance-1.0");
+>>>>>>> Stashed changes
                 }
             }
         } else {
@@ -573,6 +579,19 @@ var retryTimeoutCallback = (function() {
 
         }
         return editorContents;
+    };
+
+    // Save the @Retry annotation as currently shown into the editor object.  This
+    // includes marking the correct lines for writable and read-only.
+    var __saveRetryAnnotationInContent = function(editor, content) {
+        utils.saveContentInEditor(editor, content, "@Retry\\s*(?:\\([^\\(\\)]*\\))");
+    };
+
+    // Save the @Timeout annotation as currently shown into the editor object.  This
+    // includes marking the correct lines for writable and read-only.
+    var __saveTimeoutAnnotationInContent = function(editor, content) {
+
+        utils.saveContentInEditor(editor, content, "@Timeout\\s*\\(\\s*2000\\s*\\)");
     };
 
     var createPlayground = function(root, stepName) {
