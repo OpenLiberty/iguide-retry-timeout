@@ -116,7 +116,7 @@ var retryTimeoutCallback = (function() {
         return match;
     };
 
-    var __checkMicroProfileFaultToleranceFeatureContent = function(content) {
+    var __checkMicroProfileFaultToleranceFeatureContent = function(editor, content) {
         var isFTFeatureThere = true;
         var editorContentBreakdown = __getMicroProfileFaultToleranceFeatureContent(content);
         if (editorContentBreakdown.hasOwnProperty("features")) {
@@ -129,12 +129,15 @@ var retryTimeoutCallback = (function() {
                 features = features.replace(/\s/g, '');
                 if (features.length !== "<feature>mpFaultTolerance-1.0</feature><feature>servlet-3.1</feature><feature>cdi-1.2</feature><feature>jaxrs-2.0</feature>".length) {
                     isFTFeatureThere = false; // contains extra text
+                } else {
+                    // Syntax is good.  Save off this version of server.xml.
+                    utils.saveFeatureInContent(editor, content, "mpFaultTolerance-1.0");
                 }
             }
         } else {
             isFTFeatureThere = false;
         }
-        return isFTFeatureThere;
+        utils.handleEditorSave(editor.stepName, editor, isFTFeatureThere, __correctEditorError);
     };
 
     var __correctEditorError = function(stepName) {
@@ -166,8 +169,8 @@ var retryTimeoutCallback = (function() {
 
     var __saveServerXML = function(editor) {
         var stepName = stepContent.getCurrentStepName();
-        var content = contentManager.getTabbedEditorContents(stepName, serverFileName);        
-        utils.validateContentAndSave(stepName, editor, content, __checkMicroProfileFaultToleranceFeatureContent, __correctEditorError);
+        var content = contentManager.getTabbedEditorContents(stepName, serverFileName);
+        __checkMicroProfileFaultToleranceFeatureContent(editor, content);
     };
 
     var saveServerXMLButton = function(event) {
@@ -207,8 +210,14 @@ var retryTimeoutCallback = (function() {
         var contentIsCorrect = true;
         if (stepName === "TimeoutAnnotation") {
             contentIsCorrect = __validateEditorTimeoutAnnotationStep(content);
+            if (contentIsCorrect) {
+                __saveTimeoutAnnotationInContent(editor, content);
+            }
         } else if (stepName === "AddRetryOnRetry") {
             contentIsCorrect = __validateEditorRetryOnRetryStep(content);
+            if (contentIsCorrect) {
+                __saveRetryAnnotationInContent(editor, content);
+            } 
         } else if (stepName === "AddAbortOnRetry") {
             var paramsToCheck = ["retryOn=TimeoutException.class",
                                  "maxRetries=4",
@@ -221,6 +230,9 @@ var retryTimeoutCallback = (function() {
                                  "abortOn=FileNotFoundException.class"
                                 ]
             contentIsCorrect = __checkRetryAnnotationInContent(content, paramsToCheck);
+            if (contentIsCorrect) {
+                __saveRetryAnnotationInContent(editor, content);
+            }
         }
         utils.handleEditorSave(stepName, editor, contentIsCorrect, __correctEditorError, mapStepNameToScollLine[stepName], bankServiceFileName);
     };
@@ -575,6 +587,19 @@ var retryTimeoutCallback = (function() {
         return editorContents;
     };
 
+    // Save the @Retry annotation as currently shown into the editor object.  This
+    // includes marking the correct lines for writable and read-only.
+    var __saveRetryAnnotationInContent = function(editor, content) {
+        utils.saveContentInEditor(editor, content, "@Retry\\s*(?:\\([^\\(\\)]*\\))");
+    };
+
+    // Save the @Timeout annotation as currently shown into the editor object.  This
+    // includes marking the correct lines for writable and read-only.
+    var __saveTimeoutAnnotationInContent = function(editor, content) {
+
+        utils.saveContentInEditor(editor, content, "@Timeout\\s*\\(\\s*2000\\s*\\)");
+    };
+
     var createPlayground = function(root, stepName) {
         if(!root.selector){
             root = root.contentRootElement;
@@ -616,6 +641,7 @@ var retryTimeoutCallback = (function() {
         var contentIsCorrect = false;
         if (__checkRetryAnnotationInContent(content, paramsToCheck)) {
             contentIsCorrect = true;
+            __saveRetryAnnotationInContent(editor, content);
         }
         utils.handleEditorSave(stepName, editor, contentIsCorrect, __correctEditorError, mapStepNameToScollLine[stepName], bankServiceFileName);
         return contentIsCorrect;
