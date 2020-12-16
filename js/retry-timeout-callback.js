@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (c) 2017 IBM Corporation and others.
+* Copyright (c) 2017, 2020 IBM Corporation and others.
 * All rights reserved. This program and the accompanying materials
 * are made available under the terms of the Eclipse Public License v1.0
 * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ var retryTimeoutCallback = (function() {
     var __browserTransactionBaseURL = "https://global-ebank.openliberty.io/transactions";
     var mapStepNameToScollLine = { 'TimeoutAnnotation': 8,
                                    'AddRetryOnRetry': 13,
-                                   'AddLimitsRetry': 17, 
+                                   'AddLimitsRetry': 17,
                                    'AddDelayRetry': 18,
                                    'AddJitterRetry': 20,
                                    'AddAbortOnRetry': 22};
@@ -217,21 +217,33 @@ var retryTimeoutCallback = (function() {
             contentIsCorrect = __validateEditorRetryOnRetryStep(content);
             if (contentIsCorrect) {
                 __saveRetryAnnotationInContent(editor, content);
-            } 
+            }
         } else if (stepName === "AddAbortOnRetry") {
-            var paramsToCheck = ["retryOn=TimeoutException.class",
-                                 "maxRetries=4",
-                                 "maxDuration=10",
-                                 "durationUnit=ChronoUnit.SECONDS",
-                                 "delay=200",
-                                 "delayUnit=ChronoUnit.MILLIS",
-                                 "jitter=100",
-                                 "jitterDelayUnit=ChronoUnit.MILLIS",
-                                 "abortOn=FileNotFoundException.class"
-                                ]
-            contentIsCorrect = __checkRetryAnnotationInContent(content, paramsToCheck);
-            if (contentIsCorrect) {
-                __saveRetryAnnotationInContent(editor, content);
+            // Check that the 'retryOn' parameter was expanded to 2 classes
+            //          retryOn = {TimeoutException, IOException}
+            if (content.includes("retryOn")) {
+                contentIsCorrect = __checkMultiRetryOnAnnotationInContent(content);
+                if (contentIsCorrect) {
+                    // Check for the rest of the parameters
+                    var otherContent = content.substring(0, content.indexOf('retryOn')) +
+                                       content.substring(content.indexOf('}') + 2);
+                    var paramsToCheck = [
+                                        "maxRetries=4",
+                                        "maxDuration=10",
+                                        "durationUnit=ChronoUnit.SECONDS",
+                                        "delay=200",
+                                        "delayUnit=ChronoUnit.MILLIS",
+                                        "jitter=100",
+                                        "jitterDelayUnit=ChronoUnit.MILLIS",
+                                        "abortOn=FileNotFoundException.class"
+                                       ];
+                    contentIsCorrect = __checkRetryAnnotationInContent(otherContent, paramsToCheck);
+                    if (contentIsCorrect) {
+                        __saveRetryAnnotationInContent(editor, content);
+                    }
+                }
+            } else {
+                contentIsCorrect = false;
             }
         }
         utils.handleEditorSave(stepName, editor, contentIsCorrect, __correctEditorError, mapStepNameToScollLine[stepName], bankServiceFileName);
@@ -309,13 +321,13 @@ var retryTimeoutCallback = (function() {
                     browserContentHTML = htmlRootDir + "transaction-history-loading.html";
                 }
             } else if (stepName === "TimeoutAnnotation" || stepName === "AddAbortOnRetry") {
-                browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";   
+                browserContentHTML = htmlRootDir + "transaction-history-timeout-error.html";
             } else /** if (stepName === "AddRetryOnRetry" || stepName === "AddLimitsRetry", etc....)**/ {
                 browserContentHTML = htmlRootDir + "transaction-history-loading.html";
             }
-    
+
             browser.setBrowserContent(browserContentHTML);
-    
+
             switch(stepName) {
                 case "BankScenario":
                     showBrowserOverlay(browser, numOfRequest, stepName);
@@ -335,7 +347,7 @@ var retryTimeoutCallback = (function() {
                     var playground = contentManager.getPlayground(stepName);
                     playground.startTimeline();
                     break;
-            } 
+            }
         } else {
             if (checkURL === __welcomePageURL){
                 browser.setBrowserContent(browserContentHTML);
@@ -372,7 +384,7 @@ var retryTimeoutCallback = (function() {
             // Put the browser into focus if here from clicking an action button.
             var webBrowser = contentManager.getBrowser(stepName);
             webBrowser.contentRootElement.trigger("click");
-            
+
             contentManager.setBrowserURL(stepName, __browserTransactionBaseURL);
         }
     };
@@ -421,7 +433,7 @@ var retryTimeoutCallback = (function() {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
         var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 13, 13, newContent, 4);
-        // line number to scroll to = insert line + the number of lines to be insert 
+        // line number to scroll to = insert line + the number of lines to be insert
         // for this example 13 + 4 = 17
         contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, mapStepNameToScollLine[stepName]);
     };
@@ -442,7 +454,7 @@ var retryTimeoutCallback = (function() {
 
     var __addAbortOnRetryInEditor = function(stepName) {
         contentManager.resetTabbedEditorContents(stepName, bankServiceFileName);
-        var newContent = "    @Retry(retryOn = TimeoutException.class,\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS,\n           jitter = 100,\n           jitterDelayUnit = ChronoUnit.MILLIS,\n           abortOn = FileNotFoundException.class)";
+        var newContent = "    @Retry(retryOn = {TimeoutException.class, IOException.class},\n           maxRetries = 4,\n           maxDuration = 10,\n           durationUnit = ChronoUnit.SECONDS,\n           delay = 200, delayUnit = ChronoUnit.MILLIS,\n           jitter = 100,\n           jitterDelayUnit = ChronoUnit.MILLIS,\n           abortOn = FileNotFoundException.class)";
         contentManager.replaceTabbedEditorContents(stepName, bankServiceFileName, 14, 20, newContent, 8);
         contentManager.scrollTabbedEditorToView(stepName, bankServiceFileName, mapStepNameToScollLine[stepName]);
     };
@@ -464,13 +476,13 @@ var retryTimeoutCallback = (function() {
     /**
      * Match the parameters in the annotation to those expected and their
      * expected value.
-     * 
+     *
      * @param  annotationParms - inputted parms array to validate
      *                           Each entry is a string of form
      *                              name = value
      * @param  parmsToCheck - array of expected parameters and their
      *                           expected values.
-     * 
+     *
      * @returns 0 if the expected parms are not present
      *          1 if there is a match for each expected parm & its value
      *          2 if there are more parms specified than expected
@@ -525,7 +537,7 @@ var retryTimeoutCallback = (function() {
      * and its paramters.
      *
      * @param  content - content of the editor
-     * 
+     *
      * @returns editorContents - object containing
      *              retryParms - array of strings.  Each string is of form
      *                                 retryparms=value
@@ -586,6 +598,31 @@ var retryTimeoutCallback = (function() {
         }
         return editorContents;
     };
+
+    /**
+     * Parse the content of the editor to check that BOTH IOException
+     * and TimeoutException were specified for the 'retryOn' parameter,
+     * separated by a comma of course!
+     *
+     * This is specifically for the AddAbortOnRetry step.
+     *
+     * @param  content - content of the editor
+     *
+     * @returns true if both were specified
+     *          false if one, both, or other exceptions were specified
+     */
+    var __checkMultiRetryOnAnnotationInContent = function(content) {
+        try {
+            var codeToMatch = "retryOn\\s*=\\s*{\\s*(?:TimeoutException.class\\s*,\\s*IOException.class|IOException.class\\s*,\\s*TimeoutException.class)\\s*}";
+            var regExpToMatch = new RegExp(codeToMatch, "g");
+            if (regExpToMatch.exec(content) !== null) {
+                return true;
+            }
+        } catch (e) {
+
+        }
+        return false;
+    }
 
     // Save the @Retry annotation as currently shown into the editor object.  This
     // includes marking the correct lines for writable and read-only.

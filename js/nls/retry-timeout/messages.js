@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 IBM Corporation and others.
+ * Copyright (c) 2018, 2020 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ var retryTimeout_messages = {
     DESCRIPTION: "DESCRIPTION",
     TYPE: "TYPE",
     AMOUNT: "AMOUNT",
-    BALANCE: "BALANCE",  
+    BALANCE: "BALANCE",
     DESC_CREDIT_CARD: "Credit card autopay",
     DESC_FOOD: "Food",
     DESC_PAYCHECK: "Paycheck",
@@ -22,10 +22,10 @@ var retryTimeout_messages = {
     TYPE_DEBIT: "Debit",
     TYPE_CREDIT: "Credit",
     TYPE_DEPOSIT: "Deposit",
-    DATE_1: "APRIL 4&#44 2018",
-    DATE_2: "APRIL 3&#44 2018",
-    DATE_3: "APRIL 2&#44 2018",
-    DATE_4: "APRIL 1&#44 2018",
+    DATE_1: "APRIL 4&#44 2020",
+    DATE_2: "APRIL 3&#44 2020",
+    DATE_3: "APRIL 2&#44 2020",
+    DATE_4: "APRIL 1&#44 2020",
     PLEASE_TRY_AGAIN: "Please try again later.",
     TIMEOUT: "Timeout",
     RETRY: "Retry",
