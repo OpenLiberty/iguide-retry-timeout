@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (c) 2017, 2020 IBM Corporation and others.
+* Copyright (c) 2017, 2021 IBM Corporation and others.
 * All rights reserved. This program and the accompanying materials
 * are made available under the terms of the Eclipse Public License v1.0
 * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ var retryTimeoutCallback = (function() {
     };
 
     var __addMicroProfileFaultToleranceFeature = function() {
-        var FTFeature = "      <feature>mpFaultTolerance-1.0</feature>";
+        var FTFeature = "      <feature>mpFaultTolerance-2.1</feature>";
         var stepName = stepContent.getCurrentStepName();
 
         // reset content every time annotation is added through the button so as to clear out any
@@ -87,7 +87,7 @@ var retryTimeoutCallback = (function() {
         try {
             var featureMatches = features.match(/<feature>[\s\S]*?<\/feature>/g);
             $(featureMatches).each(function (index, feature) {
-                if (feature.indexOf("<feature>mpFaultTolerance-1.0</feature>") !== -1) {
+                if (feature.indexOf("<feature>mpFaultTolerance-2.1</feature>") !== -1) {
                     match = true;
                     return false; // break out of each loop
                 }
@@ -105,7 +105,7 @@ var retryTimeoutCallback = (function() {
         try {
             var featureMatches = features.match(/<feature>[\s\S]*?<\/feature>/g);
             $(featureMatches).each(function (index, feature) {
-                if (feature.indexOf("<feature>cdi-1.2</feature>") !== -1) {
+                if (feature.indexOf("<feature>cdi-2.0</feature>") !== -1) {
                     match = true;
                     return false; // break out of each loop
                 }
@@ -127,11 +127,11 @@ var retryTimeoutCallback = (function() {
                 var features = editorContentBreakdown.features;
                 features = features.replace('\n', '');
                 features = features.replace(/\s/g, '');
-                if (features.length !== "<feature>mpFaultTolerance-1.0</feature><feature>servlet-3.1</feature><feature>cdi-1.2</feature><feature>jaxrs-2.0</feature>".length) {
+                if (features.length !== "<feature>mpFaultTolerance-2.1</feature><feature>servlet-4.0</feature><feature>cdi-2.0</feature><feature>jaxrs-2.1</feature>".length) {
                     isFTFeatureThere = false; // contains extra text
                 } else {
                     // Syntax is good.  Save off this version of server.xml.
-                    utils.saveFeatureInContent(editor, content, "mpFaultTolerance-1.0");
+                    utils.saveFeatureInContent(editor, content, "mpFaultTolerance-2.1");
                 }
             }
         } else {
