@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <!--
-  Copyright (c) 2018 IBM Corporation and others.
+  Copyright (c) 2018, 2021 IBM Corporation and others.
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
   http://www.eclipse.org/legal/epl-v10.html
- 
+
   Contributors:
       IBM Corporation - initial API and implementation
 -->
-<html>
+<html lang="en">
 <head>
+    <title>Global eBank Recent Transactions</title>
     <link href="https://fonts.googleapis.com/css?family=Asap" rel="stylesheet">
     <link rel="stylesheet" href="/guides/iguides-common/css/interactive-guides/bankApp.css">
-    <script type="text/javascript"> 
+    <script type="text/javascript">
         var script = document.createElement('script');
         script.onload = function() {
             var guideRootDir = "/guides/iguide-retry-timeout/js/nls/retry-timeout/"
@@ -39,7 +40,7 @@
             display: none;
         }
 
-        #errorImg {        
+        #errorImg {
             vertical-align: middle;
         }
 
@@ -54,11 +55,11 @@
         }
 
         .flexWarningContainer {
-            margin: 24px; 
+            margin: 24px;
         }
-    </style>   
+    </style>
 </head>
-<body>    
+<body>
     <div class="bankHeadingBlockFlexContainer">
         <div class="bankHeading" data-externalizedString="YOUR_ACCOUNT"></div>
         <span>
@@ -66,20 +67,22 @@
             <img src="/guides/iguides-common/img/interactive-guides/bank-user.svg" data-externalizedAlt="USER">
         </span>
     </div>
-    
-    <div id="loader" class="loader"></div>
-    <div id="fail">
-        <div class="flexWarningContainer">
-            <div id="imgHolder">
-                <img id="errorImg" src="/guides/iguide-retry-timeout/html/images/warning.svg" data-externalizedAlt="WARNING" data-externalizedAriaLabel="WARNING">
-            </div>
-            <div class="textHolder">
-                <div data-externalizedString="TRANSACTION_UNABLE_TO_LOAD"></div>
-                <div data-externalizedString="PLEASE_TRY_AGAIN"></div>
+
+    <main>
+        <div id="loader" class="loader"></div>
+        <div id="fail">
+            <div class="flexWarningContainer">
+                <div id="imgHolder">
+                    <img id="errorImg" src="/guides/iguide-retry-timeout/html/images/warning.svg" data-externalizedAlt="WARNING" data-externalizedAriaLabel="WARNING">
+                </div>
+                <div class="textHolder">
+                    <div data-externalizedString="TRANSACTION_UNABLE_TO_LOAD"></div>
+                    <div data-externalizedString="PLEASE_TRY_AGAIN"></div>
+                </div>
             </div>
         </div>
-    </div>
-   
+    </main>
+
     <script type="text/javascript">
         timeout();
     </script>
