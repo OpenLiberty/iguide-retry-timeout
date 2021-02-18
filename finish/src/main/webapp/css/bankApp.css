@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 IBM Corporation and others.
+ * Copyright (c) 2018, 2021 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ body {
 .bankHeading {
     font-weight: 500;
     font-size: 16px;
-    color: #5E6B8D;
+    color: #5B6888;    /* #5E6B8D; */
     letter-spacing: 0;
     text-align: left;
     padding: 9px 0px 9px 18px;
@@ -83,7 +83,7 @@ body {
     flex-wrap: nowrap;
     flex-direction: column;
     justify-content: center;
-    margin: 24px; 
+    margin: 24px;
     flex-grow: 1;
     overflow: hidden;
 }
