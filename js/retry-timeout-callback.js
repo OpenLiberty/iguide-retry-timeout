@@ -41,7 +41,7 @@ var retryTimeoutCallback = (function() {
     };
 
     var __addMicroProfileFaultToleranceFeature = function() {
-        var FTFeature = "      <feature>mpFaultTolerance-2.1</feature>";
+        var FTFeature = "      <feature>mpFaultTolerance-3.0</feature>";
         var stepName = stepContent.getCurrentStepName();
 
         // reset content every time annotation is added through the button so as to clear out any
@@ -87,7 +87,7 @@ var retryTimeoutCallback = (function() {
         try {
             var featureMatches = features.match(/<feature>[\s\S]*?<\/feature>/g);
             $(featureMatches).each(function (index, feature) {
-                if (feature.indexOf("<feature>mpFaultTolerance-2.1</feature>") !== -1) {
+                if (feature.indexOf("<feature>mpFaultTolerance-3.0</feature>") !== -1) {
                     match = true;
                     return false; // break out of each loop
                 }
@@ -127,11 +127,11 @@ var retryTimeoutCallback = (function() {
                 var features = editorContentBreakdown.features;
                 features = features.replace('\n', '');
                 features = features.replace(/\s/g, '');
-                if (features.length !== "<feature>mpFaultTolerance-2.1</feature><feature>servlet-4.0</feature><feature>cdi-2.0</feature><feature>jaxrs-2.1</feature>".length) {
+                if (features.length !== "<feature>mpFaultTolerance-3.0</feature><feature>servlet-4.0</feature><feature>cdi-2.0</feature><feature>jaxrs-2.1</feature>".length) {
                     isFTFeatureThere = false; // contains extra text
                 } else {
                     // Syntax is good.  Save off this version of server.xml.
-                    utils.saveFeatureInContent(editor, content, "mpFaultTolerance-2.1");
+                    utils.saveFeatureInContent(editor, content, "mpFaultTolerance-3.0");
                 }
             }
         } else {
