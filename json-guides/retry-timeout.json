@@ -120,7 +120,7 @@
                 "Microprofile Fault Tolerance allows microservices to handle unavailable services. It uses different policies such as Timeout and Retry to guide the execution and result of some logic. The MicroProfile Fault Tolerance 1.0 feature provides an environment to support resilient microservices through patterns that include timeout and retry. Enable the MicroProfile Fault Tolerance 1.0 feature in the <code>server.xml</code> file of the Open Liberty server."
             ],
             "instruction": [
-                "In the editor, add the following element declaration to the <code>featureManager</code> element that is in the <code>server.xml</code> file.<br><codeblock>&lt;feature>mpFaultTolerance-2.1&lt;/feature&gt;</codeblock><br>Alternatively, click <action title='Add MicroProfile Fault Tolerance' onclick=\"retryTimeoutCallback.addMicroProfileFaultToleranceFeatureButton(event)\">Add</action>.<br>Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveServerXMLButton(event)\">Run</action> on the editor menu pane."
+                "In the editor, add the following element declaration to the <code>featureManager</code> element that is in the <code>server.xml</code> file.<br><codeblock>&lt;feature>mpFaultTolerance-3.0&lt;/feature&gt;</codeblock><br>Alternatively, click <action title='Add MicroProfile Fault Tolerance' onclick=\"retryTimeoutCallback.addMicroProfileFaultToleranceFeatureButton(event)\">Add</action>.<br>Then, click <action title='Run' onclick=\"retryTimeoutCallback.saveServerXMLButton(event)\">Run</action> on the editor menu pane."
             ],
             "content": [
                 {
@@ -241,7 +241,7 @@
                                 "      <feature>servlet-4.0</feature>",
                                 "      <feature>cdi-2.0</feature>",
                                 "      <feature>jaxrs-2.1</feature>",
-                                "      <feature>mpFaultTolerance-2.1</feature>",
+                                "      <feature>mpFaultTolerance-3.0</feature>",
                                 "   </featureManager>",
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
@@ -329,7 +329,7 @@
                                 "      <feature>servlet-4.0</feature>",
                                 "      <feature>cdi-2.0</feature>",
                                 "      <feature>jaxrs-2.1</feature>",
-                                "      <feature>mpFaultTolerance-2.1</feature>",
+                                "      <feature>mpFaultTolerance-3.0</feature>",
                                 "   </featureManager>",
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
@@ -425,7 +425,7 @@
                                 "      <feature>servlet-4.0</feature>",
                                 "      <feature>cdi-2.0</feature>",
                                 "      <feature>jaxrs-2.1</feature>",
-                                "      <feature>mpFaultTolerance-2.1</feature>",
+                                "      <feature>mpFaultTolerance-3.0</feature>",
                                 "   </featureManager>",
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
@@ -524,7 +524,7 @@
                                 "      <feature>servlet-4.0</feature>",
                                 "      <feature>cdi-2.0</feature>",
                                 "      <feature>jaxrs-2.1</feature>",
-                                "      <feature>mpFaultTolerance-2.1</feature>",
+                                "      <feature>mpFaultTolerance-3.0</feature>",
                                 "   </featureManager>",
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
@@ -624,7 +624,7 @@
                                 "      <feature>servlet-4.0</feature>",
                                 "      <feature>cdi-2.0</feature>",
                                 "      <feature>jaxrs-2.1</feature>",
-                                "      <feature>mpFaultTolerance-2.1</feature>",
+                                "      <feature>mpFaultTolerance-3.0</feature>",
                                 "   </featureManager>",
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
@@ -719,7 +719,7 @@
                                 "      <feature>servlet-4.0</feature>",
                                 "      <feature>cdi-2.0</feature>",
                                 "      <feature>jaxrs-2.1</feature>",
-                                "      <feature>mpFaultTolerance-2.1</feature>",
+                                "      <feature>mpFaultTolerance-3.0</feature>",
                                 "   </featureManager>",
                                 "   <httpEndpoint host=\"*\" id=\"defaultHttpEndpoint\" httpPort=\"${default.http.port}\"/>",
                                 "</server>"
