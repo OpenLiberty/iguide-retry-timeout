@@ -1,6 +1,6 @@
 # Setup
 
-To use the sample application, download and extract the [sampleapp_retryTimeout.zip](https://github.com/OpenLiberty/iguide-retry-timeout/raw/master/finish/sampleapp_retryTimeout.zip) file to your local directory.
+To use the sample application, download and extract the [sampleapp_retryTimeout.zip](https://github.com/OpenLiberty/iguide-retry-timeout/raw/prod/finish/sampleapp_retryTimeout.zip) file to your local directory.
 
 Use the `mvn install` Maven command from the directory that contains the extracted .zip files
 to build the project and install it in your local repository. The command creates the
